@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Scene Lab · 场景日语</title>
+    <meta
+      name="description"
+      content="在真实场景里练日语：逐句字幕高亮、汉字假名注音、单句循环与整段循环，支持离线。"
+    />
+    <meta name="theme-color" content="#fffdf9" />
+    <meta name="color-scheme" content="light dark" />
+    <script>
+      (function () {
+        try {
+          var raw = localStorage.getItem('scene-lab:v1');
+          var settings = raw ? (JSON.parse(raw).settings || {}) : {};
+          var mode = settings.theme || 'auto';
+          var dark =
+            mode === 'dark' ||
+            (mode === 'auto' &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+
+          var palettes = ['default', 'sakura', 'matcha', 'ocean'];
+          var palette =
+            palettes.indexOf(settings.palette) >= 0 ? settings.palette : 'default';
+          document.documentElement.dataset.palette = palette;
+
+          var colors = {
+            default: { light: '#fffdf9', dark: '#1c1e23' },
+            sakura: { light: '#fffbfc', dark: '#21191d' },
+            matcha: { light: '#fcfdf9', dark: '#1c231a' },
+            ocean: { light: '#fbfdfe', dark: '#182127' }
+          };
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) {
+            meta.setAttribute('content', colors[palette][dark ? 'dark' : 'light']);
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Scene Lab" />
+    <link rel="icon" href="/japanese-scene-lab/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/japanese-scene-lab/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/japanese-scene-lab/apple-touch-icon.png" />
+    <script type="module" crossorigin src="/japanese-scene-lab/assets/index-Cc6QW1b_.js"></script>
+    <link rel="stylesheet" crossorigin href="/japanese-scene-lab/assets/index-D7kWfjXW.css">
+  <link rel="manifest" href="/japanese-scene-lab/manifest.webmanifest"></head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
