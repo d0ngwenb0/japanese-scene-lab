@@ -19,11 +19,13 @@ function formatSec(seconds: number): string {
 export function SceneTimePill({ current, duration, countdown, onToggleMode }: Props) {
   const valid = duration > 0;
   const remaining = Math.max(0, duration - current);
-  const progress = valid ? Math.min(1, Math.max(0, current / duration)) : 0;
-  const left = !valid
+  const progress = valid
+    ? Math.min(1, Math.max(0, (countdown ? remaining : current) / duration))
+    : 0;
+  const display = !valid
     ? '--:--'
     : countdown
-      ? `-${formatSec(remaining)}`
+      ? formatSec(remaining)
       : formatSec(current);
   const total = valid ? formatSec(duration) : '--:--';
 
@@ -36,8 +38,8 @@ export function SceneTimePill({ current, duration, countdown, onToggleMode }: Pr
       type="button"
       className={countdown ? 'scene-time is-countdown' : 'scene-time'}
       onClick={onToggleMode}
-      aria-label={countdown ? `剩余时间 ${left}，总时长 ${total}，点击切换正计时` : `已播放 ${left}，总时长 ${total}，点击切换倒计时`}
-      title={countdown ? `倒计时 ${left} / ${total}（点击切换正计时）` : `已播 ${left} / ${total}（点击切换倒计时）`}
+      aria-label={countdown ? `倒计时 ${display}，总时长 ${total}，点击切换正计时` : `已播放 ${display}，总时长 ${total}，点击切换倒计时`}
+      title={countdown ? `倒计时 ${display} / 总时长 ${total}（点击切换正计时）` : `已播 ${display} / 总时长 ${total}（点击切换倒计时）`}
     >
       <svg className="scene-time-ring" viewBox="0 0 36 36" aria-hidden="true">
         <circle className="scene-time-track" cx="18" cy="18" r={r} />
@@ -51,9 +53,7 @@ export function SceneTimePill({ current, duration, countdown, onToggleMode }: Pr
         />
       </svg>
       <span className="scene-time-text">
-        <span className="scene-time-cur">{left}</span>
-        <span className="scene-time-sep">/</span>
-        <span className="scene-time-total">{total}</span>
+        <span className="scene-time-cur">{display}</span>
       </span>
     </button>
   );

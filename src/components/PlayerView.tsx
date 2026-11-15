@@ -80,7 +80,7 @@ export function PlayerView({
 }: Props) {
   const [aiOpen, setAiOpen] = useState(false);
   const [pausedByAi, setPausedByAi] = useState(false);
-  const [timeCountdown, setTimeCountdown] = useState(false);
+  const [timeCountdown, setTimeCountdown] = useState(true);
 
   const { index, playing, lineProgress, sceneTime, sceneDuration, missing, toggle, pause, resume, select, next, prev, replay } = usePlayer({
     sceneId: scenario.id,
