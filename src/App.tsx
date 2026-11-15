@@ -80,6 +80,9 @@ export default function App() {
 
   const [autoPlayNext, setAutoPlayNext] = useState(false);
   const [replayTick, setReplayTick] = useState(0);
+  const [timerEndAt, setTimerEndAt] = useState<number | null>(null);
+  const [timerPreset, setTimerPreset] = useState<number | null>(null);
+  const [timerStopTick, setTimerStopTick] = useState(0);
 
   const open = useCallback((id: string) => {
     setAutoPlayNext(false);
@@ -110,6 +113,42 @@ export default function App() {
     setState((prev) => ({ ...prev, settings: { ...prev.settings, ...patch } }));
   }, []);
 
+  const setPlaybackTimer = useCallback((minutes: number | null) => {
+    if (minutes === null || minutes <= 0) {
+      setTimerEndAt(null);
+      setTimerPreset(null);
+      return;
+    }
+    setTimerEndAt(Date.now() + minutes * 60_000);
+    setTimerPreset(minutes);
+  }, []);
+
+  useEffect(() => {
+    if (timerEndAt === null) return;
+    const triggerStop = () => {
+      if (Date.now() < timerEndAt) return false;
+      setTimerEndAt(null);
+      setTimerPreset(null);
+      setAutoPlayNext(false);
+      updateSettings({ bgm: false });
+      setTimerStopTick((t) => t + 1);
+      return true;
+    };
+    if (triggerStop()) return;
+    const timeoutId = window.setTimeout(
+      triggerStop,
+      Math.max(0, timerEndAt - Date.now()) + 50,
+    );
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') triggerStop();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      window.clearTimeout(timeoutId);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [timerEndAt, updateSettings]);
+
   const changeTheme = useCallback(
     (theme: ThemeMode) => {
       updateSettings({ theme });
@@ -135,6 +174,10 @@ export default function App() {
           onSettingsChange={updateSettings}
           onSceneChange={open}
           onSceneEnd={advanceToRandomScene}
+          timerEndAt={timerEndAt}
+          timerPreset={timerPreset}
+          timerStopTick={timerStopTick}
+          onTimerChange={setPlaybackTimer}
         />
       ) : (
         <ScenarioList

@@ -14,6 +14,7 @@ import { BackIcon, CopyIcon, LoopAllIcon, LoopOneIcon, NextIcon, PauseIcon, Play
 import { copyText, formatLine, formatScene, stripFurigana } from '../lib/copy';
 import { ThemeToggle } from './ThemeToggle';
 import { BgmToggle } from './BgmToggle';
+import { PlaybackTimer } from './PlaybackTimer';
 import { PaletteToggle } from './PaletteToggle';
 import { ForceRefreshButton } from './ForceRefreshButton';
 import { FullscreenToggle } from './FullscreenToggle';
@@ -37,6 +38,10 @@ interface Props {
   onSettingsChange: (patch: Partial<Settings>) => void;
   onSceneChange: (id: string) => void;
   onSceneEnd?: () => void;
+  timerEndAt: number | null;
+  timerPreset: number | null;
+  timerStopTick: number;
+  onTimerChange: (minutes: number | null) => void;
 }
 
 function PlayingMark() {
@@ -62,6 +67,10 @@ export function PlayerView({
   onSettingsChange,
   onSceneChange,
   onSceneEnd,
+  timerEndAt,
+  timerPreset,
+  timerStopTick,
+  onTimerChange,
 }: Props) {
   const [aiOpen, setAiOpen] = useState(false);
   const [pausedByAi, setPausedByAi] = useState(false);
@@ -78,6 +87,15 @@ export function PlayerView({
   const listRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Array<HTMLElement | null>>([]);
   const [toast, setToast] = useState('');
+  const lastTimerStopTickRef = useRef(timerStopTick);
+
+  useEffect(() => {
+    if (timerStopTick <= lastTimerStopTickRef.current) return;
+    lastTimerStopTickRef.current = timerStopTick;
+    setPausedByAi(false);
+    pause();
+    setToast('定时时间到，已暂停播放');
+  }, [timerStopTick, pause]);
   const [aiWidth, setAiWidth] = useState(() => {
     try {
       const saved = Number(localStorage.getItem('scene-lab:ai-width:v1'));
@@ -337,6 +355,11 @@ export function PlayerView({
             onSelect={onSceneChange}
           />
           <BgmToggle enabled={bgm} onChange={onBgmChange} />
+          <PlaybackTimer
+            endAt={timerEndAt}
+            activeMinutes={timerPreset}
+            onSelect={onTimerChange}
+          />
           <ThemeToggle mode={theme} onChange={onThemeChange} />
           <PaletteToggle
             palette={settings.palette}

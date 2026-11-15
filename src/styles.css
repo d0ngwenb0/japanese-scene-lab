@@ -306,16 +306,113 @@ a:focus-visible {
 }
 
 .bgm-btn.is-on,
-.fullscreen-btn.is-on {
+.fullscreen-btn.is-on,
+.timer-btn.is-on {
   color: var(--accent);
   background: var(--accent-soft);
   border-color: color-mix(in srgb, var(--accent) 20%, transparent);
 }
 
 .bgm-btn.is-on:hover,
-.fullscreen-btn.is-on:hover {
+.fullscreen-btn.is-on:hover,
+.timer-btn.is-on:hover {
   color: var(--accent);
   background: color-mix(in srgb, var(--accent) 18%, var(--surface));
+}
+
+.timer-btn.is-on {
+  width: auto;
+  padding: 0 8px;
+  gap: 4px;
+  border-radius: 999px;
+}
+
+.timer-badge {
+  font-size: 11px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.timer-popover {
+  min-width: 164px;
+  padding: 6px;
+}
+
+.timer-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 8px 6px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  margin-bottom: 2px;
+}
+
+.timer-title {
+  font-size: 11.5px;
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.timer-hint {
+  font-size: 10px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.timer-cancel {
+  color: #b4432c;
+}
+
+.timer-cancel:hover {
+  color: #b4432c;
+}
+
+.timer-custom {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+}
+
+.timer-custom input {
+  flex: 1;
+  min-width: 0;
+  height: 26px;
+  padding: 0 7px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--ink);
+  font: inherit;
+  font-size: 11px;
+}
+
+.timer-custom input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.timer-custom button {
+  flex: none;
+  height: 26px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.timer-custom button:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 
 .menu-wrap {

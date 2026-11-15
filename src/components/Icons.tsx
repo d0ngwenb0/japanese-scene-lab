@@ -341,3 +341,13 @@ export function MicIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function TimerIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <circle cx="12" cy="13" r="8" />
+      <path d="M12 9v4l2.5 1.5" />
+      <path d="M9.5 2.5h5" />
+    </svg>
+  );
+}
