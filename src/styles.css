@@ -3831,9 +3831,13 @@ dialog::backdrop {
   z-index: 60;
   display: flex;
   flex-direction: column;
-  background: color-mix(in srgb, var(--bg) 78%, transparent);
-  backdrop-filter: blur(22px) saturate(1.2);
-  -webkit-backdrop-filter: blur(22px) saturate(1.2);
+  background: color-mix(in srgb, var(--bg) 52%, transparent);
+  backdrop-filter: blur(6px) saturate(1.1);
+  -webkit-backdrop-filter: blur(6px) saturate(1.1);
+}
+
+:root[data-theme='dark'] .focus-overlay {
+  background: color-mix(in srgb, var(--bg) 60%, transparent);
 }
 
 .focus-exit {
@@ -3848,7 +3852,7 @@ dialog::backdrop {
   padding: 0 12px;
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  background: color-mix(in srgb, var(--surface) 84%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   color: var(--muted);
@@ -3867,6 +3871,7 @@ dialog::backdrop {
 }
 
 .focus-stage {
+  container-type: inline-size;
   flex: 1;
   min-height: 0;
   overflow-y: auto;
@@ -3875,22 +3880,28 @@ dialog::backdrop {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
-  padding: 38vh 24px 40vh;
+  gap: clamp(14px, 2vw, 24px);
+  padding: clamp(22dvh, 28dvh, 32dvh) clamp(16px, 4vw, 56px) clamp(24dvh, 30dvh, 34dvh);
   -webkit-mask-image: linear-gradient(
     to bottom,
     transparent 0%,
-    #000 15%,
-    #000 85%,
+    #000 12%,
+    #000 88%,
     transparent 100%
   );
   mask-image: linear-gradient(
     to bottom,
     transparent 0%,
-    #000 15%,
-    #000 85%,
+    #000 12%,
+    #000 88%,
     transparent 100%
   );
+}
+
+@supports (gap: 1cqi) {
+  .focus-stage {
+    gap: clamp(14px, 2cqi, 24px);
+  }
 }
 
 .focus-stage::-webkit-scrollbar {
@@ -3898,19 +3909,19 @@ dialog::backdrop {
 }
 
 .focus-line {
-  width: min(760px, 100%);
+  width: min(1080px, 92%);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  padding: 14px 22px;
-  border: 1px solid transparent;
-  border-radius: 18px;
-  background: transparent;
+  padding: clamp(14px, 1.8vw, 22px) clamp(18px, 3vw, 36px);
+  border: 1.5px solid transparent;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--surface) 26%, transparent);
   text-align: center;
   cursor: pointer;
-  opacity: 0.34;
-  transform: scale(0.95);
+  opacity: 0.44;
+  transform: scale(0.96);
   transition:
     opacity 0.28s ease,
     transform 0.28s ease,
@@ -3919,35 +3930,68 @@ dialog::backdrop {
     box-shadow 0.28s ease;
 }
 
+@supports (width: 1cqi) {
+  .focus-line {
+    width: min(1080px, 92cqi);
+    padding: clamp(14px, 1.8cqi, 22px) clamp(18px, 3cqi, 36px);
+  }
+}
+
 .focus-line:hover {
-  opacity: 0.68;
+  opacity: 0.78;
+  background: color-mix(in srgb, var(--surface) 52%, transparent);
 }
 
 .focus-line.is-active {
   opacity: 1;
   transform: scale(1);
-  background: color-mix(in srgb, var(--surface) 78%, transparent);
-  border-color: color-mix(in srgb, var(--accent) 26%, var(--border));
-  box-shadow: 0 10px 32px rgba(24, 20, 14, 0.08);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent-soft) 86%, var(--surface)),
+    color-mix(in srgb, var(--surface) 92%, var(--accent-soft))
+  );
+  border-color: color-mix(in srgb, var(--accent) 68%, transparent);
+  box-shadow:
+    0 14px 36px -8px color-mix(in srgb, var(--accent) 32%, transparent),
+    0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 :root[data-theme='dark'] .focus-line.is-active {
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.36);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent) 24%, var(--surface)),
+    color-mix(in srgb, var(--surface) 88%, var(--accent))
+  );
+  border-color: color-mix(in srgb, var(--accent) 75%, transparent);
+  box-shadow:
+    0 16px 40px -6px rgba(0, 0, 0, 0.45),
+    0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
 }
 
 .focus-ja {
   display: block;
   font-family: var(--jp);
-  font-size: clamp(20px, 3vw, 28px);
-  line-height: 1.75;
+  font-size: clamp(1.25rem, 0.9rem + 1.8vw, 2.35rem);
+  line-height: 1.72;
   font-weight: 500;
   color: var(--ink);
   word-break: normal;
   overflow-wrap: anywhere;
 }
 
+@supports (font-size: 1cqi) {
+  .focus-ja {
+    font-size: clamp(1.25rem, 0.9rem + 1.8cqi, 2.35rem);
+  }
+}
+
 .focus-line.is-active .focus-ja {
-  font-weight: 650;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--accent-text) 80%, var(--ink));
+}
+
+:root[data-theme='dark'] .focus-line.is-active .focus-ja {
+  color: color-mix(in srgb, var(--accent-text) 65%, #fff);
 }
 
 .focus-ja rt {
@@ -3957,15 +4001,26 @@ dialog::backdrop {
   color: var(--faint);
 }
 
+.focus-line.is-active .focus-ja rt {
+  color: color-mix(in srgb, var(--accent-text) 72%, var(--muted));
+}
+
 .focus-zh {
   display: block;
-  font-size: clamp(14px, 1.8vw, 17px);
+  font-size: clamp(0.875rem, 0.72rem + 0.8vw, 1.35rem);
   line-height: 1.55;
   color: var(--muted);
 }
 
+@supports (font-size: 1cqi) {
+  .focus-zh {
+    font-size: clamp(0.875rem, 0.72rem + 0.8cqi, 1.35rem);
+  }
+}
+
 .focus-line.is-active .focus-zh {
-  color: color-mix(in srgb, var(--ink) 80%, var(--muted));
+  color: var(--ink);
+  font-weight: 500;
 }
 
 .focus-playbar {
@@ -3980,31 +4035,104 @@ dialog::backdrop {
 .focus-playbar-row {
   pointer-events: auto;
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 10px 14px;
-  padding: 8px 14px;
+  gap: 8px 14px;
+  max-width: min(94vw, 920px);
+  padding: 8px 16px;
   border: 1px solid var(--border);
-  border-radius: 22px;
-  background: color-mix(in srgb, var(--surface) 84%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   box-shadow: var(--dock-shadow);
 }
 
+.focus-playbar-row .transport {
+  flex-direction: row;
+  align-items: center;
+  width: auto;
+  gap: 6px;
+}
+
+.focus-playbar-row .ctrl-replay {
+  margin-left: 2px;
+  margin-top: 0;
+}
+
+.focus-playbar-row .modes {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  width: auto;
+  gap: 6px;
+  padding-top: 0;
+  border-top: none;
+}
+
+.focus-playbar-row .speed-group {
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  margin-left: 4px;
+  padding-top: 0;
+  border-top: none;
+}
+
+.focus-playbar-row .modes .pill-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.focus-playbar-row .speed-group .pill {
+  width: auto;
+  min-width: 38px;
+  height: 30px;
+  padding: 0 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.focus-playbar-row .modes .pill-icon.is-on,
+.focus-playbar-row .speed-group .pill.is-on {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+@media (max-width: 720px) {
+  .focus-playbar-row {
+    width: 100%;
+    border-radius: 22px;
+    padding: 8px 12px;
+    gap: 8px 10px;
+  }
+}
+
 @media (max-width: 600px) {
   .focus-stage {
-    padding: 34vh 14px 36vh;
-    gap: 14px;
+    padding: 26dvh 12px 28dvh;
+    gap: 12px;
   }
 
   .focus-line {
+    width: 100%;
     padding: 12px 14px;
   }
 
   .focus-playbar-row {
-    width: 100%;
     border-radius: 18px;
     padding: 8px 10px;
     gap: 8px;
