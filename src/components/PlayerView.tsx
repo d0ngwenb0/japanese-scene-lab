@@ -18,6 +18,7 @@ import { PlaybackTimer } from './PlaybackTimer';
 import { PaletteToggle } from './PaletteToggle';
 import { ForceRefreshButton } from './ForceRefreshButton';
 import { FullscreenToggle } from './FullscreenToggle';
+import { JlptStage } from './JlptStage';
 import { SceneSwitcher } from './SceneSwitcher';
 import { AiChat } from './AiChat';
 import { PassageList } from './PassageList';
@@ -152,6 +153,7 @@ export function PlayerView({
   }, []);
 
   const isPassage = scenario.kind === 'passage';
+  const isJlpt = scenario.kind === 'jlpt';
   const line = scenario.lines[index];
   const total = scenario.lines.length;
   const overall = ((index + lineProgress) / total) * 100;
@@ -430,7 +432,15 @@ export function PlayerView({
           </p>
         )}
         <div className="subs" ref={listRef}>
-          {isPassage ? (
+          {isJlpt ? (
+            <JlptStage
+              scenario={scenario}
+              index={index}
+              playing={playing}
+              itemRefs={itemRefs}
+              onSelect={select}
+            />
+          ) : isPassage ? (
             <PassageList
               scenario={scenario}
               index={index}

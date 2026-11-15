@@ -220,7 +220,10 @@ export function SceneSwitcher({ scenarios, currentId, onSelect }: Props) {
                     <span className="scene-menu-title" lang="ja">
                       <Furigana text={scene.title} />
                     </span>
-                    <span className="scene-menu-zh">{scene.kind === 'passage' ? '短文 · ' : ''}{scene.titleZh}</span>
+                    <span className="scene-menu-zh">
+                      {scene.kind === 'passage' ? '短文 · ' : scene.kind === 'jlpt' ? 'JLPT · ' : ''}
+                      {scene.titleZh}
+                    </span>
                   </span>
                   <span className="scene-menu-check" aria-hidden="true">
                     {current ? <CheckIcon width={14} height={14} /> : null}

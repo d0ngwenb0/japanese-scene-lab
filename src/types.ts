@@ -1,6 +1,6 @@
 import type { SceneCategory } from './lib/sceneCategories';
 
-export type SceneKind = 'dialogue' | 'passage';
+export type SceneKind = 'dialogue' | 'passage' | 'jlpt';
 
 export type VoiceName =
   | 'Zephyr'
@@ -55,9 +55,20 @@ export interface Line {
   style?: string;
 }
 
+export interface JlptMeta {
+  level: 'N1' | 'N2' | 'N3' | 'N4' | 'N5';
+  type: string;
+  question: string;
+  questionZh: string;
+  options: string[];
+  /** 0-based index into options */
+  answer: number;
+  explanation: string;
+}
+
 export interface Scenario {
   id: string;
-  /** 对话场景默认不填；短文场景填 passage */
+  /** 对话场景默认不填；短文场景填 passage；JLPT 听力题填 jlpt */
   kind?: SceneKind;
   category: SceneCategory;
   title: string;
@@ -68,6 +79,7 @@ export interface Scenario {
   accentDark: string;
   speakers: Speaker[];
   lines: Line[];
+  jlpt?: JlptMeta;
 }
 
 export type LoopMode = 'off' | 'line' | 'all' | 'scenes';

@@ -117,7 +117,7 @@ function sceneContext(scenario: Scenario, lineId?: string): string {
       ? `${index + 1}. ${speakerLabel(scenario, scenario.lines[index])}：${stripFurigana(scenario.lines[index].ja)}`
       : '';
   return [
-    `【场景】${stripFurigana(scenario.title)}（${scenario.kind === 'passage' ? '短文' : '对话'}）`,
+    `【场景】${stripFurigana(scenario.title)}（${scenario.kind === 'passage' ? '短文' : scenario.kind === 'jlpt' ? 'JLPT听力' : '对话'}）`,
     `【人物】${scenario.speakers.map((item) => item.label).join('、')}`,
     '【台词】',
     lines,

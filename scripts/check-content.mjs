@@ -106,12 +106,13 @@ for (const scene of Array.isArray(scenarios) ? scenarios : []) {
   checkMarkup(scene.title, `${where}.title`);
   checkLineKanji(scene.title, `${where}.title`);
 
-  if (scene.kind && !['dialogue', 'passage'].includes(scene.kind)) {
-    errors.push(`${where}: kind 必须是 dialogue 或 passage`);
+  if (scene.kind && !['dialogue', 'passage', 'jlpt'].includes(scene.kind)) {
+    errors.push(`${where}: kind 必须是 dialogue、passage 或 jlpt`);
   }
   const isPassage = scene.kind === 'passage';
+  const isJlpt = scene.kind === 'jlpt';
   const narratorOnly = scene.speakers.length === 1 && scene.speakers[0].id === 'narrator';
-  if (narratorOnly && !isPassage) {
+  if (narratorOnly && !isPassage && !isJlpt) {
     errors.push(`${where}: 单朗读者场景必须标记 kind: "passage"`);
   }
   if (isPassage && !narratorOnly) {
@@ -121,6 +122,13 @@ for (const scene of Array.isArray(scenarios) ? scenarios : []) {
   if (isPassage) {
     if (scene.lines.length < 5 || scene.lines.length > 6) {
       errors.push(`${where}: 短文场景段数必须为 5–6 段（当前 ${scene.lines.length} 段）`);
+    }
+  } else if (isJlpt) {
+    if (scene.lines.length < 4 || scene.lines.length > 12) {
+      errors.push(`${where}: JLPT 听力句数必须为 4–12 句（当前 ${scene.lines.length} 句）`);
+    }
+    if (!scene.jlpt || !Array.isArray(scene.jlpt.options) || scene.jlpt.options.length < 3) {
+      errors.push(`${where}: JLPT 听力必须提供 jlpt 题目与选项`);
     }
   } else {
     if (scene.lines.length < 5 || scene.lines.length > 6) {

@@ -25,12 +25,13 @@ interface Props {
   onOpen: (id: string) => void;
 }
 
-type KindFilter = 'all' | 'dialogue' | 'passage';
+type KindFilter = 'all' | 'dialogue' | 'passage' | 'jlpt';
 
 const KIND_OPTIONS: Array<{ value: KindFilter; label: string }> = [
   { value: 'all', label: '全部' },
   { value: 'dialogue', label: '对话' },
   { value: 'passage', label: '短文' },
+  { value: 'jlpt', label: 'JLPT' },
 ];
 
 const FILTER_STORAGE_KEY = 'scene-lab:filter:v1';
@@ -264,7 +265,11 @@ export function ScenarioList({
                       {scene.emoji}
                     </span>
                     <span className="card-head-right">
-                      {scene.kind === 'passage' ? <span className="kind-badge">短文</span> : null}
+                      {scene.kind === 'passage' ? (
+                        <span className="kind-badge">短文</span>
+                      ) : scene.kind === 'jlpt' ? (
+                        <span className="kind-badge">{scene.jlpt ? `JLPT ${scene.jlpt.level}` : 'JLPT'}</span>
+                      ) : null}
                     </span>
                   </span>
                   <span className="card-title" lang="ja">
@@ -301,7 +306,11 @@ export function ScenarioList({
                         <Furigana text={scene.title} />
                       </span>
                       <span className="scene-zh">{scene.titleZh}</span>
-                      {scene.kind === 'passage' ? <span className="kind-badge">短文</span> : null}
+                      {scene.kind === 'passage' ? (
+                        <span className="kind-badge">短文</span>
+                      ) : scene.kind === 'jlpt' ? (
+                        <span className="kind-badge">{scene.jlpt ? `JLPT ${scene.jlpt.level}` : 'JLPT'}</span>
+                      ) : null}
                     </span>
                   </span>
                   <span className="scene-side">

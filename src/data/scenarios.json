@@ -260,5 +260,100 @@
         "style": "decisive agreement and supportive wrap-up"
       }
     ]
+  },
+  {
+    "id": "jlpt-n2-client-meeting-prep",
+    "kind": "jlpt",
+    "category": "work",
+    "title": "JLPT N2 {課題理解|かだいりかい}：{会議|かいぎ}の{準備|じゅんび}",
+    "titleZh": "JLPT N2 任务理解：会议准备",
+    "emoji": "🎧",
+    "accent": "#2563eb",
+    "accentDark": "#60a5fa",
+    "speakers": [
+      {
+        "id": "narrator",
+        "label": "ナレーター",
+        "voice": "Aoede",
+        "style": "clear, neutral Japanese JLPT exam narrator"
+      },
+      {
+        "id": "man",
+        "label": "男の社員",
+        "voice": "Puck",
+        "style": "natural, polite Japanese male office worker"
+      },
+      {
+        "id": "woman",
+        "label": "女の社員",
+        "voice": "Kore",
+        "style": "calm, clear Japanese female office colleague"
+      }
+    ],
+    "jlpt": {
+      "level": "N2",
+      "type": "課題理解",
+      "question": "{男|おとこ}の{社員|しゃいん}はこれからまず{何|なに}をしますか。",
+      "questionZh": "男职员接下来首先要做什么？",
+      "options": [
+        "{会議室|かいぎしつ}を{予約|よやく}する",
+        "プロジェクターを{確認|かくにん}する",
+        "{資料|しりょう}を{印刷|いんさつ}する",
+        "お{茶|ちゃ}を{用意|ようい}する"
+      ],
+      "answer": 2,
+      "explanation": "女职员说明会议室预约和投影仪确认已经完成（排除1、2）；茶水由前台的田中负责端过去，无需准备（排除4）；最后明确要求男职员「先に資料を印刷して、私の席に置いておいてください」，因此选 3。"
+    },
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "narrator",
+        "ja": "{会社|かいしゃ}で{男|おとこ}の{社員|しゃいん}と{女|おんな}の{社員|しゃいん}が{話|はな}しています。{男|おとこ}の{社員|しゃいん}はこれからまず{何|なに}をしますか。",
+        "zh": "在公司里，男职员和女职员正在说话。男职员接下来首先要做什么？",
+        "style": "clear, steady Japanese JLPT exam question prompt"
+      },
+      {
+        "id": "l2",
+        "speaker": "man",
+        "ja": "{佐藤|さとう}さん、{午後|ごご}{２時|にじ}からの{取引先|とりひきさき}との{打|う}ち{合|あ}わせ、{準備|じゅんび}はだいたい{終|お}わりましたか。",
+        "zh": "佐藤，下午两点和客户的洽谈，准备得差不多了吗？",
+        "style": "polite workplace check-in"
+      },
+      {
+        "id": "l3",
+        "speaker": "woman",
+        "ja": "ええ、{会議室|かいぎしつ}の{予約|よやく}とプロジェクターの{確認|かくにん}はもう{済|す}みました。あと、{配|くば}る{資料|しりょう}のコピーをこれからお{願|ねが}いできますか。",
+        "zh": "嗯，会议室的预约和投影仪的确认都已经搞定了。另外，分发用的资料复印件接下来能拜托你吗？",
+        "style": "calm, clear colleague response and request"
+      },
+      {
+        "id": "l4",
+        "speaker": "man",
+        "ja": "わかりました。{十部|じゅうぶ}でいいですか。あ、その{前|まえ}にお{茶|ちゃ}も{用意|ようい}したほうがいいですよね。",
+        "zh": "好的，印十份就可以了吧？啊，在此之前是不是也把茶水准备好比较好？",
+        "style": "attentive confirmation"
+      },
+      {
+        "id": "l5",
+        "speaker": "woman",
+        "ja": "お{茶|ちゃ}は{受付|うけつけ}の{田中|たなか}さんが{運|はこ}んでくれることになっているので{大丈夫|だいじょうぶ}です。それより、{先|さき}に{資料|しりょう}を{印刷|いんさつ}して、{私|わたし}の{席|せき}に{置|お}いておいてください。",
+        "zh": "茶水已经安排前台的田中先生端过来了，所以没关系。比起那个，请先去把资料打印好，放在我座位上。",
+        "style": "reassuring clarification and clear priority instruction"
+      },
+      {
+        "id": "l6",
+        "speaker": "man",
+        "ja": "{承知|しょうち}しました。じゃあ、すぐ{印刷|いんさつ}して{持|も}ってきます。",
+        "zh": "明白了。那我马上去打印拿过来。",
+        "style": "prompt, polite acknowledgment"
+      },
+      {
+        "id": "l7",
+        "speaker": "narrator",
+        "ja": "{男|おとこ}の{社員|しゃいん}はこれからまず{何|なに}をしますか。",
+        "zh": "男职员接下来首先要做什么？",
+        "style": "clear, steady Japanese JLPT exam question repeat"
+      }
+    ]
   }
 ]
