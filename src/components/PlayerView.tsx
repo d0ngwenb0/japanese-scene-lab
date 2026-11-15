@@ -80,7 +80,6 @@ export function PlayerView({
 }: Props) {
   const [aiOpen, setAiOpen] = useState(false);
   const [pausedByAi, setPausedByAi] = useState(false);
-  const [timeCountdown, setTimeCountdown] = useState(true);
 
   const { index, playing, lineProgress, sceneTime, sceneDuration, missing, toggle, pause, resume, select, next, prev, replay } = usePlayer({
     sceneId: scenario.id,
@@ -559,12 +558,7 @@ export function PlayerView({
             </button>
           </div>
 
-          <SceneTimePill
-            current={sceneTime}
-            duration={sceneDuration}
-            countdown={timeCountdown}
-            onToggleMode={() => setTimeCountdown((v) => !v)}
-          />
+          <SceneTimePill current={sceneTime} duration={sceneDuration} />
 
           <div className="modes">
             <button
@@ -664,8 +658,6 @@ export function PlayerView({
           isPassage={isPassage}
           sceneTime={sceneTime}
           sceneDuration={sceneDuration}
-          timeCountdown={timeCountdown}
-          onToggleTimeMode={() => setTimeCountdown((v) => !v)}
           onSelect={select}
           onToggle={toggle}
           onPrev={prev}

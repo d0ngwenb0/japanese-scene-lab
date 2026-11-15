@@ -4155,8 +4155,7 @@ dialog::backdrop {
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-  cursor: pointer;
-  transition: border-color 0.14s ease, color 0.14s ease, background 0.14s ease;
+  user-select: none;
 }
 
 .scene-time-ring {
@@ -4186,25 +4185,7 @@ dialog::backdrop {
   gap: 3px;
 }
 
-.scene-time:hover,
-.scene-time:focus-visible {
-  border-color: var(--border-strong);
-  background: var(--surface);
-}
-
-.scene-time.is-countdown {
-  color: var(--accent-text);
-  border-color: color-mix(in srgb, var(--accent) 28%, var(--border));
-  background: var(--accent-soft);
-}
-
-.scene-time-sep,
-.scene-time-total {
-  color: var(--muted);
-  font-weight: 500;
-}
-
-/* 桌面端左侧竖排播放栏：改为紧凑圆形进度环 + 双行小字，避免撑胖竖条 */
+/* 桌面端左侧竖排播放栏：改为紧凑圆形进度环 + 单个倒计时数字，避免撑胖竖条 */
 @media (min-width: 1000px) and (min-height: 561px) {
   .playbar .scene-time {
     position: relative;
@@ -4215,17 +4196,6 @@ dialog::backdrop {
     border-radius: 50%;
     border-color: transparent;
     background: transparent;
-  }
-
-  .playbar .scene-time:hover,
-  .playbar .scene-time:focus-visible {
-    background: var(--surface-2);
-    border-color: transparent;
-  }
-
-  .playbar .scene-time.is-countdown {
-    background: color-mix(in srgb, var(--accent-soft) 70%, transparent);
-    border-color: transparent;
   }
 
   .playbar .scene-time-ring {

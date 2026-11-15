@@ -211,6 +211,8 @@ export function usePlayer({ sceneId, lines, loop, rate, autoPlay = false, onScen
     let activeTrack: StitchedTrack | null = null;
     stitchedRef.current = null;
     pendingStitchedSwapRef.current = false;
+    setSceneDuration(0);
+    setSceneTime(0);
 
     buildStitchedTrack(sceneId, lines, INTER_LINE_GAP_MS, controller.signal).then((track) => {
       if (!track || controller.signal.aborted) {
@@ -343,8 +345,6 @@ export function usePlayer({ sceneId, lines, loop, rate, autoPlay = false, onScen
 
       if (inGapRef.current) return;
       setLineProgress(a.duration > 0 ? Math.min(a.currentTime / a.duration, 1) : 0);
-      if (a.duration > 0) setSceneDuration(a.duration);
-      setSceneTime(a.currentTime);
     };
 
     const onPlaying = () => {

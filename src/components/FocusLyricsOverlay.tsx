@@ -24,8 +24,6 @@ interface Props {
   isPassage: boolean;
   sceneTime: number;
   sceneDuration: number;
-  timeCountdown: boolean;
-  onToggleTimeMode: () => void;
   onSelect: (i: number) => void;
   onToggle: () => void;
   onPrev: () => void;
@@ -46,8 +44,6 @@ export function FocusLyricsOverlay({
   isPassage,
   sceneTime,
   sceneDuration,
-  timeCountdown,
-  onToggleTimeMode,
   onSelect,
   onToggle,
   onPrev,
@@ -165,12 +161,7 @@ export function FocusLyricsOverlay({
             </button>
           </div>
 
-          <SceneTimePill
-            current={sceneTime}
-            duration={sceneDuration}
-            countdown={timeCountdown}
-            onToggleMode={onToggleTimeMode}
-          />
+          <SceneTimePill current={sceneTime} duration={sceneDuration} />
 
           <div className="modes">
             <button
