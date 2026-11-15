@@ -649,6 +649,7 @@ export function PlayerView({
 
       {focusMode && (
         <FocusLyricsOverlay
+          title={scenario.title}
           lines={scenario.lines}
           index={index}
           playing={playing}

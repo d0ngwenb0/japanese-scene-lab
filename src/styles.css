@@ -3843,6 +3843,38 @@ dialog::backdrop {
   background: color-mix(in srgb, var(--bg) 60%, transparent);
 }
 
+.focus-title {
+  position: fixed;
+  top: calc(14px + var(--safe-top));
+  left: calc(16px + var(--safe-left));
+  z-index: 62;
+  max-width: calc(100vw - 120px);
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--ink);
+  font-family: var(--jp);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: var(--card-shadow);
+  transition:
+    opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.focus-title rt {
+  font-size: 0.48em;
+  font-weight: 400;
+  color: var(--muted);
+}
+
 .focus-exit {
   position: fixed;
   top: calc(14px + var(--safe-top));
@@ -3863,7 +3895,13 @@ dialog::backdrop {
   font-weight: 600;
   box-shadow: var(--card-shadow);
   cursor: pointer;
-  transition: color 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+  transition:
+    color 0.14s ease,
+    border-color 0.14s ease,
+    background 0.14s ease,
+    opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.42s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .focus-exit:hover,
@@ -4039,6 +4077,44 @@ dialog::backdrop {
   padding: 8px calc(16px + var(--safe-right)) calc(14px + var(--safe-bottom))
     calc(16px + var(--safe-left));
   pointer-events: none;
+  transition:
+    opacity 0.44s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.44s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.44s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.focus-overlay.is-chrome-hidden .focus-title,
+.focus-overlay.is-chrome-hidden .focus-exit {
+  opacity: 0;
+  transform: translateY(-10px);
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+.focus-overlay.is-chrome-hidden .focus-playbar {
+  opacity: 0;
+  transform: translateY(14px);
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+.focus-overlay.is-chrome-hidden .focus-playbar-row {
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .focus-title,
+  .focus-exit,
+  .focus-playbar {
+    transition: opacity 0.15s ease;
+  }
+
+  .focus-overlay.is-chrome-hidden .focus-title,
+  .focus-overlay.is-chrome-hidden .focus-exit,
+  .focus-overlay.is-chrome-hidden .focus-playbar {
+    transform: none;
+    filter: none;
+  }
 }
 
 .focus-playbar-row {

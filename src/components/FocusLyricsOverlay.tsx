@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Line, LoopMode } from '../types';
 import { Furigana } from '../lib/furigana';
 import {
@@ -14,7 +14,10 @@ import {
 } from './Icons';
 import { SceneTimePill } from './SceneTimePill';
 
+const CHROME_IDLE_MS = 3800;
+
 interface Props {
+  title: string;
   lines: Line[];
   index: number;
   playing: boolean;
@@ -35,6 +38,7 @@ interface Props {
 }
 
 export function FocusLyricsOverlay({
+  title,
   lines,
   index,
   playing,
@@ -55,6 +59,41 @@ export function FocusLyricsOverlay({
 }: Props) {
   const lineRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const mountedRef = useRef(false);
+  const hideTimerRef = useRef<number | null>(null);
+  const hoveringChromeRef = useRef(false);
+  const [chromeVisible, setChromeVisible] = useState(true);
+
+  const clearHideTimer = useCallback(() => {
+    if (hideTimerRef.current !== null) {
+      window.clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+  }, []);
+
+  const scheduleHide = useCallback(
+    (delay = CHROME_IDLE_MS) => {
+      clearHideTimer();
+      if (hoveringChromeRef.current) return;
+      hideTimerRef.current = window.setTimeout(() => {
+        setChromeVisible(false);
+        hideTimerRef.current = null;
+      }, delay);
+    },
+    [clearHideTimer],
+  );
+
+  const revealChrome = useCallback(
+    (delay = CHROME_IDLE_MS) => {
+      setChromeVisible(true);
+      scheduleHide(delay);
+    },
+    [scheduleHide],
+  );
+
+  useEffect(() => {
+    scheduleHide(CHROME_IDLE_MS);
+    return clearHideTimer;
+  }, [clearHideTimer, scheduleHide]);
 
   useEffect(() => {
     const el = lineRefs.current[index];
@@ -71,18 +110,63 @@ export function FocusLyricsOverlay({
       if (event.key === 'Escape') {
         event.stopPropagation();
         onClose();
+        return;
       }
+      revealChrome();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  }, [onClose, revealChrome]);
+
+  const handleChromeEnter = () => {
+    hoveringChromeRef.current = true;
+    clearHideTimer();
+    setChromeVisible(true);
+  };
+
+  const handleChromeLeave = () => {
+    hoveringChromeRef.current = false;
+    scheduleHide(CHROME_IDLE_MS);
+  };
 
   return (
-    <div className="focus-overlay" role="dialog" aria-modal="true" aria-label="字幕沉浸模式">
+    <div
+      className={chromeVisible ? 'focus-overlay' : 'focus-overlay is-chrome-hidden'}
+      role="dialog"
+      aria-modal="true"
+      aria-label="字幕沉浸模式"
+      onPointerMove={(e) => {
+        if (e.pointerType !== 'touch') revealChrome();
+      }}
+      onPointerEnter={(e) => {
+        if (e.pointerType !== 'touch') revealChrome();
+      }}
+      onPointerLeave={(e) => {
+        if (e.pointerType !== 'touch' && !hoveringChromeRef.current) {
+          scheduleHide(700);
+        }
+      }}
+      onClick={(e) => {
+        const target = e.target as HTMLElement;
+        if (target.closest('button, .focus-playbar-row, .focus-title')) return;
+        if (chromeVisible) {
+          clearHideTimer();
+          setChromeVisible(false);
+        } else {
+          revealChrome();
+        }
+      }}
+    >
+      <div className="focus-title" title={title}>
+        <Furigana text={title} />
+      </div>
+
       <button
         type="button"
         className="focus-exit"
         onClick={onClose}
+        onPointerEnter={handleChromeEnter}
+        onPointerLeave={handleChromeLeave}
         aria-label="退出字幕沉浸模式"
         title="退出字幕沉浸模式（Esc）"
       >
@@ -121,7 +205,12 @@ export function FocusLyricsOverlay({
       </div>
 
       <div className="focus-playbar" role="group" aria-label="播放控制">
-        <div className="focus-playbar-row">
+        <div
+          className="focus-playbar-row"
+          onPointerEnter={handleChromeEnter}
+          onPointerLeave={handleChromeLeave}
+          onClick={() => revealChrome()}
+        >
           <div className="focus-bar-meta">
             <SceneTimePill current={sceneTime} duration={sceneDuration} />
           </div>
