@@ -3909,20 +3909,21 @@ dialog::backdrop {
 }
 
 .focus-line {
+  position: relative;
   width: min(1080px, 92%);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  padding: clamp(12px, 1.5vw, 18px) clamp(16px, 3vw, 32px);
+  padding: clamp(14px, 1.8vw, 22px) clamp(16px, 3vw, 32px);
   border: none;
   border-radius: 0;
   background: transparent;
   text-align: center;
   cursor: pointer;
-  opacity: 0.34;
-  filter: blur(0.6px);
-  transform: scale(0.95);
+  opacity: 0.28;
+  filter: blur(0.8px);
+  transform: scale(0.93);
   transition:
     opacity 0.28s ease,
     filter 0.28s ease,
@@ -3933,7 +3934,7 @@ dialog::backdrop {
 @supports (width: 1cqi) {
   .focus-line {
     width: min(1080px, 92cqi);
-    padding: clamp(12px, 1.5cqi, 18px) clamp(16px, 3cqi, 32px);
+    padding: clamp(14px, 1.8cqi, 22px) clamp(16px, 3cqi, 32px);
   }
 }
 
@@ -3945,21 +3946,50 @@ dialog::backdrop {
 .focus-line.is-active {
   opacity: 1;
   filter: blur(0);
-  transform: scale(1.03);
+  transform: scale(1.04);
   background: radial-gradient(
-    ellipse 72% 85% at 50% 50%,
-    color-mix(in srgb, var(--accent-soft) 54%, transparent) 0%,
-    transparent 74%
+    ellipse 68% 85% at 50% 50%,
+    color-mix(in srgb, var(--accent) 16%, transparent) 0%,
+    color-mix(in srgb, var(--accent-soft) 50%, transparent) 42%,
+    transparent 76%
   );
   border-color: transparent;
   box-shadow: none;
 }
 
+.focus-line.is-active::after {
+  content: '';
+  display: block;
+  width: min(140px, 32%);
+  height: 2.5px;
+  margin-top: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+
+.focus-line.is-active.is-playing::after {
+  animation: focus-beam 2.2s ease-in-out infinite;
+}
+
+@keyframes focus-beam {
+  0%,
+  100% {
+    opacity: 0.75;
+    transform: scaleX(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleX(1.12);
+  }
+}
+
 :root[data-theme='dark'] .focus-line.is-active {
   background: radial-gradient(
-    ellipse 72% 85% at 50% 50%,
-    color-mix(in srgb, var(--accent) 18%, transparent) 0%,
-    transparent 74%
+    ellipse 68% 85% at 50% 50%,
+    color-mix(in srgb, var(--accent) 24%, transparent) 0%,
+    color-mix(in srgb, var(--accent) 8%, transparent) 44%,
+    transparent 76%
   );
   border-color: transparent;
   box-shadow: none;
@@ -3984,13 +4014,17 @@ dialog::backdrop {
 
 .focus-line.is-active .focus-ja {
   font-weight: 700;
-  color: color-mix(in srgb, var(--accent-text) 82%, var(--ink));
-  text-shadow: 0 2px 24px color-mix(in srgb, var(--accent) 26%, transparent);
+  color: var(--accent);
+  text-shadow:
+    0 0 18px color-mix(in srgb, var(--accent) 32%, transparent),
+    0 0 38px color-mix(in srgb, var(--accent) 16%, transparent);
 }
 
 :root[data-theme='dark'] .focus-line.is-active .focus-ja {
-  color: color-mix(in srgb, var(--accent-text) 72%, #fff);
-  text-shadow: 0 2px 28px color-mix(in srgb, var(--accent) 42%, transparent);
+  color: color-mix(in srgb, var(--accent) 70%, #ffffff);
+  text-shadow:
+    0 0 22px color-mix(in srgb, var(--accent) 62%, transparent),
+    0 0 48px color-mix(in srgb, var(--accent) 32%, transparent);
 }
 
 .focus-ja rt {
