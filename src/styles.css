@@ -3845,55 +3845,68 @@ dialog::backdrop {
 
 .focus-title {
   position: fixed;
-  top: calc(14px + var(--safe-top));
-  left: calc(16px + var(--safe-left));
+  top: calc(16px + var(--safe-top));
+  left: calc(20px + var(--safe-left));
   z-index: 62;
-  max-width: calc(100vw - 120px);
-  padding: 6px 14px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--surface) 82%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  max-width: calc(100vw - 124px);
+  padding: 2px 0;
+  border: none;
+  background: transparent;
+  color: color-mix(in srgb, var(--ink) 76%, var(--muted));
   font-family: var(--jp);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: clamp(13px, 1.2vw, 15px);
+  font-weight: 500;
+  line-height: 1.65;
+  letter-spacing: 0.01em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  box-shadow: var(--card-shadow);
+  text-shadow: 0 1px 12px color-mix(in srgb, var(--bg) 75%, transparent);
+  pointer-events: none;
+  user-select: none;
   transition:
     opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
     transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
     filter 0.42s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.focus-title::before {
+  content: '';
+  flex: none;
+  width: 3px;
+  height: 13px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 78%, transparent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
 .focus-title rt {
-  font-size: 0.48em;
+  font-size: 0.44em;
   font-weight: 400;
-  color: var(--muted);
+  color: color-mix(in srgb, var(--muted) 85%, transparent);
 }
 
 .focus-exit {
   position: fixed;
-  top: calc(14px + var(--safe-top));
-  right: calc(16px + var(--safe-right));
+  top: calc(16px + var(--safe-top));
+  right: calc(18px + var(--safe-right));
   z-index: 62;
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  height: 32px;
-  padding: 0 12px;
-  border: 1px solid var(--border);
+  height: 30px;
+  padding: 0 11px;
+  border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--surface) 84%, transparent);
+  background: color-mix(in srgb, var(--surface) 52%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   color: var(--muted);
   font-size: 12px;
-  font-weight: 600;
-  box-shadow: var(--card-shadow);
+  font-weight: 500;
   cursor: pointer;
   transition:
     color 0.14s ease,
