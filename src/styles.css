@@ -3977,8 +3977,8 @@ dialog::backdrop {
   background: transparent;
   text-align: center;
   cursor: pointer;
-  opacity: 0.24;
-  filter: blur(1px);
+  opacity: 0.22;
+  filter: blur(2px);
   transform: scale(0.8);
   transition:
     opacity 0.28s ease,
@@ -4003,23 +4003,13 @@ dialog::backdrop {
   opacity: 1;
   filter: blur(0);
   transform: scale(1.07);
-  background: radial-gradient(
-    ellipse 68% 85% at 50% 50%,
-    color-mix(in srgb, var(--accent) 16%, transparent) 0%,
-    color-mix(in srgb, var(--accent-soft) 50%, transparent) 42%,
-    transparent 76%
-  );
+  background: transparent;
   border-color: transparent;
   box-shadow: none;
 }
 
 :root[data-theme='dark'] .focus-line.is-active {
-  background: radial-gradient(
-    ellipse 68% 85% at 50% 50%,
-    color-mix(in srgb, var(--accent) 24%, transparent) 0%,
-    color-mix(in srgb, var(--accent) 8%, transparent) 44%,
-    transparent 76%
-  );
+  background: transparent;
   border-color: transparent;
   box-shadow: none;
 }

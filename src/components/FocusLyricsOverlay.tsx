@@ -15,6 +15,11 @@ import {
 import { SceneTimePill } from './SceneTimePill';
 
 const CHROME_IDLE_MS = 3800;
+let focusChromeShownOnce = false;
+
+export function resetFocusChrome() {
+  focusChromeShownOnce = false;
+}
 
 interface Props {
   title: string;
@@ -61,7 +66,18 @@ export function FocusLyricsOverlay({
   const mountedRef = useRef(false);
   const hideTimerRef = useRef<number | null>(null);
   const hoveringChromeRef = useRef(false);
-  const [chromeVisible, setChromeVisible] = useState(true);
+  const [chromeVisible, setChromeVisible] = useState(() => {
+    if (!focusChromeShownOnce) {
+      focusChromeShownOnce = true;
+      return true;
+    }
+    return false;
+  });
+
+  const handleClose = useCallback(() => {
+    focusChromeShownOnce = false;
+    onClose();
+  }, [onClose]);
 
   const clearHideTimer = useCallback(() => {
     if (hideTimerRef.current !== null) {
@@ -91,9 +107,11 @@ export function FocusLyricsOverlay({
   );
 
   useEffect(() => {
-    scheduleHide(CHROME_IDLE_MS);
+    if (chromeVisible) {
+      scheduleHide(CHROME_IDLE_MS);
+    }
     return clearHideTimer;
-  }, [clearHideTimer, scheduleHide]);
+  }, [chromeVisible, clearHideTimer, scheduleHide]);
 
   useEffect(() => {
     const el = lineRefs.current[index];
@@ -109,14 +127,14 @@ export function FocusLyricsOverlay({
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.stopPropagation();
-        onClose();
+        handleClose();
         return;
       }
       revealChrome();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [onClose, revealChrome]);
+  }, [handleClose, revealChrome]);
 
   const handleChromeEnter = () => {
     hoveringChromeRef.current = true;
@@ -164,7 +182,7 @@ export function FocusLyricsOverlay({
       <button
         type="button"
         className="focus-exit"
-        onClick={onClose}
+        onClick={handleClose}
         onPointerEnter={handleChromeEnter}
         onPointerLeave={handleChromeLeave}
         aria-label="退出字幕沉浸模式"

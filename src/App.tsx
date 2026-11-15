@@ -6,6 +6,7 @@ import { useBgm } from './lib/useBgm';
 import { stripFurigana } from './lib/copy';
 import { ScenarioList } from './components/ScenarioList';
 import { PlayerView } from './components/PlayerView';
+import { resetFocusChrome } from './components/FocusLyricsOverlay';
 import { PullToRefresh } from './components/PullToRefresh';
 
 const scenarios = scenariosData as Scenario[];
@@ -81,6 +82,10 @@ export default function App() {
   const [autoPlayNext, setAutoPlayNext] = useState(false);
   const [replayTick, setReplayTick] = useState(0);
   const [focusMode, setFocusMode] = useState(false);
+
+  useEffect(() => {
+    if (!focusMode) resetFocusChrome();
+  }, [focusMode]);
   const [timerEndAt, setTimerEndAt] = useState<number | null>(null);
   const [timerPreset, setTimerPreset] = useState<number | null>(null);
   const [timerStopTick, setTimerStopTick] = useState(0);
