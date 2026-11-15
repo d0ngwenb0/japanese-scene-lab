@@ -322,8 +322,13 @@ export function AiChat({
       return;
     }
 
+    if (!window.isSecureContext) {
+      setError('语音输入需要 HTTPS 安全连接，请使用 HTTPS 地址访问。');
+      return;
+    }
+
     if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
-      setError('当前浏览器不支持录音输入，请改用 Chrome / Safari 最新版。');
+      setError('当前浏览器不支持录音输入，请改用 Safari / Chrome 最新版。');
       return;
     }
 
@@ -331,9 +336,17 @@ export function AiChat({
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaStreamRef.current = stream;
-      const mimeTypes = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'];
-      const chosenMime = mimeTypes.find((type) => MediaRecorder.isTypeSupported(type)) ?? '';
-      const recorder = chosenMime ? new MediaRecorder(stream, { mimeType: chosenMime }) : new MediaRecorder(stream);
+      const mimeTypes = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus'];
+      const chosenMime =
+        typeof MediaRecorder.isTypeSupported === 'function'
+          ? (mimeTypes.find((type) => MediaRecorder.isTypeSupported(type)) ?? '')
+          : '';
+      let recorder: MediaRecorder;
+      try {
+        recorder = chosenMime ? new MediaRecorder(stream, { mimeType: chosenMime }) : new MediaRecorder(stream);
+      } catch {
+        recorder = new MediaRecorder(stream);
+      }
       audioChunksRef.current = [];
       mediaRecorderRef.current = recorder;
 
@@ -388,11 +401,17 @@ export function AiChat({
       setRecording(true);
     } catch (err) {
       releaseMicrophone();
-      const name = (err as { name?: string })?.name;
+      const name = (err as { name?: string })?.name ?? '';
       if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
-        setError('麦克风权限被拒绝，请在浏览器设置中允许麦克风访问。');
+        setError('麦克风权限被拒绝，请在浏览器及系统「设置 → Chrome → 麦克风」中允许访问。');
+      } else if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+        setError('未检测到可用麦克风设备，请检查设备音频输入后重试。');
+      } else if (name === 'NotReadableError' || name === 'TrackStartError') {
+        setError('麦克风正被占用或音频会话冲突，请关闭其他占用麦克风的应用后重试。');
+      } else if (name === 'SecurityError') {
+        setError('当前页面非安全上下文（HTTPS），无法调用麦克风。');
       } else {
-        setError('无法打开麦克风，请检查设备权限后重试。');
+        setError(`无法打开麦克风${name ? `（${name}）` : ''}，请检查设备与系统「设置 → Chrome → 麦克风」权限后重试。`);
       }
     }
   };
