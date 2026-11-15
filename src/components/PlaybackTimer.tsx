@@ -134,7 +134,7 @@ export function PlaybackTimer({ endAt, activeMinutes, onSelect }: Props) {
               inputMode="numeric"
               value={customMinutes}
               onChange={(event) => setCustomMinutes(event.target.value)}
-              placeholder="自定义(分)"
+              placeholder="输入分钟"
               aria-label="自定义分钟数"
             />
             <button type="submit" disabled={!customMinutes.trim()}>
