@@ -1,0 +1,30 @@
+{
+  "name": "jp-scenario-lab",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build && node scripts/postbuild.mjs",
+    "preview": "vite preview",
+    "tts": "node scripts/generate-audio.mjs",
+    "tts:force": "node scripts/generate-audio.mjs --force",
+    "tts:passages": "node scripts/generate-audio.mjs --passages --force",
+    "scene:new": "node scripts/generate-scene.mjs",
+    "check": "node scripts/check-content.mjs",
+    "prebuild": "npm run check",
+    "corpus:check": "node scripts/check-corpus.mjs"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "typescript": "~5.9.0",
+    "vite": "^7.0.0",
+    "vite-plugin-pwa": "^1.0.0"
+  }
+}

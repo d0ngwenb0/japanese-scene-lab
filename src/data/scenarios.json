@@ -1,0 +1,319 @@
+[
+  {
+    "id": "city-hall-japanese-class-practice",
+    "title": "{市役所|しやくしょ}の{日本語|にほんご}{教室|きょうしつ}で{会話|かいわ}を{練習|れんしゅう}する",
+    "titleZh": "在市役所日语教室练习会话",
+    "category": "study",
+    "emoji": "🗣️",
+    "accent": "#0d9488",
+    "accentDark": "#2dd4bf",
+    "kind": "dialogue",
+    "speakers": [
+      {
+        "id": "teacher",
+        "label": "ボランティアの先生",
+        "voice": "Charon",
+        "style": "warm, encouraging and patient volunteer teacher"
+      },
+      {
+        "id": "you",
+        "label": "わたし",
+        "self": true,
+        "voice": "Leda",
+        "style": "earnest and polite foreign resident practicing Japanese"
+      }
+    ],
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "teacher",
+        "ja": "{今日|きょう}は{近所|きんじょ}の{人|ひと}へのあいさつを{練習|れんしゅう}しましょう。まずはゴミ{出|だ}しの{時|とき}の{会話|かいわ}からですね。",
+        "zh": "今天我们来练习跟邻居打招呼吧。首先从扔垃圾时的对话开始。",
+        "style": "encouraging and gentle greeting"
+      },
+      {
+        "id": "l2",
+        "speaker": "you",
+        "ja": "はい！ええと、「おはようございます、{今日|きょう}は{寒|さむ}いですね」でいいですか？",
+        "zh": "好的！呃……说“早上好，今天真冷啊”可以吗？",
+        "style": "trying carefully and seeking feedback"
+      },
+      {
+        "id": "l3",
+        "speaker": "teacher",
+        "ja": "ばっちりです！そのあと、「{燃|も}えるゴミの{日|ひ}は{今日|きょう}で{合|あ}っていますか」と{聞|き}いてみましょうか。",
+        "zh": "非常棒！接下来，我们试着问一句“今天是可燃垃圾日没错吧？”看看。",
+        "style": "praising and guiding gently"
+      },
+      {
+        "id": "l4",
+        "speaker": "you",
+        "ja": "「{燃|も}えるゴミの{日|ひ}は{今日|きょう}で{合|あ}っていますか」……{実|じつ}は、ゴミの{分別|ぶんべつ}がまだちょっと{不安|ふあん}なんです。",
+        "zh": "“今天是可燃垃圾日没错吧”……其实，我对垃圾分类还是有点不太放心。",
+        "style": "practicing the phrase then confiding an honest worry"
+      },
+      {
+        "id": "l5",
+        "speaker": "teacher",
+        "ja": "{分|わ}かります、{地域|ちいき}によってルールが{違|ちが}いますからね。あとで{市役所|しやくしょ}のパンフレットを{一緒|いっしょ}に{確認|かくにん}しましょう！",
+        "zh": "很理解呢，毕竟每个地区的规矩都不一样。待会儿我们一起看市役所的手册确认一下吧！",
+        "style": "sympathetic and reassuring"
+      },
+      {
+        "id": "l6",
+        "speaker": "you",
+        "ja": "ありがとうございます！とても{心強|こころづよ}いです。よろしくお{願|ねが}いします！",
+        "zh": "太感谢了！心里踏实多了，请多指教！",
+        "style": "relieved and grateful"
+      }
+    ]
+  },
+  {
+    "id": "api-progress-report-deployment",
+    "title": "API{開発|かいはつ}の{進捗|しんちょく}{報告|ほうこく}とテスト{環境|かんきょう}デプロイの{確認|かくにん}",
+    "titleZh": "汇报API开发进度与确认测试环境部署",
+    "category": "work",
+    "emoji": "💻",
+    "accent": "#2563eb",
+    "accentDark": "#60a5fa",
+    "kind": "dialogue",
+    "speakers": [
+      {
+        "id": "you",
+        "label": "わたし",
+        "self": true,
+        "voice": "Puck",
+        "style": "polite, conscientious software engineer reporting clearly"
+      },
+      {
+        "id": "tech-lead",
+        "label": "技术负责人",
+        "voice": "Charon",
+        "style": "calm, supportive tech lead listening attentively"
+      }
+    ],
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "you",
+        "ja": "{今|いま}、お{時間|じかん}よろしいでしょうか。{担当|たんとう}している{認証|にんしょう}APIの{実装|じっそう}と{結合|けつごう}テストの{進捗|しんちょく}をご{報告|ほうこく}したいのですが。",
+        "zh": "请问现在方便打扰一下吗？我想向您汇报一下我负责的身份验证API开发以及联调测试的进度。",
+        "style": "polite and respectful opening"
+      },
+      {
+        "id": "l2",
+        "speaker": "tech-lead",
+        "ja": "はい、{大丈夫|だいじょうぶ}ですよ。{今|いま}どのあたりまで{進|すす}んでいますか。",
+        "zh": "嗯，没问题。目前进展到哪一步了？",
+        "style": "receptive and attentive"
+      },
+      {
+        "id": "l3",
+        "speaker": "you",
+        "ja": "{主要|しゅよう}エンドポイントの{実装|じっそう}は{完了|かんりょう}して、フロントとの{結合|けつごう}テストも{正常系|せいじょうけい}はすべて{通|とお}りました。{今|いま}、エラー{処理|しょり}の{最終|さいしゅう}{確認|かくにん}をしています。",
+        "zh": "主要接口的开发已经完成，和前端的联调测试中正常流程也全部通过了。目前正在做错误处理的最终确认。",
+        "style": "clear and structured status update"
+      },
+      {
+        "id": "l4",
+        "speaker": "tech-lead",
+        "ja": "それは{順調|じゅんちょう}ですね。テスト{環境|かんきょう}へのデプロイはいつ{頃|ごろ}できそうですか。",
+        "zh": "进展很顺利嘛。大概什么时候能部署到测试环境呢？",
+        "style": "encouraging and inquisitive"
+      },
+      {
+        "id": "l5",
+        "speaker": "you",
+        "ja": "{今日|きょう}の{夕方|ゆうがた}には{確認|かくにん}が{終|お}わるので、{明日|あした}の{午前|ごぜん}10{時|じ}{頃|ごろ}にテスト{環境|かんきょう}へ{反映|はんえい}したいと{考|かんが}えています。スケジュール{的|てき}に{問題|もんだい}ないでしょうか。",
+        "zh": "今天傍晚前就能确认完毕，所以我计划明天上午10点左右部署到测试环境。请问这个时间安排没问题吗？",
+        "style": "proactive proposal seeking confirmation"
+      },
+      {
+        "id": "l6",
+        "speaker": "tech-lead",
+        "ja": "はい、{問題|もんだい}ありません。デプロイが{終|お}わったら、チームチャットで{共有|きょうゆう}をお{願|ねが}いします。",
+        "zh": "嗯，没问题。部署完成后，请在团队群里通知大家一下。",
+        "style": "decisive approval with follow-up request"
+      }
+    ]
+  },
+  {
+    "id": "rainy-day-kissaten",
+    "title": "{雨|あめ}の{日|ひ}の{喫茶店|きっさてん}",
+    "titleZh": "雨天的咖啡馆（短文）",
+    "category": "social",
+    "emoji": "☕",
+    "accent": "#8c5a3c",
+    "accentDark": "#c98b63",
+    "kind": "passage",
+    "speakers": [
+      {
+        "id": "narrator",
+        "label": "朗读",
+        "voice": "Kore",
+        "style": "clear, neutral, steady standard Japanese broadcast narration, crisp articulation, no breathiness"
+      }
+    ],
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "narrator",
+        "ja": "{週末|しゅうまつ}の{午後|ごご}、{小雨|こさめ}が{降|ふ}り{始|はじ}めたので、{駅|えき}の{近|ちか}くの{古|ふる}い{喫茶店|きっさてん}に{入|はい}りました。",
+        "zh": "周末的午后，天空下起了小雨，于是我走进了车站附近的一家老咖啡馆。",
+        "style": "warm, calm, unhurried Japanese prose opening"
+      },
+      {
+        "id": "l2",
+        "speaker": "narrator",
+        "ja": "{扉|とびら}を{開|あ}けると、{焙煎|ばいせん}したコーヒーの{香|かお}りと、{静|しず}かなピアノの{音|おと}がやさしく{迎|むか}えてくれます。",
+        "zh": "推开门，烘焙咖啡的香气和轻柔的钢琴声温柔地迎面而来。",
+        "style": "gentle, descriptive, unhurried narration"
+      },
+      {
+        "id": "l3",
+        "speaker": "narrator",
+        "ja": "{窓際|まどぎわ}の{席|せき}に{座|すわ}って、{熱|あつ}いカフェオレを{一口|ひとくち}{飲|の}むと、{冷|ひ}えた{体|からだ}がゆっくり{温|あたた}まっていきます。",
+        "zh": "坐在靠窗的位置上，喝一口热拿铁，微凉的身体也渐渐暖和起来。",
+        "style": "relaxed, soothing, unhurried narration"
+      },
+      {
+        "id": "l4",
+        "speaker": "narrator",
+        "ja": "{窓|まど}の{外|そと}を{行|ゆ}き{交|か}う{傘|かさ}を{眺|なが}めながら、{持|も}ってきた{文庫本|ぶんこぼん}を{読|よ}むのが、{私|わたし}のささやかな{楽|たの}しみです。",
+        "zh": "一边看着窗外往来的雨伞，一边读着随身带来的文库本，是我小小的乐趣。",
+        "style": "reflective, warm, unhurried narration"
+      },
+      {
+        "id": "l5",
+        "speaker": "narrator",
+        "ja": "{忙|いそが}しい{毎日|まいにち}の{中|なか}でも、こんなふうに{立|た}ち{止|ど}まって{深呼吸|しんこきゅう}できる{時間|じかん}を、これからも{大切|たいせつ}にしたいと{思|おも}います。",
+        "zh": "即使在忙碌的日常里，我也希望能一直珍惜这样能停下脚步、静心放松的时光。",
+        "style": "calm, sincere, unhurried prose closing"
+      }
+    ]
+  },
+  {
+    "id": "spec-change-schedule-negotiation",
+    "title": "{仕様変更|しようへんこう}とスケジュール{調整|ちょうせい}",
+    "titleZh": "需求变更确认与排期协商",
+    "category": "work",
+    "emoji": "📋",
+    "accent": "#0d9488",
+    "accentDark": "#2dd4bf",
+    "kind": "dialogue",
+    "speakers": [
+      {
+        "id": "pm",
+        "label": "产品经理",
+        "voice": "Leda",
+        "style": "friendly, clear, collaborative Japanese product manager"
+      },
+      {
+        "id": "you",
+        "label": "わたし",
+        "self": true,
+        "voice": "Puck",
+        "style": "calm, polite, constructive Japanese software engineer"
+      }
+    ],
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "pm",
+        "ja": "{急|きゅう}で{申|もう}し{訳|わけ}ないんですが、{今週|こんしゅう}{金曜|きんよう}のリリースに{向|む}けて、{検索|けんさく}フィルターを{一|ひと}つ{追加|ついか}してほしいという{要望|ようぼう}が{来|き}ています。",
+        "zh": "不好意思这么突然，针对本周五的发布，业务方那边提了个需求，希望能再加一个搜索筛选条件。",
+        "style": "apologetic yet clear workplace request"
+      },
+      {
+        "id": "l2",
+        "speaker": "you",
+        "ja": "{承知|しょうち}しました。ちなみに、そのフィルターの{条件|じょうけん}はすでに{確定|かくてい}していますか。",
+        "zh": "好的，我了解了。请问这个筛选条件的具体规则已经确定了吗？",
+        "style": "polite and attentive confirmation"
+      },
+      {
+        "id": "l3",
+        "speaker": "pm",
+        "ja": "はい、ステータスごとの{絞|しぼ}り{込|こ}みだけなので、{画面|がめん}の{修正|しゅうせい}はそれほど{大|おお}きくないと{思|おも}います。",
+        "zh": "是的，只是按状态进行筛选，我想页面的改动应该不会太大。",
+        "style": "reassuring and concise explanation"
+      },
+      {
+        "id": "l4",
+        "speaker": "you",
+        "ja": "なるほど。APIの{修正|しゅうせい}とテストを{含|ふく}めると、まる{一日|いちにち}ほど{追加|ついか}で{工数|こうすう}がかかりそうです。",
+        "zh": "原来如此。如果算上 API 的修改和测试，大概还需要额外一天的工作量。",
+        "style": "thoughtful, objective estimation"
+      },
+      {
+        "id": "l5",
+        "speaker": "you",
+        "ja": "{金曜|きんよう}のリリースを{優先|ゆうせん}するなら、{今回|こんかい}は{予定|よてい}{通|どお}り{出|だ}して、フィルターは{来週|らいしゅう}のアップデートに{回|まわ}すのも{一案|いちあん}ですが、いかがでしょうか。",
+        "zh": "如果优先保周五发布的话，这次先按原计划上线，把筛选功能放到下周更新中也是一个方案，您看怎么样？",
+        "style": "constructive and polite proposal"
+      },
+      {
+        "id": "l6",
+        "speaker": "pm",
+        "ja": "そうですね、{品質|ひんしつ}を{落|お}としたくないので、その{方針|ほうしん}でいきましょう。{関係者|かんけいしゃ}には{私|わたし}から{共有|きょうゆう}しておきます。",
+        "zh": "确实，我们也不想影响质量，那就按这个方案来吧。相关人员那边由我去同步说明。",
+        "style": "decisive agreement and supportive wrap-up"
+      }
+    ]
+  },
+  {
+    "id": "autumn-evening-sento",
+    "title": "{秋|あき}の{夜|よる}の{銭湯|せんとう}",
+    "titleZh": "秋夜的钱汤（短文）",
+    "category": "home",
+    "emoji": "♨️",
+    "accent": "#b45309",
+    "accentDark": "#f59e0b",
+    "kind": "passage",
+    "speakers": [
+      {
+        "id": "narrator",
+        "label": "朗读",
+        "voice": "Aoede",
+        "style": "clear, warm, steady standard Japanese broadcast narration, crisp articulation, no breathiness"
+      }
+    ],
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "narrator",
+        "ja": "{十一月|じゅういちがつ}に{入|はい}ると、{夕方|ゆうがた}にはすっかり{空気|くうき}が{冷|つめ}たくなります。そんな{日|ひ}は、{近所|きんじょ}の{古|ふる}い{銭湯|せんとう}へ{足|あし}を{運|はこ}ぶのが{私|わたし}の{定番|ていばん}です。",
+        "zh": "一进入十一月，傍晚的空气便彻底变凉了。每逢这样的日子，去附近的老钱汤泡个澡，就是我的固定习惯。",
+        "style": "calm, warm Japanese prose opening"
+      },
+      {
+        "id": "l2",
+        "speaker": "narrator",
+        "ja": "{暖簾|のれん}をくぐって{脱衣所|だついじょ}に{入|はい}ると、ほのかな{石鹸|せっけん}の{香|かお}りと{湯気|ゆげ}が{迎|むか}えてくれます。{木|き}のロッカーに{上着|うわぎ}を{閉|し}まって、{浴室|よくしつ}の{扉|とびら}を{開|あ}けます。",
+        "zh": "掀开布帘走进更衣室，淡淡的肥皂香和热气便迎面而来。把外套放进木制储物柜里，推开浴室的门。",
+        "style": "gentle, descriptive, unhurried narration"
+      },
+      {
+        "id": "l3",
+        "speaker": "narrator",
+        "ja": "{少|すこ}し{熱|あつ}めのお{湯|ゆ}に{肩|かた}までつかった{瞬間|しゅんかん}、{体|からだ}の{芯|しん}までじんわり{温|あたた}まります。{一日|いちにち}の{疲|つか}れが、{湯船|ゆぶね}の{中|なか}にゆっくり{溶|と}けていくようです。",
+        "zh": "在略微偏烫的热水里一直泡到肩膀的那一刻，从身体深处慢慢暖和起来。一天的疲惫，仿佛也随之在浴池里缓缓融化了。",
+        "style": "relaxed, soothing, unhurried narration"
+      },
+      {
+        "id": "l4",
+        "speaker": "narrator",
+        "ja": "{湯上|ゆあ}がりに{冷|つめ}たいコーヒー{牛乳|ぎゅうにゅう}を{飲|の}みながら、{待合室|まちあいしつ}のベンチでひと{息|いき}つきます。{常連|じょうれん}さんの{穏|おだ}やかな{会話|かいわ}を{聞|き}いていると、{心|こころ}まで{落|お}ち{着|つ}きます。",
+        "zh": "泡完澡后，一边喝着冰凉的咖啡牛奶，一边在休息区的长椅上喘口气。听着常客们平和的闲聊，连心情也随之平静下来。",
+        "style": "reflective, warm, unhurried narration"
+      },
+      {
+        "id": "l5",
+        "speaker": "narrator",
+        "ja": "{外|そと}に{出|で}ると、さっきまで{寒|さむ}かった{夜風|よかぜ}が{不思議|ふしぎ}と{心地|ここち}よく{感|かん}じられます。ぽかぽかした{気分|きぶん}のまま、{家路|いえじ}につくのが{秋|あき}の{夜|よる}のささやかな{贅沢|ぜいたく}です。",
+        "zh": "走到外面时，刚才还觉得寒冷的夜风不可思议地变得十分惬意。带着浑身暖融融的心情踏上归途，正是秋夜里小小的奢侈。",
+        "style": "calm, sincere, unhurried prose closing"
+      }
+    ]
+  }
+]
