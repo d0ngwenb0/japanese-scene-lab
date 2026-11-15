@@ -1428,7 +1428,7 @@ a:focus-visible {
   gap: 12px;
   padding: 7px 40px;
   border-bottom: 1px solid var(--border);
-  background: var(--bg);
+  background: transparent;
 }
 
 .list-tools-left,
@@ -1490,17 +1490,24 @@ a:focus-visible {
   overscroll-behavior-y: contain;
   padding: 4px 0 10px;
   scrollbar-width: thin;
-  scrollbar-color: var(--border-strong) transparent;
+  scrollbar-color: color-mix(in srgb, var(--border-strong) 55%, transparent) transparent;
 }
 
 .subs::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+}
+
+.subs::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .subs::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border: 2px solid var(--bg);
+  background: color-mix(in srgb, var(--border-strong) 55%, transparent);
   border-radius: 999px;
+}
+
+.subs::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
 }
 
 .turn {
@@ -3001,10 +3008,6 @@ a,
 .scene-zh,
 .bubble-zh {
   text-wrap: pretty;
-}
-
-.list-pane {
-  scrollbar-gutter: stable;
 }
 
 /* 注音由伪元素显示，文字本身不进入选区 */
