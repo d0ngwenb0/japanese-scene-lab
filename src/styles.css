@@ -3964,7 +3964,7 @@ dialog::backdrop {
   cursor: pointer;
   opacity: 0.28;
   filter: blur(0.8px);
-  transform: scale(0.93);
+  transform: scale(0.86);
   transition:
     opacity 0.28s ease,
     filter 0.28s ease,
@@ -3987,7 +3987,7 @@ dialog::backdrop {
 .focus-line.is-active {
   opacity: 1;
   filter: blur(0);
-  transform: scale(1.04);
+  transform: scale(1.06);
   background: radial-gradient(
     ellipse 68% 85% at 50% 50%,
     color-mix(in srgb, var(--accent) 16%, transparent) 0%,
@@ -4012,7 +4012,7 @@ dialog::backdrop {
 .focus-ja {
   display: block;
   font-family: var(--jp);
-  font-size: clamp(1.25rem, 0.9rem + 1.8vw, 2.35rem);
+  font-size: clamp(1.25rem, 0.95rem + 1.9vw, 2.5rem);
   line-height: 1.72;
   font-weight: 500;
   color: var(--ink);
@@ -4022,7 +4022,7 @@ dialog::backdrop {
 
 @supports (font-size: 1cqi) {
   .focus-ja {
-    font-size: clamp(1.25rem, 0.9rem + 1.8cqi, 2.35rem);
+    font-size: clamp(1.25rem, 0.95rem + 1.9cqi, 2.5rem);
   }
 }
 
@@ -4054,14 +4054,14 @@ dialog::backdrop {
 
 .focus-zh {
   display: block;
-  font-size: clamp(0.875rem, 0.72rem + 0.8vw, 1.35rem);
+  font-size: clamp(0.875rem, 0.74rem + 0.85vw, 1.45rem);
   line-height: 1.55;
   color: var(--muted);
 }
 
 @supports (font-size: 1cqi) {
   .focus-zh {
-    font-size: clamp(0.875rem, 0.72rem + 0.8cqi, 1.35rem);
+    font-size: clamp(0.875rem, 0.74rem + 0.85cqi, 1.45rem);
   }
 }
 
