@@ -80,6 +80,7 @@ export default function App() {
 
   const [autoPlayNext, setAutoPlayNext] = useState(false);
   const [replayTick, setReplayTick] = useState(0);
+  const [focusMode, setFocusMode] = useState(false);
   const [timerEndAt, setTimerEndAt] = useState<number | null>(null);
   const [timerPreset, setTimerPreset] = useState<number | null>(null);
   const [timerStopTick, setTimerStopTick] = useState(0);
@@ -91,6 +92,7 @@ export default function App() {
 
   const back = useCallback(() => {
     setAutoPlayNext(false);
+    setFocusMode(false);
     window.location.hash = '#/';
   }, []);
 
@@ -178,6 +180,8 @@ export default function App() {
           timerPreset={timerPreset}
           timerStopTick={timerStopTick}
           onTimerChange={setPlaybackTimer}
+          focusMode={focusMode}
+          onFocusModeChange={setFocusMode}
         />
       ) : (
         <ScenarioList

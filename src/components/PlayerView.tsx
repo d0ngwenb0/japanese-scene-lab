@@ -10,7 +10,7 @@ import {
 import type { Line, LoopMode, Scenario, Settings, ThemeMode } from '../types';
 import { Furigana } from '../lib/furigana';
 import { usePlayer } from '../lib/usePlayer';
-import { BackIcon, CopyIcon, LoopAllIcon, LoopOneIcon, NextIcon, PauseIcon, PlayIcon, PrevIcon, ReplayIcon, ShuffleIcon, SparklesIcon } from './Icons';
+import { BackIcon, CopyIcon, LoopAllIcon, LoopOneIcon, LyricsIcon, NextIcon, PauseIcon, PlayIcon, PrevIcon, ReplayIcon, ShuffleIcon, SparklesIcon } from './Icons';
 import { copyText, formatLine, formatScene, stripFurigana } from '../lib/copy';
 import { ThemeToggle } from './ThemeToggle';
 import { BgmToggle } from './BgmToggle';
@@ -21,6 +21,7 @@ import { FullscreenToggle } from './FullscreenToggle';
 import { SceneSwitcher } from './SceneSwitcher';
 import { AiChat } from './AiChat';
 import { PassageList } from './PassageList';
+import { FocusLyricsOverlay } from './FocusLyricsOverlay';
 import { getSpeakerColors } from '../lib/speakerColors';
 
 const SPEEDS = [0.75, 1, 1.25];
@@ -42,6 +43,8 @@ interface Props {
   timerPreset: number | null;
   timerStopTick: number;
   onTimerChange: (minutes: number | null) => void;
+  focusMode: boolean;
+  onFocusModeChange: (enabled: boolean) => void;
 }
 
 function PlayingMark() {
@@ -71,6 +74,8 @@ export function PlayerView({
   timerPreset,
   timerStopTick,
   onTimerChange,
+  focusMode,
+  onFocusModeChange,
 }: Props) {
   const [aiOpen, setAiOpen] = useState(false);
   const [pausedByAi, setPausedByAi] = useState(false);
@@ -258,6 +263,10 @@ export function PlayerView({
         case 'Escape':
           if (event.defaultPrevented || document.documentElement.dataset.fullscreen === 'true') return;
           if (document.querySelector('.menu-popover')) return;
+          if (focusMode) {
+            onFocusModeChange(false);
+            return;
+          }
           if (aiOpen) {
             closeAi();
             return;
@@ -268,7 +277,7 @@ export function PlayerView({
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [toggle, next, prev, replay, onBack, onSettingsChange, settings.loop, aiOpen, closeAi]);
+  }, [toggle, next, prev, replay, onBack, onSettingsChange, settings.loop, aiOpen, closeAi, focusMode, onFocusModeChange]);
 
   const clampAiWidth = useCallback(
     (width: number) => {
@@ -383,6 +392,16 @@ export function PlayerView({
             </div>
           </div>
           <div className="list-tools-right">
+            <button
+              type="button"
+              className={focusMode ? 'tool-btn is-active' : 'tool-btn'}
+              onClick={() => onFocusModeChange(true)}
+              aria-label="字幕沉浸模式"
+              aria-pressed={focusMode}
+              title="字幕沉浸模式"
+            >
+              <LyricsIcon width={16} height={16} />
+            </button>
             <button
               type="button"
               className={aiOpen ? 'tool-btn ai-trigger is-active' : 'tool-btn ai-trigger'}
@@ -624,6 +643,26 @@ export function PlayerView({
         pausedByAi={pausedByAi}
         onClose={closeAi}
       />
+
+      {focusMode && (
+        <FocusLyricsOverlay
+          lines={scenario.lines}
+          index={index}
+          playing={playing}
+          loop={settings.loop}
+          rate={settings.rate}
+          speeds={SPEEDS}
+          isPassage={isPassage}
+          onSelect={select}
+          onToggle={toggle}
+          onPrev={prev}
+          onNext={next}
+          onReplay={replay}
+          onToggleLoop={toggleLoop}
+          onRateChange={(rate) => onSettingsChange({ rate })}
+          onClose={() => onFocusModeChange(false)}
+        />
+      )}
 
       {toast && (
         <div className="toast" role="status" aria-live="polite">

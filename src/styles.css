@@ -3812,3 +3812,191 @@ dialog::backdrop {
 .ai-confirm-danger:hover {
   opacity: 0.9;
 }
+
+/* ---------- 字幕沉浸模式 ---------- */
+
+.focus-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
+  backdrop-filter: blur(22px) saturate(1.2);
+  -webkit-backdrop-filter: blur(22px) saturate(1.2);
+}
+
+.focus-exit {
+  position: fixed;
+  top: calc(14px + var(--safe-top));
+  right: calc(16px + var(--safe-right));
+  z-index: 62;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: var(--card-shadow);
+  cursor: pointer;
+  transition: color 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+}
+
+.focus-exit:hover,
+.focus-exit:focus-visible {
+  color: var(--ink);
+  border-color: var(--border-strong);
+  background: var(--surface);
+}
+
+.focus-stage {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 38vh 24px 40vh;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 15%,
+    #000 85%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 15%,
+    #000 85%,
+    transparent 100%
+  );
+}
+
+.focus-stage::-webkit-scrollbar {
+  display: none;
+}
+
+.focus-line {
+  width: min(760px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 22px;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  background: transparent;
+  text-align: center;
+  cursor: pointer;
+  opacity: 0.34;
+  transform: scale(0.95);
+  transition:
+    opacity 0.28s ease,
+    transform 0.28s ease,
+    background 0.28s ease,
+    border-color 0.28s ease,
+    box-shadow 0.28s ease;
+}
+
+.focus-line:hover {
+  opacity: 0.68;
+}
+
+.focus-line.is-active {
+  opacity: 1;
+  transform: scale(1);
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 26%, var(--border));
+  box-shadow: 0 10px 32px rgba(24, 20, 14, 0.08);
+}
+
+:root[data-theme='dark'] .focus-line.is-active {
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.36);
+}
+
+.focus-ja {
+  display: block;
+  font-family: var(--jp);
+  font-size: clamp(20px, 3vw, 28px);
+  line-height: 1.75;
+  font-weight: 500;
+  color: var(--ink);
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+
+.focus-line.is-active .focus-ja {
+  font-weight: 650;
+}
+
+.focus-ja rt {
+  font-size: 0.44em;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--faint);
+}
+
+.focus-zh {
+  display: block;
+  font-size: clamp(14px, 1.8vw, 17px);
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.focus-line.is-active .focus-zh {
+  color: color-mix(in srgb, var(--ink) 80%, var(--muted));
+}
+
+.focus-playbar {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  padding: 8px calc(16px + var(--safe-right)) calc(14px + var(--safe-bottom))
+    calc(16px + var(--safe-left));
+  pointer-events: none;
+}
+
+.focus-playbar-row {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--surface) 84%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--dock-shadow);
+}
+
+@media (max-width: 600px) {
+  .focus-stage {
+    padding: 34vh 14px 36vh;
+    gap: 14px;
+  }
+
+  .focus-line {
+    padding: 12px 14px;
+  }
+
+  .focus-playbar-row {
+    width: 100%;
+    border-radius: 18px;
+    padding: 8px 10px;
+    gap: 8px;
+  }
+}

@@ -351,3 +351,13 @@ export function TimerIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function LyricsIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M4 6h16" />
+      <path d="M6 12h12" />
+      <path d="M8 18h8" />
+    </svg>
+  );
+}
