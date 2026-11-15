@@ -4214,10 +4214,10 @@ dialog::backdrop {
   border: none;
   border-radius: 999px;
   background: transparent;
-  color: color-mix(in srgb, var(--ink) 86%, var(--muted));
+  color: var(--muted);
   font: inherit;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: 0.02em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -4232,15 +4232,15 @@ dialog::backdrop {
 }
 
 .scene-time-track {
-  fill: color-mix(in srgb, var(--surface-2) 70%, transparent);
-  stroke: color-mix(in srgb, var(--border-strong) 65%, transparent);
-  stroke-width: 2.5;
+  fill: none;
+  stroke: color-mix(in srgb, var(--border-strong) 45%, transparent);
+  stroke-width: 1.8;
 }
 
 .scene-time-fill {
   fill: none;
-  stroke: color-mix(in srgb, var(--accent) 78%, var(--muted));
-  stroke-width: 2.6;
+  stroke: color-mix(in srgb, var(--accent) 48%, transparent);
+  stroke-width: 2;
   stroke-linecap: round;
   transition: stroke-dashoffset 0.25s linear;
 }
@@ -4250,7 +4250,7 @@ dialog::backdrop {
   align-items: center;
 }
 
-/* 桌面端左侧竖排播放栏：与 38×38 图标按钮等宽的轻量细环，协调融入竖条节奏 */
+/* 桌面端左侧竖排播放栏：与 38×38 图标按钮等宽的轻盈细环，文字轻柔协调 */
 @media (min-width: 1000px) and (min-height: 561px) {
   .playbar .scene-time {
     position: relative;
@@ -4270,14 +4270,14 @@ dialog::backdrop {
   }
 
   .playbar .scene-time-track {
-    fill: color-mix(in srgb, var(--surface-2) 55%, transparent);
-    stroke: color-mix(in srgb, var(--border-strong) 55%, transparent);
-    stroke-width: 1.5;
+    fill: none;
+    stroke: color-mix(in srgb, var(--border-strong) 40%, transparent);
+    stroke-width: 0.95;
   }
 
   .playbar .scene-time-fill {
-    stroke: color-mix(in srgb, var(--accent) 76%, var(--muted));
-    stroke-width: 1.7;
+    stroke: color-mix(in srgb, var(--accent) 44%, transparent);
+    stroke-width: 1.15;
   }
 
   .playbar .scene-time-text {
@@ -4290,8 +4290,8 @@ dialog::backdrop {
 
   .playbar .scene-time-cur {
     font-size: 9.5px;
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: -0.01em;
-    color: color-mix(in srgb, var(--ink) 88%, var(--muted));
+    color: var(--muted);
   }
 }
