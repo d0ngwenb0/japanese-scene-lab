@@ -4143,9 +4143,9 @@ dialog::backdrop {
   flex: none;
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 6px;
   height: 28px;
-  padding: 0 9px;
+  padding: 0 9px 0 6px;
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--surface-2);
@@ -4157,6 +4157,33 @@ dialog::backdrop {
   white-space: nowrap;
   cursor: pointer;
   transition: border-color 0.14s ease, color 0.14s ease, background 0.14s ease;
+}
+
+.scene-time-ring {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  transform: rotate(-90deg);
+}
+
+.scene-time-track {
+  fill: none;
+  stroke: color-mix(in srgb, var(--ink) 14%, transparent);
+  stroke-width: 3.2;
+}
+
+.scene-time-fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.2s linear;
+}
+
+.scene-time-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
 }
 
 .scene-time:hover,
@@ -4175,4 +4202,71 @@ dialog::backdrop {
 .scene-time-total {
   color: var(--muted);
   font-weight: 500;
+}
+
+/* 桌面端左侧竖排播放栏：改为紧凑圆形进度环 + 双行小字，避免撑胖竖条 */
+@media (min-width: 1000px) and (min-height: 561px) {
+  .playbar .scene-time {
+    position: relative;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+    border-color: transparent;
+    background: transparent;
+  }
+
+  .playbar .scene-time:hover,
+  .playbar .scene-time:focus-visible {
+    background: var(--surface-2);
+    border-color: transparent;
+  }
+
+  .playbar .scene-time.is-countdown {
+    background: color-mix(in srgb, var(--accent-soft) 70%, transparent);
+    border-color: transparent;
+  }
+
+  .playbar .scene-time-ring {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .playbar .scene-time-track {
+    stroke: color-mix(in srgb, var(--ink) 12%, transparent);
+    stroke-width: 2.2;
+  }
+
+  .playbar .scene-time-fill {
+    stroke-width: 2.4;
+  }
+
+  .playbar .scene-time-text {
+    position: relative;
+    z-index: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    line-height: 1;
+  }
+
+  .playbar .scene-time-cur {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .playbar .scene-time-sep {
+    display: none;
+  }
+
+  .playbar .scene-time-total {
+    font-size: 7.5px;
+    opacity: 0.85;
+    letter-spacing: -0.02em;
+  }
 }

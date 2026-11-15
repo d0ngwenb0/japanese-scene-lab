@@ -19,6 +19,7 @@ function formatSec(seconds: number): string {
 export function SceneTimePill({ current, duration, countdown, onToggleMode }: Props) {
   const valid = duration > 0;
   const remaining = Math.max(0, duration - current);
+  const progress = valid ? Math.min(1, Math.max(0, current / duration)) : 0;
   const left = !valid
     ? '--:--'
     : countdown
@@ -26,17 +27,34 @@ export function SceneTimePill({ current, duration, countdown, onToggleMode }: Pr
       : formatSec(current);
   const total = valid ? formatSec(duration) : '--:--';
 
+  const r = 15.5;
+  const circumference = 2 * Math.PI * r;
+  const dashOffset = circumference * (1 - progress);
+
   return (
     <button
       type="button"
       className={countdown ? 'scene-time is-countdown' : 'scene-time'}
       onClick={onToggleMode}
       aria-label={countdown ? `剩余时间 ${left}，总时长 ${total}，点击切换正计时` : `已播放 ${left}，总时长 ${total}，点击切换倒计时`}
-      title={countdown ? '倒计时（点击切换为正计时）' : '正计时（点击切换为倒计时）'}
+      title={countdown ? `倒计时 ${left} / ${total}（点击切换正计时）` : `已播 ${left} / ${total}（点击切换倒计时）`}
     >
-      <span>{left}</span>
-      <span className="scene-time-sep">/</span>
-      <span className="scene-time-total">{total}</span>
+      <svg className="scene-time-ring" viewBox="0 0 36 36" aria-hidden="true">
+        <circle className="scene-time-track" cx="18" cy="18" r={r} />
+        <circle
+          className="scene-time-fill"
+          cx="18"
+          cy="18"
+          r={r}
+          strokeDasharray={circumference}
+          strokeDashoffset={dashOffset}
+        />
+      </svg>
+      <span className="scene-time-text">
+        <span className="scene-time-cur">{left}</span>
+        <span className="scene-time-sep">/</span>
+        <span className="scene-time-total">{total}</span>
+      </span>
     </button>
   );
 }
