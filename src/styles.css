@@ -3850,16 +3850,17 @@ dialog::backdrop {
   z-index: 62;
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-  max-width: calc(100vw - 124px);
+  gap: 10px;
+  min-height: 36px;
+  max-width: calc(100vw - 140px);
   padding: 2px 0;
   border: none;
   background: transparent;
-  color: color-mix(in srgb, var(--ink) 76%, var(--muted));
+  color: color-mix(in srgb, var(--ink) 80%, var(--muted));
   font-family: var(--jp);
-  font-size: clamp(13px, 1.2vw, 15px);
-  font-weight: 500;
-  line-height: 1.65;
+  font-size: clamp(14px, 1.25vw, 16px);
+  font-weight: 600;
+  line-height: 1.6;
   letter-spacing: 0.01em;
   white-space: nowrap;
   overflow: hidden;
@@ -3876,10 +3877,10 @@ dialog::backdrop {
 .focus-title::before {
   content: '';
   flex: none;
-  width: 3px;
-  height: 13px;
+  width: 3.5px;
+  height: 16px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--accent) 78%, transparent);
+  background: color-mix(in srgb, var(--accent) 82%, transparent);
   box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
@@ -3896,16 +3897,16 @@ dialog::backdrop {
   z-index: 62;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  height: 30px;
-  padding: 0 11px;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
   border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--surface) 52%, transparent);
+  background: color-mix(in srgb, var(--surface) 56%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition:
@@ -3929,13 +3930,14 @@ dialog::backdrop {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   overscroll-behavior: contain;
   scrollbar-width: none;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: clamp(14px, 2vw, 24px);
-  padding: clamp(22dvh, 28dvh, 32dvh) clamp(16px, 4vw, 56px) clamp(24dvh, 30dvh, 34dvh);
+  padding: clamp(22dvh, 28dvh, 32dvh) clamp(10px, 2vw, 28px) clamp(24dvh, 30dvh, 34dvh);
   -webkit-mask-image: linear-gradient(
     to bottom,
     transparent 0%,
@@ -3964,20 +3966,20 @@ dialog::backdrop {
 
 .focus-line {
   position: relative;
-  width: min(1080px, 92%);
+  width: min(1440px, 92%);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  padding: clamp(14px, 1.8vw, 22px) clamp(16px, 3vw, 32px);
+  padding: clamp(14px, 1.8vw, 22px) clamp(10px, 1.5vw, 24px);
   border: none;
   border-radius: 0;
   background: transparent;
   text-align: center;
   cursor: pointer;
-  opacity: 0.28;
-  filter: blur(0.8px);
-  transform: scale(0.86);
+  opacity: 0.24;
+  filter: blur(1px);
+  transform: scale(0.8);
   transition:
     opacity 0.28s ease,
     filter 0.28s ease,
@@ -3987,8 +3989,8 @@ dialog::backdrop {
 
 @supports (width: 1cqi) {
   .focus-line {
-    width: min(1080px, 92cqi);
-    padding: clamp(14px, 1.8cqi, 22px) clamp(16px, 3cqi, 32px);
+    width: min(1440px, 92cqi);
+    padding: clamp(14px, 1.8cqi, 22px) clamp(10px, 1.5cqi, 24px);
   }
 }
 
@@ -4000,7 +4002,7 @@ dialog::backdrop {
 .focus-line.is-active {
   opacity: 1;
   filter: blur(0);
-  transform: scale(1.06);
+  transform: scale(1.07);
   background: radial-gradient(
     ellipse 68% 85% at 50% 50%,
     color-mix(in srgb, var(--accent) 16%, transparent) 0%,
@@ -4025,7 +4027,7 @@ dialog::backdrop {
 .focus-ja {
   display: block;
   font-family: var(--jp);
-  font-size: clamp(1.25rem, 0.95rem + 1.9vw, 2.5rem);
+  font-size: clamp(1.25rem, 1rem + 2.1vw, 2.85rem);
   line-height: 1.72;
   font-weight: 500;
   color: var(--ink);
@@ -4035,7 +4037,7 @@ dialog::backdrop {
 
 @supports (font-size: 1cqi) {
   .focus-ja {
-    font-size: clamp(1.25rem, 0.95rem + 1.9cqi, 2.5rem);
+    font-size: clamp(1.25rem, 1rem + 2.1cqi, 2.85rem);
   }
 }
 
@@ -4067,14 +4069,14 @@ dialog::backdrop {
 
 .focus-zh {
   display: block;
-  font-size: clamp(0.875rem, 0.74rem + 0.85vw, 1.45rem);
+  font-size: clamp(0.875rem, 0.76rem + 0.9vw, 1.55rem);
   line-height: 1.55;
   color: var(--muted);
 }
 
 @supports (font-size: 1cqi) {
   .focus-zh {
-    font-size: clamp(0.875rem, 0.74rem + 0.85cqi, 1.45rem);
+    font-size: clamp(0.875rem, 0.76rem + 0.9cqi, 1.55rem);
   }
 }
 
