@@ -122,6 +122,10 @@ export function FocusLyricsOverlay({
 
       <div className="focus-playbar" role="group" aria-label="播放控制">
         <div className="focus-playbar-row">
+          <div className="focus-bar-meta">
+            <SceneTimePill current={sceneTime} duration={sceneDuration} />
+          </div>
+
           <div className="transport">
             <button
               type="button"
@@ -152,7 +156,7 @@ export function FocusLyricsOverlay({
             </button>
             <button
               type="button"
-              className="ctrl"
+              className="ctrl ctrl-replay"
               onClick={onReplay}
               aria-label={isPassage ? '重播本段' : '重播本句'}
               title={isPassage ? '重播本段' : '重播本句'}
@@ -160,8 +164,6 @@ export function FocusLyricsOverlay({
               <ReplayIcon width={17} height={17} />
             </button>
           </div>
-
-          <SceneTimePill current={sceneTime} duration={sceneDuration} />
 
           <div className="modes">
             <button
@@ -172,7 +174,7 @@ export function FocusLyricsOverlay({
               aria-label={isPassage ? '单段循环' : '单句循环'}
               title={isPassage ? '单段循环' : '单句循环'}
             >
-              <LoopOneIcon width={18} height={18} />
+              <LoopOneIcon width={17} height={17} />
             </button>
             <button
               type="button"
@@ -182,7 +184,7 @@ export function FocusLyricsOverlay({
               aria-label={isPassage ? '整篇循环' : '整段循环'}
               title={isPassage ? '整篇循环' : '整段循环'}
             >
-              <LoopAllIcon width={18} height={18} />
+              <LoopAllIcon width={17} height={17} />
             </button>
             <button
               type="button"
@@ -192,7 +194,7 @@ export function FocusLyricsOverlay({
               aria-label="所有场景随机循环"
               title="所有场景随机循环"
             >
-              <ShuffleIcon width={17} height={17} />
+              <ShuffleIcon width={16} height={16} />
             </button>
             <div className="speed-group" role="group" aria-label="播放速度">
               {speeds.map((speed) => (
