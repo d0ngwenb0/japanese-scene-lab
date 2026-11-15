@@ -12,6 +12,7 @@ import {
   ReplayIcon,
   ShuffleIcon,
 } from './Icons';
+import { SceneTimePill } from './SceneTimePill';
 
 interface Props {
   lines: Line[];
@@ -21,6 +22,10 @@ interface Props {
   rate: number;
   speeds: number[];
   isPassage: boolean;
+  sceneTime: number;
+  sceneDuration: number;
+  timeCountdown: boolean;
+  onToggleTimeMode: () => void;
   onSelect: (i: number) => void;
   onToggle: () => void;
   onPrev: () => void;
@@ -39,6 +44,10 @@ export function FocusLyricsOverlay({
   rate,
   speeds,
   isPassage,
+  sceneTime,
+  sceneDuration,
+  timeCountdown,
+  onToggleTimeMode,
   onSelect,
   onToggle,
   onPrev,
@@ -155,6 +164,13 @@ export function FocusLyricsOverlay({
               <ReplayIcon width={17} height={17} />
             </button>
           </div>
+
+          <SceneTimePill
+            current={sceneTime}
+            duration={sceneDuration}
+            countdown={timeCountdown}
+            onToggleMode={onToggleTimeMode}
+          />
 
           <div className="modes">
             <button

@@ -22,6 +22,7 @@ import { SceneSwitcher } from './SceneSwitcher';
 import { AiChat } from './AiChat';
 import { PassageList } from './PassageList';
 import { FocusLyricsOverlay } from './FocusLyricsOverlay';
+import { SceneTimePill } from './SceneTimePill';
 import { getSpeakerColors } from '../lib/speakerColors';
 
 const SPEEDS = [0.75, 1, 1.25];
@@ -79,8 +80,9 @@ export function PlayerView({
 }: Props) {
   const [aiOpen, setAiOpen] = useState(false);
   const [pausedByAi, setPausedByAi] = useState(false);
+  const [timeCountdown, setTimeCountdown] = useState(false);
 
-  const { index, playing, lineProgress, missing, toggle, pause, resume, select, next, prev, replay } = usePlayer({
+  const { index, playing, lineProgress, sceneTime, sceneDuration, missing, toggle, pause, resume, select, next, prev, replay } = usePlayer({
     sceneId: scenario.id,
     lines: scenario.lines,
     loop: settings.loop,
@@ -557,6 +559,13 @@ export function PlayerView({
             </button>
           </div>
 
+          <SceneTimePill
+            current={sceneTime}
+            duration={sceneDuration}
+            countdown={timeCountdown}
+            onToggleMode={() => setTimeCountdown((v) => !v)}
+          />
+
           <div className="modes">
             <button
               type="button"
@@ -653,6 +662,10 @@ export function PlayerView({
           rate={settings.rate}
           speeds={SPEEDS}
           isPassage={isPassage}
+          sceneTime={sceneTime}
+          sceneDuration={sceneDuration}
+          timeCountdown={timeCountdown}
+          onToggleTimeMode={() => setTimeCountdown((v) => !v)}
           onSelect={select}
           onToggle={toggle}
           onPrev={prev}

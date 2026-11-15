@@ -83,6 +83,8 @@ export function usePlayer({ sceneId, lines, loop, rate, autoPlay = false, onScen
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(autoPlay);
   const [lineProgress, setLineProgress] = useState(0);
+  const [sceneTime, setSceneTime] = useState(0);
+  const [sceneDuration, setSceneDuration] = useState(0);
   const [missing, setMissing] = useState(false);
 
   const indexRef = useRef(index);
@@ -136,6 +138,8 @@ export function usePlayer({ sceneId, lines, loop, rate, autoPlay = false, onScen
       inGapRef.current = false;
       internalTransitionRef.current = autoplay;
       const cue = track.cues[Math.min(Math.max(targetIndex, 0), track.cues.length - 1)];
+      setSceneDuration(track.cues[track.cues.length - 1]?.end ?? 0);
+      setSceneTime(cue.start);
       pendingSeekRef.current = cue.start > 0 ? cue.start : null;
       audio.src = track.blobUrl;
       audio.loop = loopRef.current === 'all' && !oneShot.current;
@@ -175,6 +179,7 @@ export function usePlayer({ sceneId, lines, loop, rate, autoPlay = false, onScen
         syncLoopFlag();
         audio.playbackRate = rateRef.current;
         audio.currentTime = track.cues[target].start;
+        setSceneTime(track.cues[target].start);
         if (autoplay) {
           setPlaying(true);
           safePlay();
@@ -214,6 +219,7 @@ export function usePlayer({ sceneId, lines, loop, rate, autoPlay = false, onScen
       }
       activeTrack = track;
       stitchedRef.current = track;
+      setSceneDuration(track.cues[track.cues.length - 1]?.end ?? 0);
       if (!playingRef.current) {
         activateStitched(track, indexRef.current, false);
       } else {
@@ -329,11 +335,16 @@ export function usePlayer({ sceneId, lines, loop, rate, autoPlay = false, onScen
         const cue = track.cues[cueIdx];
         const dur = Math.max(cue.end - cue.start, 0.01);
         setLineProgress(Math.min(Math.max((t - cue.start) / dur, 0), 1));
+        const total = track.cues[track.cues.length - 1]?.end ?? 0;
+        if (total > 0) setSceneDuration(total);
+        setSceneTime(Math.min(Math.max(t, 0), total || t));
         return;
       }
 
       if (inGapRef.current) return;
       setLineProgress(a.duration > 0 ? Math.min(a.currentTime / a.duration, 1) : 0);
+      if (a.duration > 0) setSceneDuration(a.duration);
+      setSceneTime(a.currentTime);
     };
 
     const onPlaying = () => {
@@ -519,6 +530,8 @@ export function usePlayer({ sceneId, lines, loop, rate, autoPlay = false, onScen
     index,
     playing,
     lineProgress,
+    sceneTime,
+    sceneDuration,
     missing,
     toggle,
     pause,
