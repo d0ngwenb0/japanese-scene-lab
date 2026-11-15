@@ -4208,58 +4208,57 @@ dialog::backdrop {
   flex: none;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 28px;
-  padding: 0 9px 0 6px;
-  border: 1px solid var(--border);
+  gap: 7px;
+  height: 30px;
+  padding: 0 4px;
+  border: none;
   border-radius: 999px;
-  background: var(--surface-2);
-  color: var(--ink);
+  background: transparent;
+  color: color-mix(in srgb, var(--ink) 86%, var(--muted));
   font: inherit;
-  font-size: 11.5px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   user-select: none;
 }
 
 .scene-time-ring {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   flex: none;
   transform: rotate(-90deg);
 }
 
 .scene-time-track {
-  fill: none;
-  stroke: color-mix(in srgb, var(--ink) 14%, transparent);
-  stroke-width: 3.2;
+  fill: color-mix(in srgb, var(--surface-2) 70%, transparent);
+  stroke: color-mix(in srgb, var(--border-strong) 65%, transparent);
+  stroke-width: 2.5;
 }
 
 .scene-time-fill {
   fill: none;
-  stroke: var(--accent);
-  stroke-width: 3.2;
+  stroke: color-mix(in srgb, var(--accent) 78%, var(--muted));
+  stroke-width: 2.6;
   stroke-linecap: round;
-  transition: stroke-dashoffset 0.2s linear;
+  transition: stroke-dashoffset 0.25s linear;
 }
 
 .scene-time-text {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
 }
 
-/* 桌面端左侧竖排播放栏：改为紧凑圆形进度环 + 单个倒计时数字，避免撑胖竖条 */
+/* 桌面端左侧竖排播放栏：与 38×38 图标按钮等宽的轻量细环，协调融入竖条节奏 */
 @media (min-width: 1000px) and (min-height: 561px) {
   .playbar .scene-time {
     position: relative;
-    width: 42px;
-    height: 42px;
+    width: 38px;
+    height: 38px;
     padding: 0;
     justify-content: center;
     border-radius: 50%;
-    border-color: transparent;
     background: transparent;
   }
 
@@ -4271,37 +4270,28 @@ dialog::backdrop {
   }
 
   .playbar .scene-time-track {
-    stroke: color-mix(in srgb, var(--ink) 12%, transparent);
-    stroke-width: 2.2;
+    fill: color-mix(in srgb, var(--surface-2) 55%, transparent);
+    stroke: color-mix(in srgb, var(--border-strong) 55%, transparent);
+    stroke-width: 1.5;
   }
 
   .playbar .scene-time-fill {
-    stroke-width: 2.4;
+    stroke: color-mix(in srgb, var(--accent) 76%, var(--muted));
+    stroke-width: 1.7;
   }
 
   .playbar .scene-time-text {
     position: relative;
     z-index: 1;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 1px;
     line-height: 1;
   }
 
   .playbar .scene-time-cur {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-  }
-
-  .playbar .scene-time-sep {
-    display: none;
-  }
-
-  .playbar .scene-time-total {
-    font-size: 7.5px;
-    opacity: 0.85;
-    letter-spacing: -0.02em;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: color-mix(in srgb, var(--ink) 88%, var(--muted));
   }
 }
