@@ -21,7 +21,7 @@ export function SceneTimePill({ current, duration }: Props) {
   const display = valid ? formatSec(remaining) : '--:--';
   const total = valid ? formatSec(duration) : '--:--';
 
-  const r = 15.5;
+  const r = 17.4;
   const circumference = 2 * Math.PI * r;
   const dashOffset = circumference * (1 - progress);
 

@@ -3960,33 +3960,6 @@ dialog::backdrop {
   box-shadow: none;
 }
 
-.focus-line.is-active::after {
-  content: '';
-  display: block;
-  width: min(140px, 32%);
-  height: 2.5px;
-  margin-top: 4px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
-  box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 70%, transparent);
-}
-
-.focus-line.is-active.is-playing::after {
-  animation: focus-beam 2.2s ease-in-out infinite;
-}
-
-@keyframes focus-beam {
-  0%,
-  100% {
-    opacity: 0.75;
-    transform: scaleX(0.92);
-  }
-  50% {
-    opacity: 1;
-    transform: scaleX(1.12);
-  }
-}
-
 :root[data-theme='dark'] .focus-line.is-active {
   background: radial-gradient(
     ellipse 68% 85% at 50% 50%,
