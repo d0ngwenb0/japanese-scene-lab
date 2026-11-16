@@ -131,8 +131,8 @@ for (const scene of Array.isArray(scenarios) ? scenarios : []) {
       errors.push(`${where}: JLPT 听力必须提供 jlpt 题目与选项`);
     }
   } else {
-    if (scene.lines.length < 5 || scene.lines.length > 6) {
-      errors.push(`${where}: 对话场景句数必须为 5–6 句（当前 ${scene.lines.length} 句）`);
+    if (scene.lines.length < 5 || scene.lines.length > 8) {
+      errors.push(`${where}: 对话场景句数必须为 5–8 句（当前 ${scene.lines.length} 句）`);
     }
     const selfSpeakers = scene.speakers.filter((s) => s.self);
     if (selfSpeakers.length !== 1) {
