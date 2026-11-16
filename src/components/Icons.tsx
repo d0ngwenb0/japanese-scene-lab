@@ -361,3 +361,22 @@ export function LyricsIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function BookOpenIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M2 5.5A2.5 2.5 0 0 1 4.5 3H10a2 2 0 0 1 2 2v14a1.5 1.5 0 0 0-1.5-1.5H4.5A2.5 2.5 0 0 0 2 20z" />
+      <path d="M22 5.5A2.5 2.5 0 0 0 19.5 3H14a2 2 0 0 0-2 2v14a1.5 1.5 0 0 1 1.5-1.5h6A2.5 2.5 0 0 1 22 20z" />
+    </svg>
+  );
+}
+
+export function VolumeIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M11 5L6 9H3v6h3l5 4z" />
+      <path d="M15.5 8.5a5 5 0 0 1 0 7" />
+      <path d="M18.5 5.5a9 9 0 0 1 0 13" />
+    </svg>
+  );
+}

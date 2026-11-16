@@ -10,7 +10,7 @@ import {
 import type { Line, LoopMode, Scenario, Settings, ThemeMode } from '../types';
 import { Furigana } from '../lib/furigana';
 import { usePlayer } from '../lib/usePlayer';
-import { BackIcon, CopyIcon, LoopAllIcon, LoopOneIcon, LyricsIcon, NextIcon, PauseIcon, PlayIcon, PrevIcon, ReplayIcon, ShuffleIcon, SparklesIcon } from './Icons';
+import { BackIcon, BookOpenIcon, CopyIcon, LoopAllIcon, LoopOneIcon, LyricsIcon, NextIcon, PauseIcon, PlayIcon, PrevIcon, ReplayIcon, ShuffleIcon, SparklesIcon } from './Icons';
 import { copyText, formatLine, formatScene, stripFurigana } from '../lib/copy';
 import { ThemeToggle } from './ThemeToggle';
 import { BgmToggle } from './BgmToggle';
@@ -19,6 +19,7 @@ import { PaletteToggle } from './PaletteToggle';
 import { ForceRefreshButton } from './ForceRefreshButton';
 import { FullscreenToggle } from './FullscreenToggle';
 import { JlptStage } from './JlptStage';
+import { VocabPanel } from './VocabPanel';
 import { SceneSwitcher } from './SceneSwitcher';
 import { AiChat } from './AiChat';
 import { PassageList } from './PassageList';
@@ -94,6 +95,7 @@ export function PlayerView({
   const listRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Array<HTMLElement | null>>([]);
   const [toast, setToast] = useState('');
+  const [vocabOpen, setVocabOpen] = useState(false);
   const lastTimerStopTickRef = useRef(timerStopTick);
 
   useEffect(() => {
@@ -397,6 +399,16 @@ export function PlayerView({
           <div className="list-tools-right">
             <button
               type="button"
+              className={vocabOpen ? 'tool-btn is-active' : 'tool-btn'}
+              onClick={() => setVocabOpen((v) => !v)}
+              aria-label="本场景生词学习与测验"
+              aria-expanded={vocabOpen}
+              title="本场景生词学习与测验"
+            >
+              <BookOpenIcon width={16} height={16} />
+            </button>
+            <button
+              type="button"
               className={focusMode ? 'tool-btn is-active' : 'tool-btn'}
               onClick={() => onFocusModeChange(true)}
               aria-label="字幕沉浸模式"
@@ -655,6 +667,17 @@ export function PlayerView({
         open={aiOpen}
         pausedByAi={pausedByAi}
         onClose={closeAi}
+      />
+
+      <VocabPanel
+        open={vocabOpen}
+        scenario={scenario}
+        allScenarios={scenarios}
+        onClose={() => setVocabOpen(false)}
+        onJumpToLine={(lineIdx) => {
+          setVocabOpen(false);
+          select(lineIdx);
+        }}
       />
 
       {focusMode && (

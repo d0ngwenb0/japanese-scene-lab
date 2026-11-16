@@ -55,6 +55,24 @@ export interface Line {
   style?: string;
 }
 
+export interface VocabItem {
+  id: string;
+  /** 日语词汇（可带 {漢字|かんじ} 标注） */
+  word: string;
+  /** 纯假名读音 */
+  reading: string;
+  /** 词性 */
+  pos: string;
+  /** 音调核，如 0 / ① / ② / ③ */
+  pitch?: string;
+  /** 中文释义 */
+  meaning: string;
+  /** 出自本场景哪一句 */
+  lineId: string;
+  /** 用法或语境提示 */
+  note?: string;
+}
+
 export interface JlptMeta {
   level: 'N1' | 'N2' | 'N3' | 'N4' | 'N5';
   type: string;
@@ -80,6 +98,7 @@ export interface Scenario {
   speakers: Speaker[];
   lines: Line[];
   jlpt?: JlptMeta;
+  vocab?: VocabItem[];
 }
 
 export type LoopMode = 'off' | 'line' | 'all' | 'scenes';
