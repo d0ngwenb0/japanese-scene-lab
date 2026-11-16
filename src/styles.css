@@ -3840,7 +3840,7 @@ dialog::backdrop {
 }
 
 :root[data-theme='dark'] .focus-overlay {
-  background: color-mix(in srgb, var(--bg) 60%, transparent);
+  background: color-mix(in srgb, var(--bg) 74%, #000 18%);
 }
 
 .focus-title {
@@ -4063,30 +4063,34 @@ dialog::backdrop {
 
 @media (color-gamut: p3) {
   .focus-line.is-active .focus-ja {
-    color: color-mix(in display-p3, var(--accent) 92%, #ff4500);
+    color: color-mix(in display-p3, var(--accent) 88%, color(display-p3 1 0.18 0.05));
     text-shadow:
-      0 0 10px color-mix(in display-p3, var(--accent) 38%, transparent),
-      0 0 28px color-mix(in display-p3, var(--accent) 26%, transparent),
-      0 0 52px color-mix(in display-p3, var(--accent) 14%, transparent);
+      0 0 2px color(display-p3 1 1 1 / 0.85),
+      0 0 16px color-mix(in display-p3, var(--accent) 58%, transparent),
+      0 0 42px color-mix(in display-p3, var(--accent) 38%, transparent),
+      0 0 80px color-mix(in display-p3, var(--accent) 22%, transparent);
   }
 
   :root[data-theme='dark'] .focus-line.is-active .focus-ja {
-    color: color-mix(in display-p3, var(--accent) 45%, color(display-p3 1 1 1));
+    color: color(display-p3 1 1 1);
     text-shadow:
-      0 0 6px color(display-p3 1 1 1 / 0.55),
-      0 0 22px color-mix(in display-p3, var(--accent) 85%, transparent),
-      0 0 56px color-mix(in display-p3, var(--accent) 48%, transparent);
+      0 0 8px color(display-p3 1 1 1 / 0.85),
+      0 0 24px color-mix(in display-p3, var(--accent) 95%, color(display-p3 1 1 1)),
+      0 0 54px color-mix(in display-p3, var(--accent) 72%, transparent),
+      0 0 96px color-mix(in display-p3, var(--accent) 44%, transparent);
   }
 }
 
 @media (dynamic-range: high) {
   .focus-line:not(.is-active):not(:hover) {
-    opacity: 0.18;
+    opacity: 0.14;
   }
 
   :root[data-theme='dark'] .focus-line.is-active .focus-zh {
-    color: color(display-p3 0.98 0.98 1);
-    text-shadow: 0 0 12px color(display-p3 1 1 1 / 0.22);
+    color: color(display-p3 1 1 1);
+    text-shadow:
+      0 0 6px color(display-p3 1 1 1 / 0.45),
+      0 0 20px color-mix(in display-p3, var(--accent) 45%, transparent);
   }
 }
 
