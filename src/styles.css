@@ -4049,35 +4049,23 @@ dialog::backdrop {
 .focus-line.is-active .focus-ja {
   font-weight: 700;
   color: var(--accent);
-  text-shadow:
-    0 0 18px color-mix(in srgb, var(--accent) 32%, transparent),
-    0 0 38px color-mix(in srgb, var(--accent) 16%, transparent);
+  text-shadow: none;
 }
 
 :root[data-theme='dark'] .focus-line.is-active .focus-ja {
-  color: color-mix(in srgb, var(--accent) 70%, #ffffff);
-  text-shadow:
-    0 0 22px color-mix(in srgb, var(--accent) 62%, transparent),
-    0 0 48px color-mix(in srgb, var(--accent) 32%, transparent);
+  color: color-mix(in srgb, var(--accent) 55%, #ffffff);
+  text-shadow: none;
 }
 
 @media (color-gamut: p3) {
   .focus-line.is-active .focus-ja {
-    color: color-mix(in display-p3, var(--accent) 88%, color(display-p3 1 0.18 0.05));
-    text-shadow:
-      0 0 2px color(display-p3 1 1 1 / 0.85),
-      0 0 16px color-mix(in display-p3, var(--accent) 58%, transparent),
-      0 0 42px color-mix(in display-p3, var(--accent) 38%, transparent),
-      0 0 80px color-mix(in display-p3, var(--accent) 22%, transparent);
+    color: color-mix(in display-p3, var(--accent) 92%, color(display-p3 1 0.18 0.05));
+    text-shadow: none;
   }
 
   :root[data-theme='dark'] .focus-line.is-active .focus-ja {
     color: color(display-p3 1 1 1);
-    text-shadow:
-      0 0 8px color(display-p3 1 1 1 / 0.85),
-      0 0 24px color-mix(in display-p3, var(--accent) 95%, color(display-p3 1 1 1)),
-      0 0 54px color-mix(in display-p3, var(--accent) 72%, transparent),
-      0 0 96px color-mix(in display-p3, var(--accent) 44%, transparent);
+    text-shadow: none;
   }
 }
 
@@ -4088,9 +4076,7 @@ dialog::backdrop {
 
   :root[data-theme='dark'] .focus-line.is-active .focus-zh {
     color: color(display-p3 1 1 1);
-    text-shadow:
-      0 0 6px color(display-p3 1 1 1 / 0.45),
-      0 0 20px color-mix(in display-p3, var(--accent) 45%, transparent);
+    text-shadow: none;
   }
 }
 
