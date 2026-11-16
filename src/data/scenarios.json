@@ -1369,5 +1369,163 @@
         "note": "「{夜風|よかぜ}に{当|あ}たる」吹吹夜风。"
       }
     ]
+  },
+  {
+    "id": "shinya-shokudou-tonjiru",
+    "kind": "dialogue",
+    "category": "food",
+    "title": "{深夜食堂|しんやしょくどう}：あったかい{豚汁定食|とんじるていしょく}",
+    "titleZh": "深夜食堂：热气腾腾的猪肉味噌汤定食",
+    "emoji": "🍲",
+    "accent": "#b45309",
+    "accentDark": "#f59e0b",
+    "speakers": [
+      {
+        "id": "master",
+        "label": "マスター",
+        "voice": "Charon",
+        "style": "deep, calm, warm, unhurried Japanese late-night diner master speaking steadily"
+      },
+      {
+        "id": "you",
+        "label": "わたし",
+        "self": true,
+        "voice": "Puck",
+        "style": "tired yet relaxed, polite late-night regular customer speaking at a calm natural pace"
+      }
+    ],
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "master",
+        "ja": "いらっしゃい。{今夜|こんや}はまた{遅|おそ}かったね。{外|そと}、かなり{冷|ひ}えてるだろ。",
+        "zh": "欢迎光临。今晚又忙到这么晚啊。外面挺冷的吧。",
+        "style": "warm, unhurried greeting from late-night diner master"
+      },
+      {
+        "id": "l2",
+        "speaker": "you",
+        "ja": "ええ、やっと{残業|ざんぎょう}が{終|お}わって……。マスター、{豚汁定食|とんじるていしょく}をひとつお{願|ねが}いできますか。",
+        "zh": "嗯，加班终于结束了……老板，能给我来一份猪肉味噌汤定食吗？",
+        "style": "tired, gentle, polite request at a steady pace"
+      },
+      {
+        "id": "l3",
+        "speaker": "master",
+        "ja": "あいよ。お{腹|なか}すいてるだろうから、{具|ぐ}をたっぷり{入|い}れておいたよ。ほら、どうぞ。",
+        "zh": "好嘞。你肯定饿坏了，我给你多盛了些料。来，慢用。",
+        "style": "kind, comforting, unhurried master voice"
+      },
+      {
+        "id": "l4",
+        "speaker": "you",
+        "ja": "うわあ、いい{湯気|ゆげ}……いただきます。……うん、{味噌|みそ}の{優|やさ}しい{味|あじ}が{体|からだ}に{染|し}みますね。",
+        "zh": "哇，好暖的热气……我开动了。……嗯，味噌温和的味道真是沁人心脾啊。",
+        "style": "relaxed, appreciative, soft tone at a natural pace"
+      },
+      {
+        "id": "l5",
+        "speaker": "master",
+        "ja": "うちの{看板|かんばん}だからね。ちなみに、{別|べつ}に{食|た}べたいものがあったら、{材料|ざいりょう}さえあれば{作|つく}るよ。",
+        "zh": "这可是咱店的招牌嘛。对了，要是还有别的想吃的，只要有食材我都能给你做。",
+        "style": "quietly confident, warm, unhurried master line"
+      },
+      {
+        "id": "l6",
+        "speaker": "you",
+        "ja": "ありがとうございます。ここへ{来|く}ると、なんだかほっとして{明日|あした}も{頑張|がんば}れそうな{気|き}がします。",
+        "zh": "谢谢老板。每次来到这里，总会莫名地松一口气，感觉明天又能继续加油了。",
+        "style": "sincere, warm, calm closing from customer"
+      },
+      {
+        "id": "l7",
+        "speaker": "master",
+        "ja": "そりゃよかった。ゆっくり{温|あたた}まっていきな。",
+        "zh": "那可太好了。慢慢吃，暖和暖和再走吧。",
+        "style": "gentle, unhurried, reassuring closing from master"
+      }
+    ],
+    "vocab": [
+      {
+        "id": "v1",
+        "word": "{冷|ひ}える",
+        "reading": "ひえる",
+        "pos": "动2",
+        "pitch": "②",
+        "meaning": "变冷、发凉（气温/身体）",
+        "lineId": "l1",
+        "note": "「{体|からだ}が{冷|ひ}える」身体发冷；「{冷|ひ}えたビール」冰镇啤酒。"
+      },
+      {
+        "id": "v2",
+        "word": "{残業|ざんぎょう}",
+        "reading": "ざんぎょう",
+        "pos": "名·动3",
+        "pitch": "0",
+        "meaning": "加班",
+        "lineId": "l2",
+        "note": "「{残業|ざんぎょう}が{終|お}わる」加班结束。"
+      },
+      {
+        "id": "v3",
+        "word": "{豚汁|とんじる}",
+        "reading": "とんじる",
+        "pos": "名词",
+        "pitch": "0",
+        "meaning": "日式猪肉蔬菜味噌汤",
+        "lineId": "l2",
+        "note": "《深夜食堂》最具代表性的招牌料理，也可读作「ぶたじる」（部分地区）。"
+      },
+      {
+        "id": "v4",
+        "word": "たっぷり",
+        "reading": "たっぷり",
+        "pos": "副词",
+        "pitch": "③",
+        "meaning": "满满地、充足地、大量",
+        "lineId": "l3",
+        "note": "「{具|ぐ}をたっぷり{入|い}れる」多放食材/配料。"
+      },
+      {
+        "id": "v5",
+        "word": "{湯気|ゆげ}",
+        "reading": "ゆげ",
+        "pos": "名词",
+        "pitch": "①",
+        "meaning": "热气、水蒸气",
+        "lineId": "l4",
+        "note": "热汤、刚出锅的饭菜冒出的热气。"
+      },
+      {
+        "id": "v6",
+        "word": "{染|し}みる",
+        "reading": "しみる",
+        "pos": "动2",
+        "pitch": "0",
+        "meaning": "渗透、沁入（心脾/身体）",
+        "lineId": "l4",
+        "note": "「{体|からだ}に{染|し}みる」暖到心里/渗透全身。"
+      },
+      {
+        "id": "v7",
+        "word": "{看板|かんばん}",
+        "reading": "かんばん",
+        "pos": "名词",
+        "pitch": "0",
+        "meaning": "招牌、招牌菜",
+        "lineId": "l5",
+        "note": "「うちの{看板|かんばん}」我们店的招牌。"
+      },
+      {
+        "id": "v8",
+        "word": "ほっとする",
+        "reading": "ほっとする",
+        "pos": "动3",
+        "pitch": "0",
+        "meaning": "松一口气、感到安心",
+        "lineId": "l6",
+        "note": "忙碌一天后感到放松、安心时的常用表达。"
+      }
+    ]
   }
 ]
