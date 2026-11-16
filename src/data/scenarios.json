@@ -1527,5 +1527,142 @@
         "note": "忙碌一天后感到放松、安心时的常用表达。"
       }
     ]
+  },
+  {
+    "id": "shinya-alley-omoide",
+    "kind": "passage",
+    "category": "social",
+    "title": "{路地裏|ろじうら}の{思|おも}い{出|で}（{深夜|しんや}フォーク{朗読|ろうどく}）",
+    "titleZh": "小巷里的回忆（深夜食堂主题曲风格民谣朗诵）",
+    "emoji": "🎸",
+    "accent": "#92400e",
+    "accentDark": "#d97706",
+    "speakers": [
+      {
+        "id": "narrator",
+        "label": "語り",
+        "voice": "Charon",
+        "style": "deep, warm, nostalgic Japanese male storyteller voice"
+      }
+    ],
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "narrator",
+        "ja": "{街灯|がいとう}の{下|した}、{細|ほそ}い{路地裏|ろじうら}を{抜|ぬ}けて、{古|ふる}い{暖簾|のれん}の{前|まえ}で{足|あし}を{止|と}める。",
+        "zh": "在路灯下穿过狭窄的小巷深处，在旧暖帘前停下了脚步。",
+        "style": "deep, warm, nostalgic Japanese male storyteller voice, unhurried and intimate"
+      },
+      {
+        "id": "l2",
+        "speaker": "narrator",
+        "ja": "{今日|きょう}もあったいろんなことを、{湯気|ゆげ}の{向|む}こうへそっと{流|なが}していく。",
+        "zh": "今天发生过的种种事情，都悄悄顺着热气飘散到另一头去。",
+        "style": "gentle, wistful, calm Japanese male narration"
+      },
+      {
+        "id": "l3",
+        "speaker": "narrator",
+        "ja": "{遠|とお}い{日|ひ}の{思|おも}い{出|で}が、コップの{中|なか}で{静|しず}かに{揺|ゆ}れている。",
+        "zh": "遥远往昔的回忆，在玻璃杯中静静地摇曳着。",
+        "style": "soft, poetic, reflective Japanese male voice"
+      },
+      {
+        "id": "l4",
+        "speaker": "narrator",
+        "ja": "ひとりきりでも、ここに{来|く}れば、いつも{変|か}わらない{灯|あか}りが{迎|むか}えてくれる。",
+        "zh": "就算独自一人，只要来到这里，那盏从未改变的灯光总会温柔迎接。",
+        "style": "warm, comforting, unhurried Japanese male voice"
+      },
+      {
+        "id": "l5",
+        "speaker": "narrator",
+        "ja": "{夜|よる}が{明|あ}けるころには、また{歩|ある}き{出|だ}せるような、そんな{気|き}がするんだ。",
+        "zh": "到了天亮的时候，总觉得自己又能重新迈步向前了。",
+        "style": "quietly hopeful, gentle closing narration"
+      }
+    ],
+    "vocab": [
+      {
+        "id": "v1",
+        "word": "{街灯|がいとう}",
+        "reading": "がいとう",
+        "pos": "名词",
+        "pitch": "0",
+        "meaning": "路灯",
+        "lineId": "l1",
+        "note": "夜晚照亮街道或小巷的灯。"
+      },
+      {
+        "id": "v2",
+        "word": "{路地裏|ろじうら}",
+        "reading": "ろじうら",
+        "pos": "名词",
+        "pitch": "0",
+        "meaning": "小巷深处、背街小巷",
+        "lineId": "l1",
+        "note": "《深夜食堂》故事发生地的典型意象。"
+      },
+      {
+        "id": "v3",
+        "word": "{暖簾|のれん}",
+        "reading": "のれん",
+        "pos": "名词",
+        "pitch": "0",
+        "meaning": "门帘（日式店铺入口布帘）",
+        "lineId": "l1",
+        "note": "挂出暖帘代表开始营业，收起代表打烊。"
+      },
+      {
+        "id": "v4",
+        "word": "{向|む}こう",
+        "reading": "むこう",
+        "pos": "名词",
+        "pitch": "②",
+        "meaning": "对面、另一头、彼端",
+        "lineId": "l2",
+        "note": "「{湯気|ゆげ}の{向|む}こう」热气的另一端。"
+      },
+      {
+        "id": "v5",
+        "word": "{思|おも}い{出|で}",
+        "reading": "おもいで",
+        "pos": "名词",
+        "pitch": "0",
+        "meaning": "回忆、往事",
+        "lineId": "l3",
+        "note": "与主题曲《思ひで》（思い出）呼应。"
+      },
+      {
+        "id": "v6",
+        "word": "{静|しず}かに{揺|ゆ}れる",
+        "reading": "しずかにゆれる",
+        "pos": "表达",
+        "pitch": "0",
+        "meaning": "静静地摇曳/晃动",
+        "lineId": "l3",
+        "note": "形容杯中倒影或烛火轻轻晃动。"
+      },
+      {
+        "id": "v7",
+        "word": "ひとりきり",
+        "reading": "ひとりきり",
+        "pos": "名词·副",
+        "pitch": "④",
+        "meaning": "孤身一人、独自一人",
+        "lineId": "l4",
+        "note": "比「ひとり」更强调孤单感。"
+      },
+      {
+        "id": "v8",
+        "word": "{夜|よる}が{明|あ}ける",
+        "reading": "よるがあける",
+        "pos": "表达",
+        "pitch": "0",
+        "meaning": "天亮、破晓",
+        "lineId": "l5",
+        "note": "漫长夜晚结束、迎来黎明。"
+      }
+    ]
   }
 ]
