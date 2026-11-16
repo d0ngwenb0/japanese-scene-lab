@@ -1074,5 +1074,163 @@
         "note": "电车晚点迟到时用来向公司或学校报备的凭证。"
       }
     ]
+  },
+  {
+    "id": "izakaya-ordering-allergy",
+    "kind": "dialogue",
+    "category": "food",
+    "title": "{居酒屋|いざかや}での{注文|ちゅうもん}：おすすめと{苦手|にがて}な{食材|しょくざい}",
+    "titleZh": "居酒屋点餐：询问推荐菜与确认忌口食材",
+    "emoji": "🏮",
+    "accent": "#d97706",
+    "accentDark": "#fbbf24",
+    "speakers": [
+      {
+        "id": "staff",
+        "label": "店員",
+        "voice": "Leda",
+        "style": "warm, friendly, unhurried Japanese izakaya staff speaking clearly at a natural pace"
+      },
+      {
+        "id": "you",
+        "label": "わたし",
+        "self": true,
+        "voice": "Puck",
+        "style": "polite, relaxed Japanese customer speaking steadily at a natural pace"
+      }
+    ],
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "staff",
+        "ja": "いらっしゃいませ。{何名様|なんめいさま}でしょうか。",
+        "zh": "欢迎光临。请问几位？",
+        "style": "warm, welcoming staff greeting at a steady natural pace"
+      },
+      {
+        "id": "l2",
+        "speaker": "you",
+        "ja": "{二人|ふたり}です。カウンター{席|せき}でも{大丈夫|だいじょうぶ}ですので、お{願|ねが}いします。",
+        "zh": "两位。吧台座位也可以，麻烦您了。",
+        "style": "polite, relaxed customer reply at a natural pace"
+      },
+      {
+        "id": "l3",
+        "speaker": "staff",
+        "ja": "かしこまりました。お{飲|の}み{物|もの}と、{本日|ほんじつ}のおすすめメニューはこちらになります。",
+        "zh": "好的，明白了。饮品单和今天的推荐菜单在这里。",
+        "style": "courteous, clear staff guidance at a natural pace"
+      },
+      {
+        "id": "l4",
+        "speaker": "you",
+        "ja": "では、{生|なま}ビールを{二|ふた}つと、お{店|みせ}の{人気|にんき}メニューを{教|おし}えていただけますか。",
+        "zh": "那先来两杯生啤，另外能介绍一下店里的人气菜品吗？",
+        "style": "friendly, polite customer order at a natural pace"
+      },
+      {
+        "id": "l5",
+        "speaker": "staff",
+        "ja": "{今夜|こんや}は{焼|や}き{鳥|とり}の{盛|も}り{合|あ}わせと、{旬|しゅん}のお{刺身|さしみ}がよく{出|で}ています。",
+        "zh": "今晚烤鸡肉串拼盘和当季生鱼片点得比较多。",
+        "style": "enthusiastic yet unhurried staff recommendation"
+      },
+      {
+        "id": "l6",
+        "speaker": "you",
+        "ja": "おいしそうですね。{友|とも}だちが{甲殻類|こうかくるい}が{苦手|にがて}なので、エビやカニが{入|はい}っていないものでお{願|ねが}いします。",
+        "zh": "听起来很不错。不过我朋友不吃甲壳类海鲜，请帮我们选不含虾蟹的菜品。",
+        "style": "polite, clear dietary request at a steady pace"
+      },
+      {
+        "id": "l7",
+        "speaker": "staff",
+        "ja": "かしこまりました。{甲殻類|こうかくるい}は{抜|ぬ}きでご{用意|ようい}いたしますので、ご{安心|あんしん}ください。",
+        "zh": "好的明白了。我们会为您去掉甲壳类食材来准备，请放心。",
+        "style": "reassuring, courteous closing from staff"
+      }
+    ],
+    "vocab": [
+      {
+        "id": "v1",
+        "word": "{何名様|なんめいさま}",
+        "reading": "なんめいさま",
+        "pos": "名词",
+        "pitch": "⑤",
+        "meaning": "几位客人（敬语）",
+        "lineId": "l1",
+        "note": "进日本餐厅时店员必问的一句话。"
+      },
+      {
+        "id": "v2",
+        "word": "カウンター{席|せき}",
+        "reading": "カウンターせき",
+        "pos": "名词",
+        "pitch": "⑤",
+        "meaning": "吧台座位",
+        "lineId": "l2",
+        "note": "相对的是「テーブル{席|せき}」（桌席）或「{座敷|ざしき}」（榻榻米）。"
+      },
+      {
+        "id": "v3",
+        "word": "かしこまりました",
+        "reading": "かしこまりました",
+        "pos": "表达",
+        "pitch": "⑥",
+        "meaning": "明白了、好的（店员敬语）",
+        "lineId": "l3",
+        "note": "服务业最高频的礼貌应答，相当于「わかりました」的敬语。"
+      },
+      {
+        "id": "v4",
+        "word": "おすすめ",
+        "reading": "おすすめ",
+        "pos": "名词",
+        "pitch": "0",
+        "meaning": "推荐、招牌",
+        "lineId": "l3",
+        "note": "「おすすめのメニュー」推荐菜。"
+      },
+      {
+        "id": "v5",
+        "word": "{盛|も}り{合|あ}わせ",
+        "reading": "もりあわせ",
+        "pos": "名词",
+        "pitch": "0",
+        "meaning": "拼盘",
+        "lineId": "l5",
+        "note": "如「お{刺身|さしみ}の{盛|も}り{合|あ}わせ」（生鱼片拼盘）。"
+      },
+      {
+        "id": "v6",
+        "word": "{旬|しゅん}",
+        "reading": "しゅん",
+        "pos": "名词",
+        "pitch": "①",
+        "meaning": "当季、时令",
+        "lineId": "l5",
+        "note": "「{旬|しゅん}の{食材|しょくざい}」时令食材。"
+      },
+      {
+        "id": "v7",
+        "word": "{苦手|にがて}",
+        "reading": "にがて",
+        "pos": "な形",
+        "pitch": "0",
+        "meaning": "不擅长、不喜欢/忌口",
+        "lineId": "l6",
+        "note": "点餐时比直接说「{嫌|きら}い」更委婉自然。"
+      },
+      {
+        "id": "v8",
+        "word": "{抜|ぬ}き",
+        "reading": "ぬき",
+        "pos": "接尾词",
+        "pitch": "0",
+        "meaning": "去掉、不含……",
+        "lineId": "l7",
+        "note": "点餐常用「わさび{抜|ぬ}き」（不要芥末）、「ネギ{抜|ぬ}き」（不要葱）。"
+      }
+    ]
   }
 ]
