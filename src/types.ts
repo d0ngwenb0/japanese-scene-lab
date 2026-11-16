@@ -99,6 +99,8 @@ export interface Scenario {
   lines: Line[];
   jlpt?: JlptMeta;
   vocab?: VocabItem[];
+  /** 可选场景专属背景音乐文件名（位于 public/bgm/） */
+  bgm?: string;
 }
 
 export type LoopMode = 'off' | 'line' | 'all' | 'scenes';

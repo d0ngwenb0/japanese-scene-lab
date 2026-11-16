@@ -24,8 +24,16 @@ export default function App() {
   );
 
   const { settings } = state;
+  const activeForBgm = useMemo(
+    () => (sceneId ? scenarios.find((s) => s.id === sceneId) : undefined),
+    [sceneId],
+  );
 
-  useBgm(settings.bgm);
+  useBgm(
+    settings.bgm || Boolean(activeForBgm?.bgm),
+    activeForBgm?.bgm,
+    activeForBgm?.bgm ? 0.14 : undefined,
+  );
 
   useEffect(() => {
     const onHashChange = () => setSceneId(readSceneId());

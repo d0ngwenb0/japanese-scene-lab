@@ -1368,7 +1368,8 @@
         "lineId": "l4",
         "note": "「{夜風|よかぜ}に{当|あ}たる」吹吹夜风。"
       }
-    ]
+    ],
+    "bgm": "city-pop.mp3"
   },
   {
     "id": "shinya-shokudou-tonjiru",
@@ -1663,6 +1664,7 @@
         "lineId": "l5",
         "note": "漫长夜晚结束、迎来黎明。"
       }
-    ]
+    ],
+    "bgm": "shinya-folk.mp3"
   }
 ]
