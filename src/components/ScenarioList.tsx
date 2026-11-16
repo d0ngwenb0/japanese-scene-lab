@@ -5,7 +5,7 @@ import { BgmToggle } from './BgmToggle';
 import { PaletteToggle } from './PaletteToggle';
 import { FullscreenToggle } from './FullscreenToggle';
 import { ForceRefreshButton } from './ForceRefreshButton';
-import { GridIcon, ListIcon, ShuffleIcon } from './Icons';
+import { GridIcon, ListIcon, ShuffleIcon, StarIcon } from './Icons';
 import { Furigana } from '../lib/furigana';
 import {
   CATEGORY_OPTIONS,
@@ -23,6 +23,9 @@ interface Props {
   onBgmChange: (enabled: boolean) => void;
   onSettingsChange: (patch: Partial<Settings>) => void;
   onOpen: (id: string) => void;
+  isFavorite: (id: string) => boolean;
+  onToggleFavorite: (id: string) => void;
+  favoriteCount: number;
 }
 
 type KindFilter = 'all' | 'dialogue' | 'passage' | 'jlpt';
@@ -66,10 +69,14 @@ export function ScenarioList({
   onBgmChange,
   onSettingsChange,
   onOpen,
+  isFavorite,
+  onToggleFavorite,
+  favoriteCount,
 }: Props) {
   const [storedFilters] = useState(readStoredFilters);
   const [kind, setKind] = useState<KindFilter>(storedFilters.kind);
   const [category, setCategory] = useState<CategoryFilter>(storedFilters.category);
+  const [onlyFavorites, setOnlyFavorites] = useState(false);
 
   const totalLines = scenarios.reduce((sum, scene) => sum + scene.lines.length, 0);
 
@@ -84,16 +91,17 @@ export function ScenarioList({
     return result;
   }, [scenarios]);
 
-  const activeFilters = Boolean(kind !== 'all' || category !== 'all');
+  const activeFilters = Boolean(kind !== 'all' || category !== 'all' || onlyFavorites);
 
   const filtered = useMemo(
     () =>
       scenarios.filter((scene) => {
+        if (onlyFavorites && !isFavorite(scene.id)) return false;
         if (category !== 'all' && sceneCategory(scene) !== category) return false;
         if (kind !== 'all' && (scene.kind ?? 'dialogue') !== kind) return false;
         return true;
       }),
-    [scenarios, category, kind],
+    [scenarios, category, kind, onlyFavorites, isFavorite],
   );
 
   const filteredLines = filtered.reduce((sum, scene) => sum + scene.lines.length, 0);
@@ -119,6 +127,7 @@ export function ScenarioList({
   const resetFilters = () => {
     setKind('all');
     setCategory('all');
+    setOnlyFavorites(false);
   };
 
   const randomStudy = () => {
@@ -218,6 +227,15 @@ export function ScenarioList({
                 {option.label}
               </button>
             ))}
+            <button
+              type="button"
+              className={onlyFavorites ? 'filter-chip fav-filter-chip is-on' : 'filter-chip fav-filter-chip'}
+              onClick={() => setOnlyFavorites((v) => !v)}
+              aria-pressed={onlyFavorites}
+            >
+              <StarIcon width={12} height={12} filled={onlyFavorites} />
+              <span>收藏{favoriteCount > 0 ? ` (${favoriteCount})` : ''}</span>
+            </button>
           </div>
 
           {activeFilters ? (
@@ -280,6 +298,19 @@ export function ScenarioList({
                     <span>{scene.lines.length} {scene.kind === 'passage' ? '段' : '句'}</span>
                   </span>
                 </button>
+                <button
+                  type="button"
+                  className={isFavorite(scene.id) ? 'fav-btn is-on' : 'fav-btn'}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleFavorite(scene.id);
+                  }}
+                  aria-label={isFavorite(scene.id) ? '取消收藏' : '收藏场景'}
+                  aria-pressed={isFavorite(scene.id)}
+                  title={isFavorite(scene.id) ? '取消收藏' : '收藏场景'}
+                >
+                  <StarIcon width={15} height={15} filled={isFavorite(scene.id)} />
+                </button>
               </li>
             ))}
           </ul>
@@ -316,6 +347,19 @@ export function ScenarioList({
                   <span className="scene-side">
                     <span className="scene-count">{scene.lines.length} {scene.kind === 'passage' ? '段' : '句'}</span>
                   </span>
+                </button>
+                <button
+                  type="button"
+                  className={isFavorite(scene.id) ? 'fav-btn fav-btn-row is-on' : 'fav-btn fav-btn-row'}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleFavorite(scene.id);
+                  }}
+                  aria-label={isFavorite(scene.id) ? '取消收藏' : '收藏场景'}
+                  aria-pressed={isFavorite(scene.id)}
+                  title={isFavorite(scene.id) ? '取消收藏' : '收藏场景'}
+                >
+                  <StarIcon width={15} height={15} filled={isFavorite(scene.id)} />
                 </button>
               </li>
             ))}

@@ -5152,3 +5152,52 @@ dialog::backdrop {
   font-size: 14px;
   padding: 28px 12px;
 }
+
+/* ---------- 场景收藏功能 ---------- */
+
+.fav-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.fav-btn {
+  position: absolute;
+  right: 12px;
+  bottom: 11px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--faint);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease, transform 0.12s ease;
+}
+
+.fav-btn:hover {
+  color: #d97706;
+  background: var(--surface-2);
+}
+
+.fav-btn.is-on,
+.fav-tool-btn.is-active {
+  color: #d97706;
+}
+
+:root[data-theme='dark'] .fav-btn.is-on,
+:root[data-theme='dark'] .fav-btn:hover,
+:root[data-theme='dark'] .fav-tool-btn.is-active {
+  color: #fbbf24;
+}
+
+.fav-btn.fav-btn-row {
+  position: static;
+  flex-shrink: 0;
+  margin-right: 10px;
+}

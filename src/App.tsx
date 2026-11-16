@@ -3,6 +3,7 @@ import scenariosData from './data/scenarios.json';
 import type { Scenario, Settings, ThemeMode } from './types';
 import { loadState, saveState } from './lib/storage';
 import { useBgm } from './lib/useBgm';
+import { useFavorites } from './lib/favorites';
 import { stripFurigana } from './lib/copy';
 import { ScenarioList } from './components/ScenarioList';
 import { PlayerView } from './components/PlayerView';
@@ -91,6 +92,7 @@ export default function App() {
   const [replayTick, setReplayTick] = useState(0);
   const [focusMode, setFocusMode] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
+  const { isFavorite, toggleFavorite, favoriteCount } = useFavorites();
 
   useEffect(() => {
     if (!focusMode) resetFocusChrome();
@@ -199,6 +201,8 @@ export default function App() {
           onFocusModeChange={setFocusMode}
           aiOpen={aiOpen}
           onAiOpenChange={setAiOpen}
+          isFavorite={isFavorite(active.id)}
+          onToggleFavorite={() => toggleFavorite(active.id)}
         />
       ) : (
         <ScenarioList
@@ -208,6 +212,9 @@ export default function App() {
           onBgmChange={(bgm) => updateSettings({ bgm })}
           onSettingsChange={updateSettings}
           onOpen={open}
+          isFavorite={isFavorite}
+          onToggleFavorite={toggleFavorite}
+          favoriteCount={favoriteCount}
         />
       )}
       <PullToRefresh />

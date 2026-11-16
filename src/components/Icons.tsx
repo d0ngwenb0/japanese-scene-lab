@@ -380,3 +380,15 @@ export function VolumeIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function StarIcon({ filled, ...props }: IconProps & { filled?: boolean }) {
+  return (
+    <svg
+      {...base}
+      {...props}
+      fill={filled ? 'currentColor' : 'none'}
+    >
+      <path d="M12 2.8l2.85 5.77 6.37.93-4.61 4.49 1.09 6.34L12 17.34l-5.7 3 1.09-6.34-4.61-4.49 6.37-.93z" />
+    </svg>
+  );
+}

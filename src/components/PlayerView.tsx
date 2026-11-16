@@ -10,7 +10,7 @@ import {
 import type { Line, LoopMode, Scenario, Settings, ThemeMode } from '../types';
 import { Furigana } from '../lib/furigana';
 import { usePlayer } from '../lib/usePlayer';
-import { BackIcon, BookOpenIcon, CopyIcon, LoopAllIcon, LoopOneIcon, LyricsIcon, NextIcon, PauseIcon, PlayIcon, PrevIcon, ReplayIcon, ShuffleIcon, SparklesIcon } from './Icons';
+import { BackIcon, BookOpenIcon, CopyIcon, LoopAllIcon, LoopOneIcon, LyricsIcon, NextIcon, PauseIcon, PlayIcon, PrevIcon, ReplayIcon, ShuffleIcon, SparklesIcon, StarIcon } from './Icons';
 import { copyText, formatLine, formatScene, stripFurigana } from '../lib/copy';
 import { ThemeToggle } from './ThemeToggle';
 import { BgmToggle } from './BgmToggle';
@@ -50,6 +50,8 @@ interface Props {
   onFocusModeChange: (enabled: boolean) => void;
   aiOpen: boolean;
   onAiOpenChange: (open: boolean) => void;
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
 }
 
 function PlayingMark() {
@@ -83,6 +85,8 @@ export function PlayerView({
   onFocusModeChange,
   aiOpen,
   onAiOpenChange,
+  isFavorite,
+  onToggleFavorite,
 }: Props) {
   const [pausedByAi, setPausedByAi] = useState(false);
 
@@ -400,6 +404,20 @@ export function PlayerView({
             </div>
           </div>
           <div className="list-tools-right">
+            <button
+              type="button"
+              className={isFavorite ? 'tool-btn fav-tool-btn is-active' : 'tool-btn fav-tool-btn'}
+              onClick={() => {
+                const next = !isFavorite;
+                onToggleFavorite();
+                showToast(next ? '已收藏场景' : '已取消收藏');
+              }}
+              aria-label={isFavorite ? '取消收藏' : '收藏场景'}
+              aria-pressed={isFavorite}
+              title={isFavorite ? '取消收藏' : '收藏场景'}
+            >
+              <StarIcon width={16} height={16} filled={isFavorite} />
+            </button>
             <button
               type="button"
               className={vocabOpen ? 'tool-btn is-active' : 'tool-btn'}
