@@ -4061,6 +4061,35 @@ dialog::backdrop {
     0 0 48px color-mix(in srgb, var(--accent) 32%, transparent);
 }
 
+@media (color-gamut: p3) {
+  .focus-line.is-active .focus-ja {
+    color: color-mix(in display-p3, var(--accent) 92%, #ff4500);
+    text-shadow:
+      0 0 10px color-mix(in display-p3, var(--accent) 38%, transparent),
+      0 0 28px color-mix(in display-p3, var(--accent) 26%, transparent),
+      0 0 52px color-mix(in display-p3, var(--accent) 14%, transparent);
+  }
+
+  :root[data-theme='dark'] .focus-line.is-active .focus-ja {
+    color: color-mix(in display-p3, var(--accent) 45%, color(display-p3 1 1 1));
+    text-shadow:
+      0 0 6px color(display-p3 1 1 1 / 0.55),
+      0 0 22px color-mix(in display-p3, var(--accent) 85%, transparent),
+      0 0 56px color-mix(in display-p3, var(--accent) 48%, transparent);
+  }
+}
+
+@media (dynamic-range: high) {
+  .focus-line:not(.is-active):not(:hover) {
+    opacity: 0.18;
+  }
+
+  :root[data-theme='dark'] .focus-line.is-active .focus-zh {
+    color: color(display-p3 0.98 0.98 1);
+    text-shadow: 0 0 12px color(display-p3 1 1 1 / 0.22);
+  }
+}
+
 .focus-ja rt {
   font-size: 0.44em;
   font-weight: 400;
