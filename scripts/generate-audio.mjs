@@ -171,14 +171,10 @@ const FORCE_READING_SURFACES = new Set([
 ]);
 
 // 首尾静音修剪 + 轻量门限抑制呼吸声 + 句尾自然余量 + -16 LUFS 响度统一
-function buildFinalLineAf(padDur = 0.14) {
+function buildFinalLineAf(padDur = 0.16) {
   return [
     'highpass=f=85',
-    'agate=threshold=0.008:ratio=2.5:attack=10:release=180',
     'silenceremove=start_periods=1:start_duration=0.06:start_threshold=-58dB:detection=peak',
-    'areverse',
-    'silenceremove=start_periods=1:start_duration=0.10:start_threshold=-58dB:detection=peak',
-    'areverse',
     'loudnorm=I=-16:TP=-1.5:LRA=11',
     `apad=pad_dur=${padDur}`,
   ].join(',');
