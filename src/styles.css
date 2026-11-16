@@ -3975,14 +3975,16 @@ dialog::backdrop {
   border: none;
   border-radius: 0;
   background: transparent;
+  box-shadow: none;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
   text-align: center;
   cursor: pointer;
   opacity: 0.22;
-  filter: blur(2px);
   transform: scale(0.8);
   transition:
     opacity 0.28s ease,
-    filter 0.28s ease,
     transform 0.28s ease,
     background 0.28s ease;
 }
@@ -3994,14 +3996,25 @@ dialog::backdrop {
   }
 }
 
+.focus-line .focus-ja,
+.focus-line .focus-zh {
+  filter: blur(2px);
+  transition: filter 0.28s ease;
+}
+
 .focus-line:hover {
   opacity: 0.72;
+}
+
+.focus-line:hover .focus-ja,
+.focus-line:hover .focus-zh,
+.focus-line.is-active .focus-ja,
+.focus-line.is-active .focus-zh {
   filter: blur(0);
 }
 
 .focus-line.is-active {
   opacity: 1;
-  filter: blur(0);
   transform: scale(1.07);
   background: transparent;
   border-color: transparent;
