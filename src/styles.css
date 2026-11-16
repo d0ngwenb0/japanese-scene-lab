@@ -3996,21 +3996,23 @@ dialog::backdrop {
   }
 }
 
-.focus-line .focus-ja,
-.focus-line .focus-zh {
-  filter: blur(2px);
-  transition: filter 0.28s ease;
+.focus-line:not(.is-active):not(:hover) .focus-ja {
+  color: transparent;
+  text-shadow: 0 0 4.5px color-mix(in srgb, var(--ink) 88%, transparent);
+}
+
+.focus-line:not(.is-active):not(:hover) .focus-ja rt {
+  color: transparent;
+  text-shadow: 0 0 2.5px color-mix(in srgb, var(--faint) 88%, transparent);
+}
+
+.focus-line:not(.is-active):not(:hover) .focus-zh {
+  color: transparent;
+  text-shadow: 0 0 3.5px color-mix(in srgb, var(--muted) 88%, transparent);
 }
 
 .focus-line:hover {
   opacity: 0.72;
-}
-
-.focus-line:hover .focus-ja,
-.focus-line:hover .focus-zh,
-.focus-line.is-active .focus-ja,
-.focus-line.is-active .focus-zh {
-  filter: blur(0);
 }
 
 .focus-line.is-active {
