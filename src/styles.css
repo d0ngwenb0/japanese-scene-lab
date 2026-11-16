@@ -3851,20 +3851,17 @@ dialog::backdrop {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  min-height: 36px;
+  min-height: 38px;
   max-width: calc(100vw - 140px);
-  padding: 2px 0;
+  padding: 0;
   border: none;
   background: transparent;
-  color: color-mix(in srgb, var(--ink) 80%, var(--muted));
+  color: color-mix(in srgb, var(--ink) 86%, var(--muted));
   font-family: var(--jp);
-  font-size: clamp(14px, 1.25vw, 16px);
+  font-size: clamp(16px, 1.45vw, 19px);
   font-weight: 600;
-  line-height: 1.6;
+  line-height: 1.7;
   letter-spacing: 0.01em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   text-shadow: 0 1px 12px color-mix(in srgb, var(--bg) 75%, transparent);
   pointer-events: none;
   user-select: none;
@@ -3878,10 +3875,19 @@ dialog::backdrop {
   content: '';
   flex: none;
   width: 3.5px;
-  height: 16px;
+  height: 18px;
   border-radius: 999px;
   background: color-mix(in srgb, var(--accent) 82%, transparent);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 45%, transparent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 42%, transparent);
+}
+
+.focus-title-text {
+  display: block;
+  min-width: 0;
+  padding-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .focus-title rt {
@@ -3898,8 +3904,8 @@ dialog::backdrop {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 36px;
-  padding: 0 14px;
+  height: 38px;
+  padding: 0 15px;
   border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
   border-radius: 999px;
   background: color-mix(in srgb, var(--surface) 56%, transparent);

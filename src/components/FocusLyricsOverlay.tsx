@@ -181,7 +181,9 @@ export function FocusLyricsOverlay({
       }}
     >
       <div className="focus-title" title={title}>
-        <Furigana text={title} />
+        <span className="focus-title-text" lang="ja">
+          <Furigana text={title} />
+        </span>
       </div>
 
       <button
