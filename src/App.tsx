@@ -82,6 +82,7 @@ export default function App() {
   const [autoPlayNext, setAutoPlayNext] = useState(false);
   const [replayTick, setReplayTick] = useState(0);
   const [focusMode, setFocusMode] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
 
   useEffect(() => {
     if (!focusMode) resetFocusChrome();
@@ -98,6 +99,7 @@ export default function App() {
   const back = useCallback(() => {
     setAutoPlayNext(false);
     setFocusMode(false);
+    setAiOpen(false);
     window.location.hash = '#/';
   }, []);
 
@@ -187,6 +189,8 @@ export default function App() {
           onTimerChange={setPlaybackTimer}
           focusMode={focusMode}
           onFocusModeChange={setFocusMode}
+          aiOpen={aiOpen}
+          onAiOpenChange={setAiOpen}
         />
       ) : (
         <ScenarioList

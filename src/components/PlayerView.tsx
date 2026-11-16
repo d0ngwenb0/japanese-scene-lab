@@ -48,6 +48,8 @@ interface Props {
   onTimerChange: (minutes: number | null) => void;
   focusMode: boolean;
   onFocusModeChange: (enabled: boolean) => void;
+  aiOpen: boolean;
+  onAiOpenChange: (open: boolean) => void;
 }
 
 function PlayingMark() {
@@ -79,8 +81,9 @@ export function PlayerView({
   onTimerChange,
   focusMode,
   onFocusModeChange,
+  aiOpen,
+  onAiOpenChange,
 }: Props) {
-  const [aiOpen, setAiOpen] = useState(false);
   const [pausedByAi, setPausedByAi] = useState(false);
 
   const { index, playing, lineProgress, sceneTime, sceneDuration, missing, toggle, pause, resume, select, next, prev, replay } = usePlayer({
@@ -120,21 +123,21 @@ export function PlayerView({
 
 
   const closeAi = useCallback(() => {
-    setAiOpen(false);
+    onAiOpenChange(false);
     if (pausedByAi) {
       setPausedByAi(false);
       resume();
     }
-  }, [pausedByAi, resume]);
+  }, [onAiOpenChange, pausedByAi, resume]);
 
   const toggleAi = useCallback(() => {
     if (aiOpen) {
       closeAi();
     } else {
       if (pause()) setPausedByAi(true);
-      setAiOpen(true);
+      onAiOpenChange(true);
     }
-  }, [aiOpen, closeAi, pause]);
+  }, [aiOpen, closeAi, onAiOpenChange, pause]);
 
   useEffect(() => {
     if (playing && pausedByAi) {
