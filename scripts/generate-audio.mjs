@@ -171,13 +171,13 @@ const FORCE_READING_SURFACES = new Set([
 ]);
 
 // 首尾静音修剪 + 轻量门限抑制呼吸声 + 句尾自然余量 + -16 LUFS 响度统一
-function buildFinalLineAf(padDur = 0.06) {
+function buildFinalLineAf(padDur = 0.14) {
   return [
-    'highpass=f=95',
-    'agate=threshold=0.022:ratio=4:attack=10:release=80',
-    'silenceremove=start_periods=1:start_duration=0.04:start_threshold=-50dB:detection=peak',
+    'highpass=f=85',
+    'agate=threshold=0.008:ratio=2.5:attack=10:release=180',
+    'silenceremove=start_periods=1:start_duration=0.06:start_threshold=-58dB:detection=peak',
     'areverse',
-    'silenceremove=start_periods=1:start_duration=0.04:start_threshold=-50dB:detection=peak',
+    'silenceremove=start_periods=1:start_duration=0.10:start_threshold=-58dB:detection=peak',
     'areverse',
     'loudnorm=I=-16:TP=-1.5:LRA=11',
     `apad=pad_dur=${padDur}`,
@@ -630,13 +630,13 @@ async function splitAudioByLines(fullFile, scene, workDir, duration) {
       const prev = idx > 0 ? aiBoundaries[idx - 1] : 0;
       const next = idx < aiBoundaries.length - 1 ? aiBoundaries[idx + 1] : duration;
       let bestMid = t;
-      let bestDist = 0.08;
+      let bestDist = 0.65;
       for (const s of baseSilences) {
-        if (s.dur < 0.22 || s.mid <= prev + 0.35 || s.mid >= next - 0.35) continue;
+        if (s.dur < 0.16 || s.mid <= prev + 0.35 || s.mid >= next - 0.35) continue;
         const d = Math.abs(s.mid - t);
         if (d < bestDist) {
           bestDist = d;
-          bestMid = s.mid;
+          bestMid = Math.min(s.end - 0.02, s.mid + 0.04);
         }
       }
       return bestMid;
@@ -678,7 +678,7 @@ async function splitAudioByLines(fullFile, scene, workDir, duration) {
       }
       const temp = join(workDir, `.${scene.lines[i].id}.new.mp3`);
       tempFiles.push(temp);
-      const padDur = scene.kind === 'passage' ? (i < scene.lines.length - 1 ? 0.55 : 0.15) : 0.06;
+      const padDur = scene.kind === 'passage' ? (i < scene.lines.length - 1 ? 0.55 : 0.18) : 0.14;
       await encodeMasteredMp3({ inputPath: fullFile, start, length, outFile: temp, padDur });
       if (!isValidMp3(temp)) {
         return {
