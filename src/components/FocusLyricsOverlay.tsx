@@ -63,6 +63,7 @@ export function FocusLyricsOverlay({
   onClose,
 }: Props) {
   const lineRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const stageRef = useRef<HTMLDivElement | null>(null);
   const mountedRef = useRef(false);
   const hideTimerRef = useRef<number | null>(null);
   const hoveringChromeRef = useRef(false);
@@ -115,10 +116,14 @@ export function FocusLyricsOverlay({
 
   useEffect(() => {
     const el = lineRefs.current[index];
-    if (!el) return;
-    el.scrollIntoView({
+    const stage = stageRef.current;
+    if (!el || !stage) return;
+    const stageRect = stage.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
+    const top = elRect.top - stageRect.top + stage.scrollTop - stage.clientHeight / 2 + elRect.height / 2;
+    stage.scrollTo({
+      top: Math.max(0, top),
       behavior: mountedRef.current ? 'smooth' : 'auto',
-      block: 'center',
     });
     mountedRef.current = true;
   }, [index]);
@@ -192,7 +197,7 @@ export function FocusLyricsOverlay({
         <span>退出</span>
       </button>
 
-      <div className="focus-stage" role="list" aria-label="双语字幕">
+      <div ref={stageRef} className="focus-stage" role="list" aria-label="双语字幕">
         {lines.map((item, i) => {
           const active = i === index;
           return (

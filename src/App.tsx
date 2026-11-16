@@ -83,15 +83,18 @@ export default function App() {
     return () => window.cancelAnimationFrame(frame);
   }, [resolvedTheme, settings.palette, active]);
 
-  useEffect(() => {
-    document.title = active ? `${stripFurigana(active.title)} · Scene Lab` : 'Scene Lab · 场景日语';
-    window.scrollTo(0, 0);
-  }, [active]);
-
   const [autoPlayNext, setAutoPlayNext] = useState(false);
   const [replayTick, setReplayTick] = useState(0);
   const [focusMode, setFocusMode] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
+
+  useEffect(() => {
+    document.title = active ? `${stripFurigana(active.title)} · Scene Lab` : 'Scene Lab · 场景日语';
+    if (!focusMode && !document.fullscreenElement) {
+      window.scrollTo(0, 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active]);
   const { isFavorite, toggleFavorite, favoriteCount } = useFavorites();
 
   useEffect(() => {
