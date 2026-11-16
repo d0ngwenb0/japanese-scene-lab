@@ -938,14 +938,14 @@
         "id": "staff",
         "label": "駅員",
         "voice": "Orus",
-        "style": "helpful, brisk, clear Japanese train station staff"
+        "style": "calm, helpful, unhurried Japanese train station staff speaking clearly at a natural pace"
       },
       {
         "id": "you",
         "label": "わたし",
         "self": true,
         "voice": "Puck",
-        "style": "slightly hurried, polite Japanese passenger asking for directions"
+        "style": "polite, clear Japanese passenger speaking steadily at a natural pace"
       }
     ],
     "lines": [
@@ -954,42 +954,42 @@
         "speaker": "you",
         "ja": "すみません、{人身事故|じんしんじこ}で{中央線|ちゅうおうせん}が{止|と}まっていると{聞|き}いたのですが、いつごろ{再開|さいかい}しますか。",
         "zh": "不好意思，我听说因为人身事故中央线停运了，大概什么时候能恢复呢？",
-        "style": "polite, slightly urgent passenger inquiry"
+        "style": "polite, clear passenger inquiry at a steady natural pace"
       },
       {
         "id": "l2",
         "speaker": "staff",
         "ja": "{現在|げんざい}、{運転見合|うんてんみあ}わせとなっていて、{再開|さいかい}まであと{３０分|さんじゅっぷん}ほどかかる{見込|みこ}みです。",
         "zh": "目前处于暂停运行状态，预计还需要大约30分钟才能恢复。",
-        "style": "clear, brisk station staff explanation"
+        "style": "calm, reassuring station staff explanation at a comfortable pace"
       },
       {
         "id": "l3",
         "speaker": "you",
         "ja": "{３０分|さんじゅっぷん}ですか……{新宿|しんじゅく}まで{急|いそ}いでいるんですが、ほかに{行|い}き{方|かた}はありますか。",
         "zh": "30分钟吗……我急着去新宿，请问还有别的走法吗？",
-        "style": "slightly worried, polite follow-up"
+        "style": "polite, thoughtful follow-up question at a natural pace"
       },
       {
         "id": "l4",
         "speaker": "staff",
         "ja": "それでしたら、{振替輸送|ふりかえゆそう}が{利用|りよう}できます。{東口|ひがしぐち}を{出|で}てすぐの{地下鉄|ちかてつ}にお{乗|の}り{換|か}えください。",
         "zh": "那样的话，您可以使用替代乘车服务。请从东口出去后直接换乘地铁。",
-        "style": "helpful, clear guidance"
+        "style": "friendly, unhurried guidance from station staff"
       },
       {
         "id": "l5",
         "speaker": "you",
         "ja": "ありがとうございます。{定期券|ていきけん}を{見|み}せるだけでそのまま{乗|の}れますか。",
         "zh": "谢谢。只要出示月票就可以直接乘车吗？",
-        "style": "polite confirmation"
+        "style": "calm, polite confirmation from passenger"
       },
       {
         "id": "l6",
         "speaker": "staff",
         "ja": "はい、{改札|かいさつ}の{駅員|えきいん}に{定期券|ていきけん}をお{見|み}せいただければ{大丈夫|だいじょうぶ}です。{遅延証明書|ちえんしょうめいしょ}もこちらでお{渡|わた}しできますよ。",
         "zh": "是的，只要在检票口向站务员出示您的月票就可以了。延误证明也可以在这里发给您。",
-        "style": "reassuring, courteous station staff wrap-up"
+        "style": "warm, courteous, unhurried station staff wrap-up"
       }
     ],
     "vocab": [
