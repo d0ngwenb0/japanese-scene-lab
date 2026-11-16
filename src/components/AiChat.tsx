@@ -380,15 +380,15 @@ export function AiChat({
     }
   };
 
-  const startWavFallbackRecording = (stream: MediaStream) => {
+  const startWavFallbackRecording = (stream: MediaStream, prewarmedCtx?: AudioContext | null) => {
     const AudioCtx =
       window.AudioContext ||
       (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!AudioCtx) {
+    if (!AudioCtx && !prewarmedCtx) {
       throw new Error('当前浏览器不支持音频录制。');
     }
 
-    const ctx = new AudioCtx();
+    const ctx = prewarmedCtx ?? new AudioCtx!();
     const source = ctx.createMediaStreamSource(stream);
     const processor = ctx.createScriptProcessor(4096, 1, 1);
     const silentGain = ctx.createGain();
@@ -467,8 +467,35 @@ export function AiChat({
     }
 
     setError('');
+    // 在用户手势同步阶段先解锁 AudioContext，避免 iPadOS WebKit 在 await getUserMedia 后丢失手势权限
+    const AudioCtx =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    let prewarmedCtx: AudioContext | null = null;
+    if (AudioCtx) {
+      try {
+        prewarmedCtx = new AudioCtx();
+        if (prewarmedCtx.state === 'suspended') {
+          prewarmedCtx.resume().catch(() => {});
+        }
+      } catch {
+        prewarmedCtx = null;
+      }
+    }
+
+    let stage = 'getUserMedia';
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      } catch (firstErr) {
+        if ((firstErr as { name?: string })?.name === 'InvalidStateError') {
+          await new Promise((r) => window.setTimeout(r, 120));
+          stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        } else {
+          throw firstErr;
+        }
+      }
       mediaStreamRef.current = stream;
 
       if (typeof MediaRecorder !== 'undefined') {
@@ -508,6 +535,7 @@ export function AiChat({
           };
 
           recorder.start();
+          prewarmedCtx?.close().catch(() => {});
           setRecording(true);
           return;
         } catch {
@@ -516,8 +544,10 @@ export function AiChat({
         }
       }
 
-      startWavFallbackRecording(stream);
+      stage = 'wavFallback';
+      startWavFallbackRecording(stream, prewarmedCtx);
     } catch (err) {
+      prewarmedCtx?.close().catch(() => {});
       releaseMicrophone();
       const name = (err as { name?: string })?.name ?? '';
       if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
@@ -528,6 +558,10 @@ export function AiChat({
         setError('麦克风正被占用或音频会话冲突，请关闭其他占用麦克风的应用后重试。');
       } else if (name === 'SecurityError') {
         setError('当前页面非安全上下文（HTTPS），无法调用麦克风。');
+      } else if (name === 'InvalidStateError') {
+        setError(
+          `麦克风状态异常（InvalidStateError · ${stage}）。iPad Chrome 内核在切后台或全屏后偶发音频会话卡死，可关闭重开标签页或改用 Safari。`,
+        );
       } else {
         setError(`无法打开麦克风${name ? `（${name}）` : ''}，请检查设备与系统「设置 → Chrome → 麦克风」权限后重试。`);
       }
