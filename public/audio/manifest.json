@@ -35,5 +35,11 @@
   "spec-change-schedule-negotiation/l3": "ed2976ca4862f171",
   "spec-change-schedule-negotiation/l4": "e73bebdcdd007882",
   "spec-change-schedule-negotiation/l5": "4ba6c1b0661a04d8",
-  "spec-change-schedule-negotiation/l6": "3f3d655c2b1d5844"
+  "spec-change-schedule-negotiation/l6": "3f3d655c2b1d5844",
+  "train-delay-transfer-inquiry/l1": "7f904fee51dc77fa",
+  "train-delay-transfer-inquiry/l2": "b9f1e7fba36600e1",
+  "train-delay-transfer-inquiry/l3": "0ae7be642fb8e9cb",
+  "train-delay-transfer-inquiry/l4": "411213b6d6ff3c0f",
+  "train-delay-transfer-inquiry/l5": "a3c53d5f86d4840e",
+  "train-delay-transfer-inquiry/l6": "b252b0402381f906"
 }

@@ -923,5 +923,156 @@
         "note": "「{眠気|ねむけ}が{出|で}る」犯困，买感冒药必问。"
       }
     ]
+  },
+  {
+    "id": "train-delay-transfer-inquiry",
+    "kind": "dialogue",
+    "category": "transport",
+    "title": "{駅|えき}での{乗|の}り{換|か}え：{電車|でんしゃ}が{遅|おく}れたときの{確認|かくにん}",
+    "titleZh": "车站问询：电车延误时确认换乘与替代路线",
+    "emoji": "🚃",
+    "accent": "#4f46e5",
+    "accentDark": "#818cf8",
+    "speakers": [
+      {
+        "id": "staff",
+        "label": "駅員",
+        "voice": "Orus",
+        "style": "helpful, brisk, clear Japanese train station staff"
+      },
+      {
+        "id": "you",
+        "label": "わたし",
+        "self": true,
+        "voice": "Puck",
+        "style": "slightly hurried, polite Japanese passenger asking for directions"
+      }
+    ],
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "you",
+        "ja": "すみません、{人身事故|じんしんじこ}で{中央線|ちゅうおうせん}が{止|と}まっていると{聞|き}いたのですが、いつごろ{再開|さいかい}しますか。",
+        "zh": "不好意思，我听说因为人身事故中央线停运了，大概什么时候能恢复呢？",
+        "style": "polite, slightly urgent passenger inquiry"
+      },
+      {
+        "id": "l2",
+        "speaker": "staff",
+        "ja": "{現在|げんざい}、{運転見合|うんてんみあ}わせとなっていて、{再開|さいかい}まであと{３０分|さんじゅっぷん}ほどかかる{見込|みこ}みです。",
+        "zh": "目前处于暂停运行状态，预计还需要大约30分钟才能恢复。",
+        "style": "clear, brisk station staff explanation"
+      },
+      {
+        "id": "l3",
+        "speaker": "you",
+        "ja": "{３０分|さんじゅっぷん}ですか……{新宿|しんじゅく}まで{急|いそ}いでいるんですが、ほかに{行|い}き{方|かた}はありますか。",
+        "zh": "30分钟吗……我急着去新宿，请问还有别的走法吗？",
+        "style": "slightly worried, polite follow-up"
+      },
+      {
+        "id": "l4",
+        "speaker": "staff",
+        "ja": "それでしたら、{振替輸送|ふりかえゆそう}が{利用|りよう}できます。{東口|ひがしぐち}を{出|で}てすぐの{地下鉄|ちかてつ}にお{乗|の}り{換|か}えください。",
+        "zh": "那样的话，您可以使用替代乘车服务。请从东口出去后直接换乘地铁。",
+        "style": "helpful, clear guidance"
+      },
+      {
+        "id": "l5",
+        "speaker": "you",
+        "ja": "ありがとうございます。{定期券|ていきけん}を{見|み}せるだけでそのまま{乗|の}れますか。",
+        "zh": "谢谢。只要出示月票就可以直接乘车吗？",
+        "style": "polite confirmation"
+      },
+      {
+        "id": "l6",
+        "speaker": "staff",
+        "ja": "はい、{改札|かいさつ}の{駅員|えきいん}に{定期券|ていきけん}をお{見|み}せいただければ{大丈夫|だいじょうぶ}です。{遅延証明書|ちえんしょうめいしょ}もこちらでお{渡|わた}しできますよ。",
+        "zh": "是的，只要在检票口向站务员出示您的月票就可以了。延误证明也可以在这里发给您。",
+        "style": "reassuring, courteous station staff wrap-up"
+      }
+    ],
+    "vocab": [
+      {
+        "id": "v1",
+        "word": "{運転見合|うんてんみあ}わせ",
+        "reading": "うんてんみあわせ",
+        "pos": "名词",
+        "pitch": "⑤",
+        "meaning": "暂停运行、停运",
+        "lineId": "l2",
+        "note": "日本电车广播最高频词之一。"
+      },
+      {
+        "id": "v2",
+        "word": "{再開|さいかい}",
+        "reading": "さいかい",
+        "pos": "名·动3",
+        "pitch": "0",
+        "meaning": "恢复运行、重新开始",
+        "lineId": "l1",
+        "note": "「{運転|うんてん}を{再開|さいかい}する」恢复行车。"
+      },
+      {
+        "id": "v3",
+        "word": "{見込|みこ}み",
+        "reading": "みこみ",
+        "pos": "名词",
+        "pitch": "0",
+        "meaning": "预计、预期",
+        "lineId": "l2",
+        "note": "「〜かかる{見込|みこ}みです」预计需要……。"
+      },
+      {
+        "id": "v4",
+        "word": "{振替輸送|ふりかえゆそう}",
+        "reading": "ふりかえゆそう",
+        "pos": "名词",
+        "pitch": "⑤",
+        "meaning": "替代路线换乘（免额外购票）",
+        "lineId": "l4",
+        "note": "电车停运时可凭原有车票/月票免费改乘其他路线。"
+      },
+      {
+        "id": "v5",
+        "word": "{乗|の}り{換|か}える",
+        "reading": "のりかえる",
+        "pos": "动2",
+        "pitch": "④",
+        "meaning": "换乘、转车",
+        "lineId": "l4",
+        "note": "名词形式是「{乗|の}り{換|か}え」。"
+      },
+      {
+        "id": "v6",
+        "word": "{定期券|ていきけん}",
+        "reading": "ていきけん",
+        "pos": "名词",
+        "pitch": "③",
+        "meaning": "月票、定期乘车券",
+        "lineId": "l5",
+        "note": "口语常简称为「{定期|ていき}」。"
+      },
+      {
+        "id": "v7",
+        "word": "{改札|かいさつ}",
+        "reading": "かいさつ",
+        "pos": "名词",
+        "pitch": "0",
+        "meaning": "检票口、闸机",
+        "lineId": "l6",
+        "note": "「{改札口|かいさつぐち}」检票口。"
+      },
+      {
+        "id": "v8",
+        "word": "{遅延証明書|ちえんしょうめいしょ}",
+        "reading": "ちえんしょうめいしょ",
+        "pos": "名词",
+        "pitch": "⑤",
+        "meaning": "延误证明",
+        "lineId": "l6",
+        "note": "电车晚点迟到时用来向公司或学校报备的凭证。"
+      }
+    ]
   }
 ]
