@@ -765,5 +765,156 @@
         "note": "「{置|お}く」+「ておく」（提前做好）+「てください」。"
       }
     ]
+  },
+  {
+    "id": "clinic-symptom-consultation",
+    "kind": "dialogue",
+    "category": "medical",
+    "title": "{病院|びょういん}での{診察|しんさつ}：{風邪|かぜ}の{症状|しょうじょう}を{伝|つた}える",
+    "titleZh": "医院就诊：向医生描述感冒症状与确认用药",
+    "emoji": "🏥",
+    "accent": "#0891b2",
+    "accentDark": "#22d3ee",
+    "speakers": [
+      {
+        "id": "doctor",
+        "label": "医師",
+        "voice": "Orus",
+        "style": "calm, reassuring, attentive Japanese clinic doctor"
+      },
+      {
+        "id": "you",
+        "label": "わたし",
+        "self": true,
+        "voice": "Puck",
+        "style": "slightly tired, polite Japanese patient explaining symptoms clearly"
+      }
+    ],
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "doctor",
+        "ja": "こんにちは。{今日|きょう}はどのような{症状|しょうじょう}でいらっしゃいましたか。",
+        "zh": "您好。今天是因为什么症状来看病的呢？",
+        "style": "warm, professional doctor greeting"
+      },
+      {
+        "id": "l2",
+        "speaker": "you",
+        "ja": "{一昨日|おととい}の{夜|よる}からのどが{痛|いた}くて、{昨日|きのう}から{微熱|びねつ}と{咳|せき}も{出|で}ています。",
+        "zh": "从前天晚上开始喉咙痛，昨天起也有点低烧和咳嗽。",
+        "style": "polite, slightly fatigued patient describing symptoms"
+      },
+      {
+        "id": "l3",
+        "speaker": "doctor",
+        "ja": "そうですか。{熱|ねつ}は{今|いま}どのくらいありますか。また、{薬|くすり}のアレルギーなどはありますか。",
+        "zh": "这样啊。现在体温大概多少度？另外，有没有药物过敏之类的情况？",
+        "style": "careful, structured medical inquiry"
+      },
+      {
+        "id": "l4",
+        "speaker": "you",
+        "ja": "{今朝|けさ}{測|はか}ったときは{３７度|さんじゅうななど}{５分|ごぶ}でした。{薬|くすり}のアレルギーは{特|とく}にありません。",
+        "zh": "今天早上量的时候是37.5度。药物过敏倒是没有。",
+        "style": "clear, straightforward patient reply"
+      },
+      {
+        "id": "l5",
+        "speaker": "doctor",
+        "ja": "わかりました。のどが{少|すこ}し{赤|あか}くなっていますね。{炎症|えんしょう}を{抑|おさ}える{薬|くすり}と{咳止|せきど}めを{出|だ}しますので、{毎食後|まいしょくご}に{飲|の}んでください。",
+        "zh": "明白了。喉咙稍微有点红肿呢。我给您开消炎药和止咳药，请每顿饭后服用。",
+        "style": "reassuring diagnosis and clear medication instructions"
+      },
+      {
+        "id": "l6",
+        "speaker": "you",
+        "ja": "ありがとうございます。{眠気|ねむけ}が{出|で}やすい{薬|くすり}は{含|ふく}まれていますか。",
+        "zh": "谢谢医生。里面包含容易让人犯困的药吗？",
+        "style": "polite follow-up question about side effects"
+      }
+    ],
+    "vocab": [
+      {
+        "id": "v1",
+        "word": "{症状|しょうじょう}",
+        "reading": "しょうじょう",
+        "pos": "名词",
+        "pitch": "③",
+        "meaning": "症状",
+        "lineId": "l1",
+        "note": "看病时医生常问「どのような{症状|しょうじょう}ですか」。"
+      },
+      {
+        "id": "v2",
+        "word": "{一昨日|おととい}",
+        "reading": "おととい",
+        "pos": "名词",
+        "pitch": "③",
+        "meaning": "前天",
+        "lineId": "l2",
+        "note": "书面或较正式场合也读作「いっさくじつ」。"
+      },
+      {
+        "id": "v3",
+        "word": "{微熱|びねつ}",
+        "reading": "びねつ",
+        "pos": "名词",
+        "pitch": "0",
+        "meaning": "低烧",
+        "lineId": "l2",
+        "note": "高烧则是「{高熱|こうねつ}」。"
+      },
+      {
+        "id": "v4",
+        "word": "アレルギー",
+        "reading": "アレルギー",
+        "pos": "名词",
+        "pitch": "②",
+        "meaning": "过敏",
+        "lineId": "l3",
+        "note": "「{薬|くすり}のアレルギー」药物过敏；「{花粉症|かふんしょう}」花粉过敏。"
+      },
+      {
+        "id": "v5",
+        "word": "{測|はか}る",
+        "reading": "はかる",
+        "pos": "动1",
+        "pitch": "②",
+        "meaning": "测量（体温、体重等）",
+        "lineId": "l4",
+        "note": "「{熱|ねつ}を{測|はか}る」量体温。"
+      },
+      {
+        "id": "v6",
+        "word": "{炎症|えんしょう}",
+        "reading": "えんしょう",
+        "pos": "名词",
+        "pitch": "0",
+        "meaning": "发炎、炎症",
+        "lineId": "l5",
+        "note": "「{炎症|えんしょう}を{抑|おさ}える」抑制炎症/消炎。"
+      },
+      {
+        "id": "v7",
+        "word": "{咳止|せきど}め",
+        "reading": "せきどめ",
+        "pos": "名词",
+        "pitch": "0",
+        "meaning": "止咳药",
+        "lineId": "l5",
+        "note": "同理还有「{痛|いた}み{止|ど}め」（止痛药）。"
+      },
+      {
+        "id": "v8",
+        "word": "{眠気|ねむけ}",
+        "reading": "ねむけ",
+        "pos": "名词",
+        "pitch": "0",
+        "meaning": "睡意、犯困",
+        "lineId": "l6",
+        "note": "「{眠気|ねむけ}が{出|で}る」犯困，买感冒药必问。"
+      }
+    ]
   }
 ]
