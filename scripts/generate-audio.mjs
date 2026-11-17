@@ -622,21 +622,30 @@ async function splitAudioByLines(fullFile, scene, workDir, duration) {
   const aiBoundaries = await detectBoundariesWithGemini(fullFile, scene, duration);
   if (aiBoundaries) {
     const baseSilences = allSilences[1]?.length ? allSilences[1] : allSilences[0] ?? [];
-    boundaries = aiBoundaries.map((t, idx) => {
+    let allMatched = true;
+    const snapped = aiBoundaries.map((t, idx) => {
       const prev = idx > 0 ? aiBoundaries[idx - 1] : 0;
       const next = idx < aiBoundaries.length - 1 ? aiBoundaries[idx + 1] : duration;
-      let bestMid = t;
+      let bestMid = null;
       let bestDist = 0.65;
       for (const s of baseSilences) {
         if (s.dur < 0.16 || s.mid <= prev + 0.35 || s.mid >= next - 0.35) continue;
         const d = Math.abs(s.mid - t);
         if (d < bestDist) {
           bestDist = d;
-          bestMid = Math.min(s.end - 0.02, s.mid + 0.04);
+          // 取静音中点略偏前位置，既保留上一句尾音，又远离下一句起音辅音
+          bestMid = Math.max(s.start + 0.05, s.mid - 0.02);
         }
+      }
+      if (bestMid === null) {
+        allMatched = false;
+        return t;
       }
       return bestMid;
     });
+    if (allMatched) {
+      boundaries = snapped;
+    }
   }
 
   if (!boundaries) {
