@@ -1831,5 +1831,156 @@
         "note": "「〜が{目安|めやす}になります」大致以……为参考。"
       }
     ]
+  },
+  {
+    "id": "drugstore-shopping-checkout",
+    "kind": "dialogue",
+    "category": "shopping",
+    "title": "ドラッグストアでの{買|か}い{物|もの}：{棚|たな}の{案内|あんない}とレジ{会計|かいけい}",
+    "titleZh": "药妆店购物：询问货架位置与收银台结账",
+    "emoji": "🛍️",
+    "accent": "#db2777",
+    "accentDark": "#f472b6",
+    "speakers": [
+      {
+        "id": "you",
+        "label": "わたし",
+        "self": true,
+        "voice": "Puck",
+        "style": "polite, natural everyday Japanese customer speaking clearly at a steady pace"
+      },
+      {
+        "id": "clerk",
+        "label": "店員",
+        "voice": "Zephyr",
+        "style": "friendly, helpful, unhurried Japanese drugstore clerk speaking clearly at a natural pace"
+      }
+    ],
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "you",
+        "ja": "すみません、のど{飴|あめ}の{売|う}り{場|ば}はどちらになりますか。",
+        "zh": "不好意思，请问润喉糖的货架在哪个位置？",
+        "style": "polite, casual customer inquiry at a steady pace"
+      },
+      {
+        "id": "l2",
+        "speaker": "clerk",
+        "ja": "{奥|おく}から{二番目|にばんめ}の{通路|つうろ}の、{右側|みぎがわ}の{棚|たな}にございます。ご{案内|あんない}しましょうか。",
+        "zh": "在里面数第二条过道的右侧货架上。需要我带您过去吗？",
+        "style": "courteous, helpful store clerk response"
+      },
+      {
+        "id": "l3",
+        "speaker": "you",
+        "ja": "あ、{大丈夫|だいじょうぶ}です、わかりました。それと、この{保湿|ほしつ}クリームは{詰|つ}め{替|か}え{用|よう}もありますか。",
+        "zh": "啊，不用了，我知道了。另外，这款保湿霜有替换装吗？",
+        "style": "polite decline and natural follow-up question"
+      },
+      {
+        "id": "l4",
+        "speaker": "clerk",
+        "ja": "はい、{同|おな}じ{棚|たな}の{一番|いちばん}{下|した}の{段|だん}にございます。お{決|き}まりでしたらレジへどうぞ。",
+        "zh": "有的，就在同一个货架的最下面一层。选好了的话请到收银台这边来。",
+        "style": "clear, welcoming clerk guidance"
+      },
+      {
+        "id": "l5",
+        "speaker": "you",
+        "ja": "ありがとうございます。これでお{願|ねが}いします。レジ{袋|ぶくろ}はいりません、PayPayで{払|はら}えますか。",
+        "zh": "谢谢。就结这些。不需要塑料袋，请问可以用 PayPay 支付吗？",
+        "style": "polite customer checkout request"
+      },
+      {
+        "id": "l6",
+        "speaker": "clerk",
+        "ja": "はい、{使|つか}えますよ。バーコードを{読|よ}み{取|と}りますので、{画面|がめん}をお{見|み}せいただけますか。",
+        "zh": "可以用的哦。我这边扫一下条形码，麻烦您出示一下付款界面可以吗？",
+        "style": "friendly, reassuring checkout wrap-up"
+      }
+    ],
+    "vocab": [
+      {
+        "id": "v1",
+        "word": "{売|う}り{場|ば}",
+        "reading": "うりば",
+        "pos": "名词",
+        "pitch": "0",
+        "meaning": "柜台、售卖区、货架区",
+        "lineId": "l1",
+        "note": "「のど{飴|あめ}の{売|う}り{場|ば}」润喉糖货架区。"
+      },
+      {
+        "id": "v2",
+        "word": "{通路|つうろ}",
+        "reading": "つうろ",
+        "pos": "名词",
+        "pitch": "①",
+        "meaning": "过道、通道",
+        "lineId": "l2",
+        "note": "「{二番目|にばんめ}の{通路|つうろ}」第二条过道。"
+      },
+      {
+        "id": "v3",
+        "word": "{棚|たな}",
+        "reading": "たな",
+        "pos": "名词",
+        "pitch": "0",
+        "meaning": "货架、架子",
+        "lineId": "l2",
+        "note": "「{一番|いちばん}{下|した}の{段|だん}」最下面一层。"
+      },
+      {
+        "id": "v4",
+        "word": "{保湿|ほしつ}",
+        "reading": "ほしつ",
+        "pos": "名·动3",
+        "pitch": "0",
+        "meaning": "保湿",
+        "lineId": "l3",
+        "note": "药妆店常见护肤关键词。"
+      },
+      {
+        "id": "v5",
+        "word": "{詰|つ}め{替|か}え{用|よう}",
+        "reading": "つめかえよう",
+        "pos": "名词",
+        "pitch": "⑤",
+        "meaning": "替换装、补充装",
+        "lineId": "l3",
+        "note": "洗发水、护肤品、洗涤剂等环保替换装，比瓶装更便宜。"
+      },
+      {
+        "id": "v6",
+        "word": "お{決|き}まり",
+        "reading": "おきまり",
+        "pos": "名词",
+        "pitch": "0",
+        "meaning": "选好、决定好",
+        "lineId": "l4",
+        "note": "「お{決|き}まりでしたらレジへどうぞ」选好了请到收银台。"
+      },
+      {
+        "id": "v7",
+        "word": "レジ{袋|ぶくろ}",
+        "reading": "レジぶくろ",
+        "pos": "名词",
+        "pitch": "③",
+        "meaning": "购物塑料袋",
+        "lineId": "l5",
+        "note": "日本超市药妆店塑料袋收费，「レジ{袋|ぶくろ}はいりません」表示不需要袋子。"
+      },
+      {
+        "id": "v8",
+        "word": "{読|よ}み{取|と}る",
+        "reading": "よみとる",
+        "pos": "动1",
+        "pitch": "③",
+        "meaning": "扫描、读取",
+        "lineId": "l6",
+        "note": "「バーコードを{読|よ}み{取|と}る」扫描条形码。"
+      }
+    ]
   }
 ]
