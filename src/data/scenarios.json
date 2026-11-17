@@ -1673,5 +1673,163 @@
       }
     ],
     "bgm": "shinya-folk.mp3"
+  },
+  {
+    "id": "apartment-viewing-inquiry",
+    "kind": "dialogue",
+    "category": "home",
+    "title": "{部屋探|へやさが}しの{内見|ないけん}：{防音|ぼうおん}と{初期費用|しょきひよう}を{聞|き}く",
+    "titleZh": "租房看房：询问隔音效果与初期费用",
+    "emoji": "🏠",
+    "accent": "#059669",
+    "accentDark": "#34d399",
+    "speakers": [
+      {
+        "id": "agent",
+        "label": "不動産担当",
+        "voice": "Aoede",
+        "style": "warm, polite, unhurried Japanese real estate agent speaking clearly at a natural pace"
+      },
+      {
+        "id": "you",
+        "label": "わたし",
+        "self": true,
+        "voice": "Puck",
+        "style": "calm, polite Japanese apartment hunter speaking steadily at a natural pace"
+      }
+    ],
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "agent",
+        "ja": "こちらが{本日|ほんじつ}ご{案内|あんない}する{１Ｋ|ワンケー}のお{部屋|へや}です。{南向|みなみむ}きなので{日当|ひあ}たりがとてもいいですよ。",
+        "zh": "这就是今天带您看的1K户型房间。因为朝南，采光非常好哦。",
+        "style": "warm, welcoming real estate agent introduction at a natural pace"
+      },
+      {
+        "id": "l2",
+        "speaker": "you",
+        "ja": "ほんとうですね、すごく{明|あか}るいです。ちなみに、{隣|となり}の{部屋|へや}との{防音|ぼうおん}はどうですか。",
+        "zh": "确实呢，非常明亮。顺便问一下，和隔壁房间的隔音怎么样？",
+        "style": "polite, curious apartment hunter question at a steady pace"
+      },
+      {
+        "id": "l3",
+        "speaker": "agent",
+        "ja": "こちらは{鉄筋|てっきん}コンクリート{造|づくり}ですので、{木造|もくぞう}に{比|くら}べると{生活音|せいかつおん}はかなり{響|ひび}きにくいです。",
+        "zh": "这栋楼是钢筋混凝土结构的，和木造房相比，生活噪音很不容易传过来。",
+        "style": "clear, reassuring explanation at an unhurried pace"
+      },
+      {
+        "id": "l4",
+        "speaker": "you",
+        "ja": "それは{安心|あんしん}しました。オートロックもついていますし、{最寄|もよ}り{駅|えき}からも{近|ちか}くて{便利|べんり}ですね。",
+        "zh": "那就放心了。而且还有自动门禁，离最近车站也近，真方便呢。",
+        "style": "pleased, natural customer comment"
+      },
+      {
+        "id": "l5",
+        "speaker": "agent",
+        "ja": "はい、{駅|えき}まで{徒歩|とほ}{６分|ろっぷん}ほどです。{近|ちか}くにスーパーもあるので、お{買|か}い{物|もの}も{楽|らく}ですよ。",
+        "zh": "是的，走到车站大约6分钟。附近也有超市，买东西也很方便。",
+        "style": "friendly, unhurried agent response"
+      },
+      {
+        "id": "l6",
+        "speaker": "you",
+        "ja": "{気|き}に{入|い}りました。{敷金|しききん}や{礼金|れいきん}などの{初期費用|しょきひよう}は、だいたいどのくらいかかりますか。",
+        "zh": "我很满意。请问押金、礼金之类的初期费用大概需要多少？",
+        "style": "calm, polite financial inquiry"
+      },
+      {
+        "id": "l7",
+        "speaker": "agent",
+        "ja": "{礼金|れいきん}なしの{物件|ぶっけん}ですので、{家賃|やちん}の{４ヶ月分|よんかげつぶん}ほどが{目安|めやす}になります。あとで{詳|くわ}しいお{見積|みつ}もりをお{出|だ}ししますね。",
+        "zh": "这套房源免礼金，所以大概以4个月房租左右为参考。待会儿我给您出份详细的报价单。",
+        "style": "courteous, reassuring closing from agent"
+      }
+    ],
+    "vocab": [
+      {
+        "id": "v1",
+        "word": "{内見|ないけん}",
+        "reading": "ないけん",
+        "pos": "名·动3",
+        "pitch": "0",
+        "meaning": "看房、实地看屋",
+        "lineId": "l1",
+        "note": "「{部屋|へや}を{内見|ないけん}する」实地看房。"
+      },
+      {
+        "id": "v2",
+        "word": "{日当|ひあ}たり",
+        "reading": "ひあたり",
+        "pos": "名词",
+        "pitch": "0",
+        "meaning": "采光、日照",
+        "lineId": "l1",
+        "note": "「{南向|みなみむ}きで{日当|ひあ}たりがいい」朝南采光好。"
+      },
+      {
+        "id": "v3",
+        "word": "{防音|ぼうおん}",
+        "reading": "ぼうおん",
+        "pos": "名词",
+        "pitch": "0",
+        "meaning": "隔音",
+        "lineId": "l2",
+        "note": "租房时最常关心的条件之一。"
+      },
+      {
+        "id": "v4",
+        "word": "{鉄筋|てっきん}コンクリート",
+        "reading": "てっきんコンクリート",
+        "pos": "名词",
+        "pitch": "⑥",
+        "meaning": "钢筋混凝土（RC造）",
+        "lineId": "l3",
+        "note": "日本租房广告常缩写为「RC{造|ぞう}」，隔音比「{木造|もくぞう}」好得多。"
+      },
+      {
+        "id": "v5",
+        "word": "{最寄|もよ}り{駅|えき}",
+        "reading": "もよりえき",
+        "pos": "名词",
+        "pitch": "0",
+        "meaning": "最近的车站",
+        "lineId": "l4",
+        "note": "填简历或租房条件时的最高频词。"
+      },
+      {
+        "id": "v6",
+        "word": "{敷金|しききん}・{礼金|れいきん}",
+        "reading": "しききん・れいきん",
+        "pos": "名词",
+        "pitch": "②",
+        "meaning": "押金与礼金",
+        "lineId": "l6",
+        "note": "敷金退租时扣完清扫费可退还；礼金是给房东的感谢费，不退。"
+      },
+      {
+        "id": "v7",
+        "word": "{物件|ぶっけん}",
+        "reading": "ぶっけん",
+        "pos": "名词",
+        "pitch": "0",
+        "meaning": "房源、不动产",
+        "lineId": "l7",
+        "note": "「おすすめ{物件|ぶっけん}」推荐房源。"
+      },
+      {
+        "id": "v8",
+        "word": "{目安|めやす}",
+        "reading": "めやす",
+        "pos": "名词",
+        "pitch": "0",
+        "meaning": "大致标准、参考基准",
+        "lineId": "l7",
+        "note": "「〜が{目安|めやす}になります」大致以……为参考。"
+      }
+    ]
   }
 ]
