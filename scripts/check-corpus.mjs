@@ -6,7 +6,7 @@
  *   E4 中文译文里出现未加引号的假名
  *   E5 数量词/日期读音命中已知错误白名单
  *   E6 日文正文含多余分词空格
- *   E7 场景句数或短文段数超出规定范围（对话 5–6 句；短文 5–6 段）
+ *   E7 场景句数或短文段数超出规定范围（对话 5–8 句；短文 5–6 段；JLPT 4–12 句）
  *   W1 跨场景实质重复台词（≥12 字，需人工判定为 B 类）
  *   W2 中文相同但日文不同的台词（疑似复制）
  *   W3 句末缺标点或单句逗号过多（影响 TTS 韵律）
@@ -65,11 +65,13 @@ const READING_RULES = {
 // E4 / E5 / E6 / E7 + W3
 for (const scene of scenarios) {
   const isPassage = scene.kind === 'passage';
+  const isJlpt = scene.kind === 'jlpt';
   if (isPassage && (scene.lines.length < 5 || scene.lines.length > 6)) {
     errors.push(`E7 ${scene.id}: 短文段数应为 5–6 段（当前 ${scene.lines.length} 段）`);
-  }
-  if (!isPassage && (scene.lines.length < 5 || scene.lines.length > 6)) {
-    errors.push(`E7 ${scene.id}: 对话句数应为 5–6 句（当前 ${scene.lines.length} 句）`);
+  } else if (isJlpt && (scene.lines.length < 4 || scene.lines.length > 12)) {
+    errors.push(`E7 ${scene.id}: JLPT 听力句数应为 4–12 句（当前 ${scene.lines.length} 句）`);
+  } else if (!isPassage && !isJlpt && (scene.lines.length < 5 || scene.lines.length > 8)) {
+    errors.push(`E7 ${scene.id}: 对话句数应为 5–8 句（当前 ${scene.lines.length} 句）`);
   }
   for (const line of scene.lines) {
     const plain = strip(line.ja).trim();
