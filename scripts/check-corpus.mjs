@@ -21,10 +21,26 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const scenarios = JSON.parse(readFileSync(join(root, 'src/data/scenarios.json'), 'utf8'));
 
 const strip = (text) => text.replace(/\{([^{}|]+)\|([^{}|]+)\}/g, '$1');
+const toKana = (text) => text.replace(/\{([^{}|]+)\|([^{}|]+)\}/g, '$2');
 const squash = (text) => strip(text).replace(/\s/g, '');
 const kana = /[\u3040-\u30ff]/;
 // 中文里允许用「」『』引用日语词
 const removeQuotedJa = (text) => text.replace(/「[^」]*」/g, '').replace(/『[^』]*』/g, '');
+
+if (process.argv.includes('--kana')) {
+  for (const scene of scenarios) {
+    console.log(`\n=== ${scene.id} ===`);
+    console.log(`T: ${strip(scene.title)}\n   ${toKana(scene.title)}`);
+    for (const line of scene.lines) {
+      console.log(`${line.id}: ${strip(line.ja)}\n    ${toKana(line.ja)}`);
+    }
+    if (scene.jlpt) {
+      console.log(`Q: ${strip(scene.jlpt.question)}\n   ${toKana(scene.jlpt.question)}`);
+      scene.jlpt.options.forEach((o, i) => console.log(`O${i}: ${strip(o)} -> ${toKana(o)}`));
+    }
+  }
+  process.exit(0);
+}
 
 const errors = [];
 const warnings = [];
@@ -62,6 +78,20 @@ const READING_RULES = {
   風邪: 'かぜ',
 };
 
+// E5b：带送假名的常见易错读音（检查 {漢字|かんじ} + 紧随的送假名）
+const OKURIGANA_RULES = [
+  { surface: '膨', next: /^ら/, expected: 'ふく' },
+  { surface: '少', next: /^な/, expected: 'すく' },
+  { surface: '少', next: /^し/, expected: 'すこ' },
+  { surface: '行', next: /^っ/, expected: 'い' },
+  { surface: '入', next: /^っ/, expected: 'はい' },
+  { surface: '入', next: /^れ/, expected: 'い' },
+  { surface: '開', next: /^け/, expected: 'あ' },
+  { surface: '閉', next: /^め/, expected: 'し' },
+  { surface: '出', next: /^[すしせ]/, expected: 'だ' },
+  { surface: '出', next: /^[てたる]/, expected: 'で' },
+];
+
 // E4 / E5 / E6 / E7 + W3
 for (const scene of scenarios) {
   const isPassage = scene.kind === 'passage';
@@ -88,12 +118,27 @@ for (const scene of scenarios) {
       warnings.push(`W3 ${scene.id}/${line.id}: 单句逗号过多（≥4 处），可能导致 TTS 停顿破碎`);
     }
   }
-  const texts = scene.lines.map((line) => ({ where: `${scene.id}/${line.id}`, ja: line.ja }));
+  const texts = [
+    { where: `${scene.id}/title`, ja: scene.title },
+    ...scene.lines.map((line) => ({ where: `${scene.id}/${line.id}`, ja: line.ja })),
+    ...(scene.jlpt
+      ? [
+          { where: `${scene.id}/jlpt.question`, ja: scene.jlpt.question },
+          ...scene.jlpt.options.map((opt, idx) => ({ where: `${scene.id}/jlpt.options[${idx}]`, ja: opt })),
+        ]
+      : []),
+  ];
   for (const { where, ja } of texts) {
-    for (const match of ja.matchAll(/\{([^{}|]+)\|([^{}|]+)\}/g)) {
-      const expected = READING_RULES[match[1]];
-      if (expected && match[2] !== expected) {
-        errors.push(`E5 ${where}: ${match[1]} 应读 ${expected}，实际标注 ${match[2]}`);
+    for (const match of ja.matchAll(/\{([^{}|]+)\|([^{}|]+)\}([ぁ-んー]*)/g)) {
+      const [, surface, reading, following] = match;
+      const expected = READING_RULES[surface];
+      if (expected && reading !== expected) {
+        errors.push(`E5 ${where}: ${surface} 应读 ${expected}，实际标注 ${reading}`);
+      }
+      for (const rule of OKURIGANA_RULES) {
+        if (surface === rule.surface && rule.next.test(following) && reading !== rule.expected) {
+          errors.push(`E5 ${where}: ${surface}${following.slice(0, 2)} 应读 ${rule.expected}，实际标注 ${reading}`);
+        }
       }
     }
   }
