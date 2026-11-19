@@ -990,5 +990,169 @@
         "style": "calm, sincere prose closing"
       }
     ]
+  },
+  {
+    "id": "pharmacy-prescription-pickup",
+    "kind": "dialogue",
+    "category": "medical",
+    "title": "{薬局|やっきょく}での{受|う}け{取|と}り：{処方箋|しょほうせん}と{飲|の}み{方|かた}の{確認|かくにん}",
+    "titleZh": "药局凭处方领药：确认服药方法与注意事项",
+    "emoji": "💊",
+    "accent": "#0d9488",
+    "accentDark": "#2dd4bf",
+    "speakers": [
+      {
+        "id": "pharmacist",
+        "label": "薬剤師",
+        "voice": "Zephyr",
+        "style": "warm, clear, attentive Japanese pharmacist explaining medication instructions"
+      },
+      {
+        "id": "you",
+        "label": "わたし",
+        "self": true,
+        "voice": "Puck",
+        "style": "polite, calm patient picking up prescription medicine at a pharmacy"
+      }
+    ],
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "pharmacist",
+        "ja": "お{待|ま}たせいたしました。{田中様|たなかさま}、{本日|ほんじつ}は{処方箋|しょほうせん}のお{薬|くすり}を{二種類|にしゅるい}ご{用意|ようい}しています。",
+        "zh": "久等了。田中您好，今天按处方为您准备了两种药。",
+        "style": "warm, polite pharmacist greeting at pickup counter"
+      },
+      {
+        "id": "l2",
+        "speaker": "you",
+        "ja": "ありがとうございます。お{薬手帳|くすりてちょう}のシールも{貼|は}っていただけましたか。",
+        "zh": "谢谢。用药手册的贴纸也帮我贴好了吗？",
+        "style": "polite, calm patient inquiry"
+      },
+      {
+        "id": "l3",
+        "speaker": "pharmacist",
+        "ja": "はい、こちらに{貼|は}っておきました。のどの{炎症|えんしょう}を{抑|おさ}える{薬|くすり}は、{一日|いちにち}{三回|さんかい}、{毎食後|まいしょくご}に{一錠|いちじょう}ずつお{飲|の}みください。",
+        "zh": "是的，已经帮您贴在这里了。缓解喉咙发炎的药，请每天三次、每次饭后服用一粒。",
+        "style": "clear, structured dosage explanation"
+      },
+      {
+        "id": "l4",
+        "speaker": "you",
+        "ja": "わかりました。もう{一|ひと}つの{咳止|せきど}めも、{同|おな}じタイミングで{飲|の}んでいいですか。",
+        "zh": "明白了。另一种止咳药也可以在同一时间服用吗？",
+        "style": "attentive confirmation question"
+      },
+      {
+        "id": "l5",
+        "speaker": "pharmacist",
+        "ja": "はい、{一緒|いっしょ}に{飲|の}んでいただいて{大丈夫|だいじょうぶ}です。ただ、{五日分|いつかぶん}は{症状|しょうじょう}が{軽|かる}くなっても{最後|さいご}まで{飲|の}み{切|き}ってくださいね。",
+        "zh": "可以的，一起服用没问题。不过这五天的药量即使症状减轻了，也请务必全部吃完哦。",
+        "style": "reassuring, caring pharmacist reminder"
+      },
+      {
+        "id": "l6",
+        "speaker": "you",
+        "ja": "{承知|しょうち}しました。{丁寧|ていねい}にご{説明|せつめい}いただき、ありがとうございます。",
+        "zh": "明白了。非常感谢您耐心的讲解。",
+        "style": "polite, grateful closing"
+      }
+    ]
+  },
+  {
+    "id": "jlpt-n2-library-return-rule",
+    "kind": "jlpt",
+    "category": "study",
+    "title": "JLPT N2 {ポイント理解|ポイントりかい}：{図書館|としょかん}の{返却|へんきゃく}{延長|えんちょう}",
+    "titleZh": "JLPT N2 要点理解：图书馆续借条件",
+    "emoji": "🎧",
+    "accent": "#4f46e5",
+    "accentDark": "#818cf8",
+    "speakers": [
+      {
+        "id": "narrator",
+        "label": "ナレーター",
+        "voice": "Aoede",
+        "style": "clear, neutral Japanese JLPT exam narrator"
+      },
+      {
+        "id": "student",
+        "label": "男の学生",
+        "voice": "Puck",
+        "style": "natural, polite Japanese male university student"
+      },
+      {
+        "id": "librarian",
+        "label": "図書館の職員",
+        "voice": "Kore",
+        "style": "calm, helpful Japanese female librarian"
+      }
+    ],
+    "jlpt": {
+      "level": "N2",
+      "type": "ポイント理解",
+      "question": "{男|おとこ}の{学生|がくせい}はなぜこの{本|ほん}を{延長|えんちょう}できませんか。",
+      "questionZh": "男学生为什么不能续借这本书？",
+      "options": [
+        "{返却|へんきゃく}{期限|きげん}を{過|す}ぎているから",
+        "すでに{一回|いっかい}{延長|えんちょう}したから",
+        "{次|つぎ}の{予約|よやく}が{入|はい}っているから",
+        "{学生証|がくせいしょう}を{忘|わす}れたから"
+      ],
+      "answer": 2,
+      "explanation": "男学生带了学生证（排除4）、尚未过还书期限（排除1），也未曾续借过（排除2）；馆员查询后明确告知「次の方から予約が入っていまして、延長はできないんです」，因此选 3。"
+    },
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "narrator",
+        "ja": "{大学|だいがく}の{図書館|としょかん}で{男|おとこ}の{学生|がくせい}と{職員|しょくいん}が{話|はな}しています。{男|おとこ}の{学生|がくせい}はなぜこの{本|ほん}を{延長|えんちょう}できませんか。",
+        "zh": "在大学图书馆里，男学生和工作人员正在说话。男学生为什么不能续借这本书？",
+        "style": "clear, steady Japanese JLPT exam question prompt"
+      },
+      {
+        "id": "l2",
+        "speaker": "student",
+        "ja": "すみません、{借|か}りているこの{本|ほん}なんですけど、{返却|へんきゃく}{期限|きげん}を{一週間|いっしゅうかん}ほど{延長|えんちょう}できますか。{学生証|がくせいしょう}はこちらです。",
+        "zh": "不好意思，我借的这本书，可以把还书期限延长一周左右吗？学生证在这里。",
+        "style": "polite student request at library counter"
+      },
+      {
+        "id": "l3",
+        "speaker": "librarian",
+        "ja": "はい、お{調|しら}べしますね。{期限|きげん}は{明日|あした}までですし、まだ{延長|えんちょう}もされていないですね。",
+        "zh": "好的，我帮您查一下。还书期限到明天为止，而且之前也还没有续借过呢。",
+        "style": "calm, attentive librarian checking system"
+      },
+      {
+        "id": "l4",
+        "speaker": "student",
+        "ja": "よかった。レポートを{書|か}くのに、もう{少|すこ}し{時間|じかん}が{欲|ほ}しかったんです。",
+        "zh": "太好了。写报告还需要再多一点时间。",
+        "style": "relieved, natural student remark"
+      },
+      {
+        "id": "l5",
+        "speaker": "librarian",
+        "ja": "あ、{申|もう}し{訳|わけ}ありません。{実|じつ}は{次|つぎ}の{方|かた}から{予約|よやく}が{入|はい}っていまして、{延長|えんちょう}はできないんです。",
+        "zh": "啊，非常抱歉。其实后面已经有其他人预约了，所以无法办理续借。",
+        "style": "apologetic, clear librarian explanation"
+      },
+      {
+        "id": "l6",
+        "speaker": "student",
+        "ja": "そうなんですか……わかりました。では、{明日|あした}までに{必|かなら}ず{返|かえ}します。",
+        "zh": "这样啊……明白了。那我一定在明天之前归还。",
+        "style": "understanding, polite student acceptance"
+      },
+      {
+        "id": "l7",
+        "speaker": "narrator",
+        "ja": "{男|おとこ}の{学生|がくせい}はなぜこの{本|ほん}を{延長|えんちょう}できませんか。",
+        "zh": "男学生为什么不能续借这本书？",
+        "style": "clear, steady Japanese JLPT exam question repeat"
+      }
+    ]
   }
 ]
