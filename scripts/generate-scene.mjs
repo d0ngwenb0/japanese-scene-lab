@@ -66,7 +66,7 @@ const prompt = `你是一个日语生活场景对话语料设计师。请围绕�
    - "speakers": 恰好 2 个说话人，各自从 Gemini 官方 30 个预设音色中选 1 个（两人音色不能相同）：Zephyr, Puck, Charon, Kore, Fenrir, Leda, Orus, Aoede, Callirrhoe, Autonoe, Enceladus, Iapetus, Umbriel, Algieba, Despina, Erinome, Algenib, Rasalgethi, Laomedeia, Achernar, Alnilam, Schedar, Gacrux, Pulcherrima, Achird, Zubenelgenubi, Vindemiatrix, Sadachbia, Sadaltager, Sulafat
      - 一个是 "id": "you", "label": "わたし", "self": true, "voice": "...", "style": 简短英文演绎风格描述（贴合该角色与场景，不要包含具体人名）
      - 另一个是对方角色（如 "id": "pharmacist", "label": "药剂师"）, 不写 self, "voice": "...", "style": 简短英文演绎风格描述（贴合该角色与场景，不要包含具体人名）
-   - "lines": 5–6 句（"id": "l1" 到 "l5"/"l6"），两人交替发言：
+   - "lines": 5–8 句（推荐 6 句，"id": "l1" 起递增），两人交替发言：
      - 每句 "ja" 为自然地道的日常日语口语；
      - 每一个汉字（包括常见汉字、々）用 {漢字|かんじ} 标注读音，纯假名不加花括号，日文正文不加分词空格；
      - 每句 "zh" 写自然流畅的中文翻译；

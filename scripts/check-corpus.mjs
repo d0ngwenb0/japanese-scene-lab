@@ -78,14 +78,13 @@ const READING_RULES = {
   風邪: 'かぜ',
 };
 
-// E5b：带送假名的常见易错读音（检查 {漢字|かんじ} + 紧随的送假名）
+// E5b：带送假名的常见易错读音（检查 {漢字|かんじ} + 紧随的送假名；避免对可能形等合法多读规则误判）
 const OKURIGANA_RULES = [
   { surface: '膨', next: /^ら/, expected: 'ふく' },
   { surface: '少', next: /^な/, expected: 'すく' },
   { surface: '少', next: /^し/, expected: 'すこ' },
   { surface: '行', next: /^っ/, expected: 'い' },
   { surface: '入', next: /^っ/, expected: 'はい' },
-  { surface: '入', next: /^れ/, expected: 'い' },
   { surface: '開', next: /^け/, expected: 'あ' },
   { surface: '閉', next: /^め/, expected: 'し' },
   { surface: '出', next: /^[すしせ]/, expected: 'だ' },
@@ -103,13 +102,16 @@ for (const scene of scenarios) {
   } else if (!isPassage && !isJlpt && (scene.lines.length < 5 || scene.lines.length > 8)) {
     errors.push(`E7 ${scene.id}: 对话句数应为 5–8 句（当前 ${scene.lines.length} 句）`);
   }
+  if (kana.test(removeQuotedJa(scene.titleZh ?? ''))) {
+    errors.push(`E4 ${scene.id}/titleZh: 中文标题里有未加「」的假名 → ${scene.titleZh}`);
+  }
+  if (scene.jlpt?.questionZh && kana.test(removeQuotedJa(scene.jlpt.questionZh))) {
+    errors.push(`E4 ${scene.id}/jlpt.questionZh: 中文里有未加「」的假名 → ${scene.jlpt.questionZh}`);
+  }
   for (const line of scene.lines) {
     const plain = strip(line.ja).trim();
     if (kana.test(removeQuotedJa(line.zh))) {
       errors.push(`E4 ${scene.id}/${line.id}: 中文里有未加「」的假名 → ${line.zh}`);
-    }
-    if (/\s/.test(strip(line.ja))) {
-      errors.push(`E6 ${scene.id}/${line.id}: 日文正文含多余空格 → ${strip(line.ja)}`);
     }
     if (!/[。？！…]$/.test(plain)) {
       warnings.push(`W3 ${scene.id}/${line.id}: 句末缺少标点（。/？/！/…），可能影响 TTS 语调收束`);
@@ -129,6 +131,9 @@ for (const scene of scenarios) {
       : []),
   ];
   for (const { where, ja } of texts) {
+    if (!where.endsWith('/title') && /\s/.test(strip(ja))) {
+      errors.push(`E6 ${where}: 日文正文含多余空格 → ${strip(ja)}`);
+    }
     for (const match of ja.matchAll(/\{([^{}|]+)\|([^{}|]+)\}([ぁ-んー]*)/g)) {
       const [, surface, reading, following] = match;
       const expected = READING_RULES[surface];
