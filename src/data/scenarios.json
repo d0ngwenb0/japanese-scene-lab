@@ -1154,5 +1154,263 @@
         "style": "clear, steady Japanese JLPT exam question repeat"
       }
     ]
+  },
+  {
+    "id": "jlpt-n2-cafe-part-time-shift",
+    "kind": "jlpt",
+    "category": "food",
+    "title": "JLPT N2 {課題理解|かだいりかい}：シフトの{変更|へんこう}",
+    "titleZh": "JLPT N2 任务理解：咖啡店调班",
+    "emoji": "🎧",
+    "accent": "#d97706",
+    "accentDark": "#fbbf24",
+    "speakers": [
+      {
+        "id": "narrator",
+        "label": "ナレーター",
+        "voice": "Aoede",
+        "style": "clear, neutral Japanese JLPT exam narrator"
+      },
+      {
+        "id": "woman",
+        "label": "女の店員",
+        "voice": "Leda",
+        "style": "polite, earnest Japanese female cafe part-time worker"
+      },
+      {
+        "id": "manager",
+        "label": "店長",
+        "voice": "Orus",
+        "style": "calm, friendly Japanese male cafe manager"
+      }
+    ],
+    "jlpt": {
+      "level": "N2",
+      "type": "課題理解",
+      "question": "{女|おんな}の{店員|てんいん}はこれからまず{何|なに}をしますか。",
+      "questionZh": "女店员接下来首先要做什么？",
+      "options": [
+        "シフト{表|ひょう}を{書|か}き{直|なお}す",
+        "{佐藤|さとう}さんに{連絡|れんらく}する",
+        "チームのチャットに{書|か}き{込|こ}む",
+        "{明日|あした}の{開店|かいてん}{準備|じゅんび}をする"
+      ],
+      "answer": 1,
+      "explanation": "店长表示排班表由自己修改（排除1），在发群消息之前请女店员先联系佐藤询问能否替班（「チャットに流す前に、先に佐藤さんに連絡して、代われるか聞いてもらえるかな」），因此选 2。"
+    },
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "narrator",
+        "ja": "カフェで{女|おんな}の{店員|てんいん}と{店長|てんちょう}が{話|はな}しています。{女|おんな}の{店員|てんいん}はこれからまず{何|なに}をしますか。",
+        "zh": "在咖啡店里，女店员和店长正在说话。女店员接下来首先要做什么？",
+        "style": "clear, steady Japanese JLPT exam question prompt"
+      },
+      {
+        "id": "l2",
+        "speaker": "woman",
+        "ja": "{店長|てんちょう}、すみません。{今週|こんしゅう}{土曜日|どようび}のシフトなんですけど、{家族|かぞく}の{用事|ようじ}が{入|はい}ってしまいまして。",
+        "zh": "店长，不好意思。关于本周六的排班，我家里突然有事。",
+        "style": "apologetic, polite workplace request"
+      },
+      {
+        "id": "l3",
+        "speaker": "manager",
+        "ja": "そうなんだ。{土曜|どよう}は{忙|いそが}しいから、{代|か}わりに{入|はい}れる{人|ひと}を{見|み}つけないといけないね。",
+        "zh": "这样啊。周六比较忙，得找个能替班的人才行呢。",
+        "style": "calm, practical manager response"
+      },
+      {
+        "id": "l4",
+        "speaker": "woman",
+        "ja": "はい、すぐチームのチャットに{書|か}き{込|こ}んで{聞|き}いてみます。シフト{表|ひょう}も{直|なお}しておきましょうか。",
+        "zh": "好的，我马上在团队群里发消息问问。排班表我也先改好吗？",
+        "style": "proactive, polite staff offer"
+      },
+      {
+        "id": "l5",
+        "speaker": "manager",
+        "ja": "シフト{表|ひょう}は{私|わたし}が{書|か}き{直|なお}すからいいよ。チャットに{流|なが}す{前|まえ}に、{先|さき}に{佐藤|さとう}さんに{連絡|れんらく}して、{代|か}われるか{聞|き}いてもらえるかな。{土曜|どよう}は{空|あ}いてることが{多|おお}いんだ。",
+        "zh": "排班表我来改就行。发群消息之前，你能先联系一下佐藤，问问他能不能替班吗？他周六经常有空。",
+        "style": "clear, helpful manager instruction"
+      },
+      {
+        "id": "l6",
+        "speaker": "woman",
+        "ja": "わかりました。では、すぐ{佐藤|さとう}さんに{電話|でんわ}してみます。",
+        "zh": "明白了。那我马上给佐藤打电话问问。",
+        "style": "prompt, polite acknowledgment"
+      },
+      {
+        "id": "l7",
+        "speaker": "narrator",
+        "ja": "{女|おんな}の{店員|てんいん}はこれからまず{何|なに}をしますか。",
+        "zh": "女店员接下来首先要做什么？",
+        "style": "clear, steady Japanese JLPT exam question repeat"
+      }
+    ]
+  },
+  {
+    "id": "jlpt-n3-weekend-hiking-plan",
+    "kind": "jlpt",
+    "category": "social",
+    "title": "JLPT N3 {ポイント理解|ポイントりかい}：{週末|しゅうまつ}の{予定|よてい}",
+    "titleZh": "JLPT N3 要点理解：周末出游计划变更",
+    "emoji": "🎧",
+    "accent": "#059669",
+    "accentDark": "#34d399",
+    "speakers": [
+      {
+        "id": "narrator",
+        "label": "ナレーター",
+        "voice": "Aoede",
+        "style": "clear, neutral Japanese JLPT exam narrator"
+      },
+      {
+        "id": "man",
+        "label": "男の人",
+        "voice": "Puck",
+        "style": "friendly, natural Japanese male friend speaking casually"
+      },
+      {
+        "id": "woman",
+        "label": "女の人",
+        "voice": "Zephyr",
+        "style": "warm, cheerful Japanese female friend speaking casually"
+      }
+    ],
+    "jlpt": {
+      "level": "N3",
+      "type": "ポイント理解",
+      "question": "{二人|ふたり}はどうして{山|やま}へ{行|い}くのをやめましたか。",
+      "questionZh": "两个人为什么取消了去爬山的计划？",
+      "options": [
+        "{女|おんな}の{人|ひと}の{足|あし}がまだ{痛|いた}いから",
+        "{男|おとこ}の{人|ひと}に{仕事|しごと}が{入|はい}ったから",
+        "{午後|ごご}から{雨|あめ}が{降|ふ}る{予報|よほう}だから",
+        "{美術館|びじゅつかん}のチケットをもらったから"
+      ],
+      "answer": 2,
+      "explanation": "女生的脚伤已经不痛了（排除1），男生的工作周五前也能完成（排除2）；美术馆是取消爬山后提议的替代去处（排除4）；取消爬山的直接原因是天气预报说周日下午会下大雨（「日曜日の午後から強い雨が降るって」），因此选 3。"
+    },
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "narrator",
+        "ja": "{男|おとこ}の{人|ひと}と{女|おんな}の{人|ひと}が{週末|しゅうまつ}の{予定|よてい}について{話|はな}しています。{二人|ふたり}はどうして{山|やま}へ{行|い}くのをやめましたか。",
+        "zh": "男生和女生正在聊周末的计划。两个人为什么取消了去爬山的计划？",
+        "style": "clear, steady Japanese JLPT exam question prompt"
+      },
+      {
+        "id": "l2",
+        "speaker": "man",
+        "ja": "{今週|こんしゅう}の{日曜日|にちようび}、{山|やま}に{登|のぼ}る{予定|よてい}だったよね。{足|あし}のけがはもう{大丈夫|だいじょうぶ}？",
+        "zh": "这周日咱们原本打算去爬山对吧。你的脚伤已经没事了吗？",
+        "style": "friendly, caring casual question"
+      },
+      {
+        "id": "l3",
+        "speaker": "woman",
+        "ja": "うん、もうぜんぜん{痛|いた}くないよ。そっちは{仕事|しごと}、{大丈夫|だいじょうぶ}なの？",
+        "zh": "嗯，已经完全不痛啦。你那边工作没问题吗？",
+        "style": "cheerful, casual reply"
+      },
+      {
+        "id": "l4",
+        "speaker": "man",
+        "ja": "{仕事|しごと}は{金曜|きんよう}までに{終|お}わるんだけど、さっき{天気予報|てんきよほう}を{見|み}たら、{日曜日|にちようび}の{午後|ごご}から{強|つよ}い{雨|あめ}が{降|ふ}るって。",
+        "zh": "工作周五前就能搞定，不过刚才我看天气预报，说周日下午开始会下大雨。",
+        "style": "slightly disappointed, natural explanation"
+      },
+      {
+        "id": "l5",
+        "speaker": "woman",
+        "ja": "えっ、そうなの？{雨|あめ}の{中|なか}で{山|やま}に{登|のぼ}るのは{危|あぶ}ないね。じゃあ、{今回|こんかい}はやめて、{駅|えき}の{近|ちか}くの{美術館|びじゅつかん}にでも{行|い}こうか。",
+        "zh": "哎，真的吗？下雨天爬山挺危险的呢。那这次就算了吧，去车站附近的美术馆逛逛怎么样？",
+        "style": "surprised then constructive casual suggestion"
+      },
+      {
+        "id": "l6",
+        "speaker": "man",
+        "ja": "いいね、そうしよう。{山|やま}はまた{晴|は}れた{日|ひ}にしよう。",
+        "zh": "好主意，就这么办吧。爬山等下次晴天再去。",
+        "style": "warm, agreeable casual closing"
+      },
+      {
+        "id": "l7",
+        "speaker": "narrator",
+        "ja": "{二人|ふたり}はどうして{山|やま}へ{行|い}くのをやめましたか。",
+        "zh": "两个人为什么取消了去爬山的计划？",
+        "style": "clear, steady Japanese JLPT exam question repeat"
+      }
+    ]
+  },
+  {
+    "id": "jlpt-n2-museum-audio-guide",
+    "kind": "jlpt",
+    "category": "travel",
+    "title": "JLPT N2 {概要理解|がいようりかい}：{美術館|びじゅつかん}の{案内|あんない}",
+    "titleZh": "JLPT N2 概要理解：美术馆馆内通知",
+    "emoji": "🎧",
+    "accent": "#7c3aed",
+    "accentDark": "#a78bfa",
+    "speakers": [
+      {
+        "id": "narrator",
+        "label": "ナレーター",
+        "voice": "Aoede",
+        "style": "clear, neutral Japanese JLPT exam narrator"
+      },
+      {
+        "id": "announcer",
+        "label": "館内放送",
+        "voice": "Charon",
+        "style": "polite, calm, formal Japanese museum public announcement voice"
+      }
+    ],
+    "jlpt": {
+      "level": "N2",
+      "type": "概要理解",
+      "question": "この{放送|ほうそう}で{伝|つた}えたいことは{何|なん}ですか。",
+      "questionZh": "这段广播主要想传达什么？",
+      "options": [
+        "{閉館|へいかん}{時間|じかん}が{変更|へんこう}になったこと",
+        "{写真|しゃしん}{撮影|さつえい}のルールと{注意点|ちゅういてん}",
+        "{特別展|とくべつてん}のチケットの{買|か}い{方|かた}",
+        "{音声|おんせい}ガイドの{返却|へんきゃく}{場所|ばしょ}"
+      ],
+      "answer": 1,
+      "explanation": "广播说明了常设展厅除部分作品外允许用手机拍照，但为保护展品禁止使用闪光灯和三脚架，并提醒不要妨碍他人欣赏，核心内容是拍照规则与注意事项，因此选 2。"
+    },
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "narrator",
+        "ja": "{美術館|びじゅつかん}で{館内|かんない}{放送|ほうそう}が{流|なが}れています。この{放送|ほうそう}で{伝|つた}えたいことは{何|なん}ですか。",
+        "zh": "美术馆里正在播放馆内广播。这段广播主要想传达什么？",
+        "style": "clear, steady Japanese JLPT exam question prompt"
+      },
+      {
+        "id": "l2",
+        "speaker": "announcer",
+        "ja": "ご{来館|らいかん}の{皆様|みなさま}にご{案内|あんない}{申|もう}し{上|あ}げます。{当館|とうかん}の{常設|じょうせつ}{展示室|てんじしつ}では、{一部|いちぶ}の{作品|さくひん}を{除|のぞ}き、スマートフォンでの{撮影|さつえい}が{可能|かのう}となっております。",
+        "zh": "各位来宾您好，向您播报一条通知。本馆常设展厅内，除部分作品外，均允许使用智能手机拍照。",
+        "style": "formal, courteous Japanese museum announcement"
+      },
+      {
+        "id": "l3",
+        "speaker": "announcer",
+        "ja": "ただし、{作品|さくひん}{保護|ほご}のためフラッシュや{三脚|さんきゃく}のご{使用|しよう}はご{遠慮|えんりょ}ください。また、{他|ほか}のお{客様|きゃくさま}の{鑑賞|かんしょう}の{妨|さまた}げにならないようご{配慮|はいりょ}をお{願|ねが}いいたします。",
+        "zh": "但为了保护展品，请勿使用闪光灯和三脚架。另外，请留意不要妨碍其他观众欣赏作品。",
+        "style": "polite, steady formal reminder"
+      },
+      {
+        "id": "l4",
+        "speaker": "narrator",
+        "ja": "この{放送|ほうそう}で{伝|つた}えたいことは{何|なん}ですか。",
+        "zh": "这段广播主要想传达什么？",
+        "style": "clear, steady Japanese JLPT exam question repeat"
+      }
+    ]
   }
 ]
