@@ -195,7 +195,11 @@ function stripFurigana(text) {
 function toTtsScript(text) {
   const converted = text.replace(/\{([^{}|]+)\|([^{}|]+)\}/g, (_match, surface, reading) => {
     if (ttsKanaMode) return reading;
-    if (FORCE_READING_SURFACES.has(surface) || COUNTER_OR_POLYPHONIC_RE.test(surface)) {
+    if (
+      FORCE_READING_SURFACES.has(surface) ||
+      COUNTER_OR_POLYPHONIC_RE.test(surface) ||
+      /[A-Za-zＡ-Ｚａ-ｚ]/.test(surface)
+    ) {
       return reading;
     }
     return surface;
