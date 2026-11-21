@@ -1,12 +1,152 @@
 const KEY_STORAGE = 'scene-lab:gemini-key:v1';
 const MODEL_STORAGE = 'scene-lab:gemini-model:v1';
+const MODELS_CACHE_STORAGE = 'scene-lab:gemini-models-cache:v1';
+const MODELS_CACHE_TTL_MS = 12 * 60 * 60 * 1000;
 
-export const GEMINI_MODELS = [
+export const AUTO_MODEL_ID = 'auto';
+
+export interface ModelOption {
+  id: string;
+  label: string;
+}
+
+export const GEMINI_MODELS: ModelOption[] = [
   { id: 'gemini-4-carbon', label: 'Gemini 4 Carbon（智力最强）' },
   { id: 'gemini-4-argon', label: 'Gemini 4 Argon（高阶推理）' },
   { id: 'gemini-4-hydrogen', label: 'Gemini 4 Hydrogen（均衡快）' },
   { id: 'gemini-3.8-flash', label: 'Gemini 3.8 Flash（极速）' },
-] as const;
+];
+
+const NON_CHAT_MODEL_RE =
+  /tts|image|imagen|veo|lyria|embedding|aqa|robotics|computer-use|native-audio|live|learnlm|vision|gemma|bison|gecko|dialog/i;
+
+function scoreGeminiModel(id: string): number {
+  const lower = id.toLowerCase();
+  const verMatch = lower.match(/^gemini-(\d+)(?:\.(\d+))?/);
+  const major = verMatch ? Number(verMatch[1]) : 0;
+  const minor = verMatch && verMatch[2] ? Number(verMatch[2]) / 10 : 0;
+  const versionScore = (major + minor) * 1000;
+
+  let tierScore = 40;
+  if (/\bultra\b/.test(lower)) tierScore = 95;
+  else if (/\bcarbon\b/.test(lower)) tierScore = 90;
+  else if (/\bpro\b|\bargon\b/.test(lower)) tierScore = 80;
+  else if (/\bhydrogen\b/.test(lower)) tierScore = 65;
+  else if (/flash-lite|\blite\b|\bnano\b|\bmini\b/.test(lower)) tierScore = 25;
+  else if (/\bflash\b/.test(lower)) tierScore = 50;
+
+  let stabilityPenalty = 0;
+  if (/preview|exp/.test(lower)) stabilityPenalty -= 5;
+  if (/-\d{2}-\d{2}$|-\d{3}$|-\d{4}$/.test(lower)) stabilityPenalty -= 10;
+  if (/latest$/.test(lower)) stabilityPenalty += 2;
+
+  return versionScore + tierScore + stabilityPenalty;
+}
+
+function keyFingerprint(key: string): string {
+  const trimmed = key.trim();
+  if (!trimmed) return '';
+  return `${trimmed.slice(0, 6)}:${trimmed.slice(-4)}:${trimmed.length}`;
+}
+
+export function loadCachedModels(key: string): { models: ModelOption[]; fresh: boolean } {
+  try {
+    const raw = localStorage.getItem(MODELS_CACHE_STORAGE);
+    if (!raw) return { models: GEMINI_MODELS, fresh: false };
+    const parsed = JSON.parse(raw) as {
+      keyFp?: string;
+      fetchedAt?: number;
+      models?: ModelOption[];
+    };
+    if (
+      parsed.keyFp === keyFingerprint(key) &&
+      Array.isArray(parsed.models) &&
+      parsed.models.length > 0
+    ) {
+      const fresh = typeof parsed.fetchedAt === 'number' && Date.now() - parsed.fetchedAt < MODELS_CACHE_TTL_MS;
+      return { models: parsed.models, fresh };
+    }
+  } catch {
+    // 忽略缓存解析失败。
+  }
+  return { models: GEMINI_MODELS, fresh: false };
+}
+
+export async function fetchAvailableModels(
+  key: string,
+  options?: { force?: boolean; signal?: AbortSignal },
+): Promise<ModelOption[]> {
+  const trimmed = key.trim();
+  if (!trimmed) return GEMINI_MODELS;
+
+  const cached = loadCachedModels(trimmed);
+  if (!options?.force && cached.fresh) {
+    return cached.models;
+  }
+
+  const response = await fetch(
+    'https://generativelanguage.googleapis.com/v1beta/models?pageSize=200',
+    {
+      method: 'GET',
+      headers: { 'x-goog-api-key': trimmed },
+      signal: options?.signal,
+    },
+  );
+  if (!response.ok) {
+    return cached.models;
+  }
+
+  const data = (await response.json()) as {
+    models?: Array<{
+      name?: string;
+      displayName?: string;
+      supportedGenerationMethods?: string[];
+    }>;
+  };
+  const rawList = Array.isArray(data.models) ? data.models : [];
+
+  const filtered = rawList
+    .filter((item) => {
+      const id = (item.name ?? '').replace(/^models\//, '');
+      if (!/^gemini-\d/i.test(id)) return false;
+      if (NON_CHAT_MODEL_RE.test(id)) return false;
+      const methods = item.supportedGenerationMethods ?? [];
+      return methods.includes('generateContent');
+    })
+    .map((item) => {
+      const id = (item.name ?? '').replace(/^models\//, '');
+      const known = GEMINI_MODELS.find((m) => m.id === id);
+      const label = known?.label ?? (item.displayName?.trim() || id);
+      return { id, label, score: scoreGeminiModel(id) };
+    })
+    .sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
+
+  // 去重并限制展示前 12 个主流候选，避免旧快照刷屏
+  const seen = new Set<string>();
+  const models: ModelOption[] = [];
+  for (const item of filtered) {
+    if (seen.has(item.id)) continue;
+    seen.add(item.id);
+    models.push({ id: item.id, label: item.label });
+    if (models.length >= 12) break;
+  }
+
+  if (!models.length) return cached.models;
+
+  try {
+    localStorage.setItem(
+      MODELS_CACHE_STORAGE,
+      JSON.stringify({
+        keyFp: keyFingerprint(trimmed),
+        fetchedAt: Date.now(),
+        models,
+      }),
+    );
+  } catch {
+    // 隐私模式忽略。
+  }
+  return models;
+}
 
 export interface ChatMessage {
   role: 'user' | 'assistant';
@@ -32,6 +172,7 @@ export function saveKey(key: string): void {
 export function clearKey(): void {
   try {
     localStorage.removeItem(KEY_STORAGE);
+    localStorage.removeItem(MODELS_CACHE_STORAGE);
   } catch {
     // 同上。
   }
@@ -39,12 +180,12 @@ export function clearKey(): void {
 
 export function loadModel(): string {
   try {
-    const saved = localStorage.getItem(MODEL_STORAGE);
-    if (saved && GEMINI_MODELS.some((item) => item.id === saved)) return saved;
+    const saved = localStorage.getItem(MODEL_STORAGE)?.trim();
+    if (saved) return saved;
   } catch {
     // 忽略。
   }
-  return GEMINI_MODELS[0].id;
+  return AUTO_MODEL_ID;
 }
 
 export function saveModel(model: string): void {
@@ -109,9 +250,17 @@ export async function streamChat(options: {
   model: string;
   contents: GeminiContent[];
   signal?: AbortSignal;
+  disableThinkingConfig?: boolean;
   onDelta: (text: string) => void;
 }): Promise<{ text: string }> {
-  const { key, model, contents, signal, onDelta } = options;
+  const { key, model, contents, signal, disableThinkingConfig, onDelta } = options;
+  const generationConfig: Record<string, unknown> = {
+    temperature: 0.4,
+    maxOutputTokens: 8192,
+  };
+  if (!disableThinkingConfig) {
+    generationConfig.thinkingConfig = { thinkingLevel: 'low' };
+  }
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`,
     {
@@ -124,11 +273,7 @@ export async function streamChat(options: {
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
         contents,
-        generationConfig: {
-          temperature: 0.4,
-          maxOutputTokens: 8192,
-          thinkingConfig: { thinkingLevel: 'low' },
-        },
+        generationConfig,
       }),
       signal,
     },
@@ -217,6 +362,84 @@ export async function streamChat(options: {
   }
 
   return { text };
+}
+
+function isThinkingConfigError(error: unknown): boolean {
+  const err = error as InteractionError | null;
+  if (!err || err.status !== 400) return false;
+  return /thinking|thinkingConfig|thinkingLevel/i.test(`${err.message} ${err.detail ?? ''}`);
+}
+
+function isFallbackableModelError(error: unknown): boolean {
+  const err = error as InteractionError | null;
+  if (!err) return false;
+  if (err.status && [403, 404, 429, 500, 502, 503, 504].includes(err.status)) return true;
+  if (err.status === 400 && /model|not found|not supported|unsupported/i.test(`${err.message} ${err.detail ?? ''}`)) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * 按候选优先级调用流式对话：
+ * - 单模型若因不支持 thinkingConfig 报 400，自动去掉 thinkingConfig 重试一次；
+ * - 多候选（如「自动最强」模式）若在未输出任何内容前遇权限/下线/限流/5xx，自动顺延下一档最强模型。
+ */
+export async function streamChatWithFallback(options: {
+  key: string;
+  candidates: string[];
+  contents: GeminiContent[];
+  signal?: AbortSignal;
+  onDelta: (text: string) => void;
+}): Promise<{ text: string; usedModel: string }> {
+  const { key, candidates, contents, signal, onDelta } = options;
+  const list = candidates.length ? candidates : [GEMINI_MODELS[0].id];
+  let lastError: unknown;
+
+  for (let i = 0; i < list.length; i += 1) {
+    const model = list[i];
+    let emitted = false;
+    const wrappedOnDelta = (delta: string) => {
+      emitted = true;
+      onDelta(delta);
+    };
+
+    try {
+      const res = await streamChat({
+        key,
+        model,
+        contents,
+        signal,
+        onDelta: wrappedOnDelta,
+      });
+      return { text: res.text, usedModel: model };
+    } catch (err) {
+      if (signal?.aborted || emitted) throw err;
+      if (isThinkingConfigError(err)) {
+        try {
+          const retry = await streamChat({
+            key,
+            model,
+            contents,
+            signal,
+            disableThinkingConfig: true,
+            onDelta: wrappedOnDelta,
+          });
+          return { text: retry.text, usedModel: model };
+        } catch (retryErr) {
+          if (signal?.aborted || emitted) throw retryErr;
+          lastError = retryErr;
+          if (i < list.length - 1 && isFallbackableModelError(retryErr)) continue;
+          throw retryErr;
+        }
+      }
+      lastError = err;
+      if (i < list.length - 1 && isFallbackableModelError(err)) continue;
+      throw err;
+    }
+  }
+
+  throw lastError ?? new Error('没有可用的 Gemini 模型，请检查 API Key。');
 }
 
 /**

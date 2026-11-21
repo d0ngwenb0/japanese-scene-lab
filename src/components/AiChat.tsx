@@ -1,17 +1,21 @@
 import { useCallback, useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import type { Line, Scenario } from '../types';
 import {
+  AUTO_MODEL_ID,
   GEMINI_MODELS,
   clearKey,
   deleteInteraction,
+  fetchAvailableModels,
+  loadCachedModels,
   loadKey,
   loadModel,
   saveKey,
   saveModel,
-  streamChat,
+  streamChatWithFallback,
   transcribeMixedAudio,
   type ChatMessage,
   type GeminiContent,
+  type ModelOption,
 } from '../lib/gemini';
 import { copyText, stripFurigana } from '../lib/copy';
 import { Furigana } from '../lib/furigana';
@@ -191,6 +195,10 @@ export function AiChat({
   const [showKey, setShowKey] = useState(false);
   const [key, setKey] = useState(() => loadKey());
   const [model, setModel] = useState(() => loadModel());
+  const [availableModels, setAvailableModels] = useState<ModelOption[]>(
+    () => loadCachedModels(loadKey()).models,
+  );
+  const [refreshingModels, setRefreshingModels] = useState(false);
   const [keyDraft, setKeyDraft] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>(initial.current.messages);
   const [interactionId, setInteractionId] = useState<string | undefined>(
@@ -803,9 +811,13 @@ export function AiChat({
       let received = false;
 
       try {
-        const result = await streamChat({
+        const candidates =
+          model === AUTO_MODEL_ID
+            ? availableModels.slice(0, 4).map((item) => item.id)
+            : [model];
+        const result = await streamChatWithFallback({
           key,
-          model,
+          candidates,
           contents,
           signal: controller.signal,
           onDelta: (delta) => {
@@ -854,8 +866,43 @@ export function AiChat({
         abortRef.current = null;
       }
     },
-    [draft, key, line.id, messages, model, busy, scenario],
+    [availableModels, draft, key, line.id, messages, model, busy, scenario],
   );
+
+  useEffect(() => {
+    if (!key) {
+      setAvailableModels(GEMINI_MODELS);
+      return;
+    }
+    const cached = loadCachedModels(key);
+    setAvailableModels(cached.models);
+    if (!open || cached.fresh) return;
+    const controller = new AbortController();
+    fetchAvailableModels(key, { signal: controller.signal })
+      .then((list) => {
+        if (!controller.signal.aborted && list.length) {
+          setAvailableModels(list);
+        }
+      })
+      .catch(() => {
+        // 静默回退到缓存或默认列表。
+      });
+    return () => controller.abort();
+  }, [key, open]);
+
+  const refreshModels = useCallback(async () => {
+    const activeKey = keyDraft.trim() || key;
+    if (!activeKey || refreshingModels) return;
+    setRefreshingModels(true);
+    try {
+      const list = await fetchAvailableModels(activeKey, { force: true });
+      if (list.length) setAvailableModels(list);
+    } catch {
+      // 忽略网络错误，保留当前列表。
+    } finally {
+      setRefreshingModels(false);
+    }
+  }, [key, keyDraft, refreshingModels]);
 
   const stop = () => {
     abortRef.current?.abort();
@@ -1009,7 +1056,19 @@ export function AiChat({
               </button>
             </div>
 
-            <label htmlFor="ai-model">模型</label>
+            <div className="ai-model-label-row">
+              <label htmlFor="ai-model">模型</label>
+              {key || keyDraft.trim() ? (
+                <button
+                  type="button"
+                  className="ai-key-toggle"
+                  onClick={refreshModels}
+                  disabled={refreshingModels}
+                >
+                  {refreshingModels ? '刷新中…' : '刷新列表'}
+                </button>
+              ) : null}
+            </div>
             <select
               id="ai-model"
               value={model}
@@ -1018,11 +1077,17 @@ export function AiChat({
                 saveModel(event.target.value);
               }}
             >
-              {GEMINI_MODELS.map((item) => (
+              <option value={AUTO_MODEL_ID}>
+                ✨ 自动最强（当前：{availableModels[0]?.label ?? GEMINI_MODELS[0].label}）
+              </option>
+              {availableModels.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.label}
                 </option>
               ))}
+              {model !== AUTO_MODEL_ID && !availableModels.some((item) => item.id === model) ? (
+                <option value={model}>{model}</option>
+              ) : null}
             </select>
             <div className="ai-settings-actions">
               <button type="submit" className="ai-primary" disabled={!keyDraft.trim()}>

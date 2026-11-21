@@ -3739,6 +3739,18 @@ body.is-resizing {
   color: var(--ink);
 }
 
+.ai-model-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ai-model-label-row .ai-key-toggle {
+  height: 24px;
+  padding: 0 8px;
+}
+
 .ai-key-link {
   color: var(--accent-text);
   font-size: 11px;
