@@ -1412,5 +1412,267 @@
         "style": "clear, steady Japanese JLPT exam question repeat"
       }
     ]
+  },
+  {
+    "id": "train-ic-card-charge-gate",
+    "kind": "dialogue",
+    "category": "transport",
+    "title": "{改札|かいさつ}での{精算|せいさん}：{IC|アイシー}カードのチャージと{乗|の}り{越|こ}し",
+    "titleZh": "检票口补票：IC 卡余额不足与充值出站",
+    "emoji": "🎫",
+    "accent": "#2563eb",
+    "accentDark": "#60a5fa",
+    "speakers": [
+      {
+        "id": "you",
+        "label": "わたし",
+        "self": true,
+        "voice": "Puck",
+        "style": "polite, slightly flustered commuter asking for help at the ticket gate"
+      },
+      {
+        "id": "staff",
+        "label": "駅員",
+        "voice": "Orus",
+        "style": "calm, courteous, helpful Japanese station attendant"
+      }
+    ],
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "you",
+        "ja": "すみません、{改札|かいさつ}でエラーが{出|で}て{通|とお}れなかったのですが、{残高不足|ざんだかぶそく}でしょうか。",
+        "zh": "不好意思，我在闸机口报错没能出去，是余额不足吗？",
+        "style": "polite, slightly flustered inquiry"
+      },
+      {
+        "id": "l2",
+        "speaker": "staff",
+        "ja": "お{調|しら}べしますね。はい、{運賃|うんちん}が{百二十円|ひゃくにじゅうえん}{足|た}りないようです。",
+        "zh": "我帮您查一下。是的，车费好像差120日元。",
+        "style": "calm, clear station staff check"
+      },
+      {
+        "id": "l3",
+        "speaker": "you",
+        "ja": "そうなんですね。こちらの{窓口|まどぐち}でそのままチャージできますか。",
+        "zh": "这样啊。请问可以在这个窗口直接充值吗？",
+        "style": "polite follow-up question"
+      },
+      {
+        "id": "l4",
+        "speaker": "staff",
+        "ja": "すみませんが、チャージはすぐ{横|よこ}の{精算機|せいさんき}でお{願|ねが}いしています。{千円|せんえん}から{入金|にゅうきん}できますよ。",
+        "zh": "不好意思，充值请使用旁边的补票机。1000日元起可以充值哦。",
+        "style": "courteous, helpful guidance"
+      },
+      {
+        "id": "l5",
+        "speaker": "you",
+        "ja": "わかりました。チャージしたら、また{自動|じどう}{改札|かいさつ}にタッチして{出|で}ればいいですか。",
+        "zh": "明白了。充完值之后，再去刷自动检票机出站就行了吗？",
+        "style": "attentive confirmation"
+      },
+      {
+        "id": "l6",
+        "speaker": "staff",
+        "ja": "はい、そのまま{通|とお}れますよ。お{気|き}をつけてどうぞ。",
+        "zh": "是的，直接刷卡就能出站了。请慢走。",
+        "style": "warm, reassuring send-off"
+      }
+    ]
+  },
+  {
+    "id": "shinkansen-reserved-seat-ticket",
+    "kind": "dialogue",
+    "category": "transport",
+    "title": "みどりの{窓口|まどぐち}：{新幹線|しんかんせん}の{指定席|していせき}と{乗|の}り{場|ば}の{確認|かくにん}",
+    "titleZh": "绿色窗口购票：购买新干线指定席与确认月台",
+    "emoji": "🚄",
+    "accent": "#0284c7",
+    "accentDark": "#38bdf8",
+    "speakers": [
+      {
+        "id": "you",
+        "label": "わたし",
+        "self": true,
+        "voice": "Puck",
+        "style": "polite, clear traveler buying a Shinkansen ticket at the counter"
+      },
+      {
+        "id": "clerk",
+        "label": "窓口担当",
+        "voice": "Kore",
+        "style": "efficient, courteous, warm Japanese JR ticket counter clerk"
+      }
+    ],
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "you",
+        "ja": "こんにちは。{次|つぎ}の{京都|きょうと}{行|ゆ}きの{新幹線|しんかんせん}で、{指定席|していせき}を{一枚|いちまい}お{願|ねが}いします。",
+        "zh": "您好，请给我一张下一班开往京都的新干线指定席车票。",
+        "style": "polite, clear ticket request"
+      },
+      {
+        "id": "l2",
+        "speaker": "clerk",
+        "ja": "かしこまりました。{十時|じゅうじ}{三十分|さんじゅっぷん}{発|はつ}ののぞみに{空|あ}きがございます。{窓側|まどがわ}と{通路側|つうろがわ}、どちらがよろしいですか。",
+        "zh": "好的明白了。10点30分发车的希望号还有空座。请问您要靠窗还是靠过道的座位？",
+        "style": "courteous, brisk clerk confirmation"
+      },
+      {
+        "id": "l3",
+        "speaker": "you",
+        "ja": "{富士山|ふじさん}が{見|み}える{方|ほう}の{窓側|まどがわ}は{空|あ}いていますか。あと、{大|おお}きめのスーツケースも{持|も}っています。",
+        "zh": "能看到富士山那一侧的靠窗位还有吗？另外我还带了一个比较大的行李箱。",
+        "style": "hopeful, polite seat preference"
+      },
+      {
+        "id": "l4",
+        "speaker": "clerk",
+        "ja": "ちょうど{最後列|さいこうれつ}の{窓側|まどがわ}が{空|あ}いておりますので、{座席|ざせき}の{後|うし}ろにスーツケースを{置|お}けるお{席|せき}でお{取|と}りしますね。",
+        "zh": "刚好最后一排靠窗还有空位，我为您订可以把行李箱放在座椅后面的座位吧。",
+        "style": "helpful, reassuring clerk response"
+      },
+      {
+        "id": "l5",
+        "speaker": "you",
+        "ja": "それは{助|たす}かります！{乗|の}り{場|ば}は{何番線|なんばんせん}になりますか。",
+        "zh": "那太帮大忙了！请问乘车月台是几号站台？",
+        "style": "pleased, polite follow-up"
+      },
+      {
+        "id": "l6",
+        "speaker": "clerk",
+        "ja": "{十六番線|じゅうろくばんせん}ホームからの{発車|はっしゃ}です。{乗車券|じょうしゃけん}と{特急券|とっきゅうけん}の{二枚|にまい}を{重|かさ}ねて{改札|かいさつ}に{入|い}れてくださいね。",
+        "zh": "从16号站台发车。进站时请把乘车券和特急券两张叠在一起放进闸机哦。",
+        "style": "clear, warm clerk closing"
+      }
+    ]
+  },
+  {
+    "id": "train-lost-item-inquiry",
+    "kind": "dialogue",
+    "category": "transport",
+    "title": "{駅|えき}での{忘|わす}れ{物|もの}：{車内|しゃない}に{忘|わす}れた{傘|かさ}を{問|と}い{合|あ}わせる",
+    "titleZh": "电车遗失物品：向站务员询问遗忘在车内的伞",
+    "emoji": "☂️",
+    "accent": "#4338ca",
+    "accentDark": "#818cf8",
+    "speakers": [
+      {
+        "id": "you",
+        "label": "わたし",
+        "self": true,
+        "voice": "Puck",
+        "style": "polite, slightly anxious commuter reporting a lost umbrella"
+      },
+      {
+        "id": "staff",
+        "label": "駅員",
+        "voice": "Aoede",
+        "style": "calm, reassuring, attentive Japanese station attendant"
+      }
+    ],
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "you",
+        "ja": "すみません、さっき{乗|の}っていた{山手線|やまのてせん}の{網棚|あみだな}に{傘|かさ}を{忘|わす}れてしまったのですが。",
+        "zh": "不好意思，我把伞忘在刚才坐的山手线行李架上了。",
+        "style": "polite, slightly worried inquiry"
+      },
+      {
+        "id": "l2",
+        "speaker": "staff",
+        "ja": "お{困|こま}りですね。{何時|なんじ}ごろ{降|お}りた{電車|でんしゃ}で、{何号車|なんごうしゃ}に{乗|の}っていたか{覚|おぼ}えていますか。",
+        "zh": "真是添麻烦了。您还记得大概几点下车的、坐的是几号车厢吗？",
+        "style": "empathetic, calm information gathering"
+      },
+      {
+        "id": "l3",
+        "speaker": "you",
+        "ja": "{五分|ごふん}ほど{前|まえ}に{渋谷|しぶや}で{降|お}りて、{確|たし}か{四号車|よんごうしゃ}でした。{紺色|こんいろ}の{折|お}りたたみ{傘|がさ}です。",
+        "zh": "大概五分钟前在涩谷下车的，记得是4号车厢。是一把深蓝色的折叠伞。",
+        "style": "clear, earnest description"
+      },
+      {
+        "id": "l4",
+        "speaker": "staff",
+        "ja": "かしこまりました。{忘|わす}れ{物|もの}として{届|とど}いていないか{確認|かくにん}しますので、お{名前|なまえ}と{連絡先|れんらくさき}をこちらにご{記入|きにゅう}ください。",
+        "zh": "明白了。我们会确认一下是否有人作为遗失物交上来，请在这里填写您的姓名和联系方式。",
+        "style": "organized, reassuring clerk response"
+      },
+      {
+        "id": "l5",
+        "speaker": "you",
+        "ja": "はい、{書|か}きました。もし{見|み}つかったら、{電話|でんわ}をいただけますか。",
+        "zh": "好的，写好了。如果找到了的话，能给我打个电话吗？",
+        "style": "polite, hopeful confirmation"
+      },
+      {
+        "id": "l6",
+        "speaker": "staff",
+        "ja": "はい、{見|み}つかり{次第|しだい}すぐにご{連絡|れんらく}いたします。お{受|う}け{取|と}りの{際|さい}は{本人確認書類|ほんにんかくにんしょるい}をお{持|も}ちくださいね。",
+        "zh": "好的，一找到就立刻联系您。来领取时请记得带上身份证件哦。",
+        "style": "courteous, reassuring closing"
+      }
+    ]
+  },
+  {
+    "id": "morning-commute-train-etiquette",
+    "kind": "passage",
+    "category": "transport",
+    "title": "{朝|あさ}の{通勤電車|つうきんでんしゃ}とマナー",
+    "titleZh": "早高峰通勤电车与乘车礼仪（短文）",
+    "emoji": "🚆",
+    "accent": "#334155",
+    "accentDark": "#94a3b8",
+    "speakers": [
+      {
+        "id": "narrator",
+        "label": "朗読",
+        "voice": "Charon",
+        "style": "clear, neutral, steady Japanese broadcast narrator, crisp articulation"
+      }
+    ],
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "narrator",
+        "ja": "{平日|へいじつ}の{朝|あさ}、{都心|としん}に{向|む}かう{通勤電車|つうきんでんしゃ}は{多|おお}くの{人|ひと}で{混雑|こんざつ}します。それでもホームでは、{乗車|じょうしゃ}{位置|いち}の{線|せん}に{沿|そ}って{静|しず}かに{列|れつ}を{作|つく}る{光景|こうけい}が{当|あ}たり{前|まえ}になっています。",
+        "zh": "工作日的早晨，开往市中心的通勤电车总是挤满了人。即便如此，在站台上沿着候车线安静排队的景象早已成为常态。",
+        "style": "clear, calm Japanese prose opening"
+      },
+      {
+        "id": "l2",
+        "speaker": "narrator",
+        "ja": "{車内|しゃない}に{入|はい}るときは、{降|お}りる{人|ひと}を{先|さき}に{通|とお}してから{乗|の}り{込|こ}むのが{基本|きほん}です。リュックを{背負|せお}っている{場合|ばあい}は、{周囲|しゅうい}の{人|ひと}に{当|あ}たらないよう{前|まえ}に{抱|かか}えるのが{親切|しんせつ}とされています。",
+        "zh": "进入车厢时，先让下车的人通过再上车是基本礼仪。如果背着双肩包，抱在胸前以免碰到周围的人被认为是一种体贴。",
+        "style": "steady, informative narration"
+      },
+      {
+        "id": "l3",
+        "speaker": "narrator",
+        "ja": "また、{車内|しゃない}ではスマートフォンをマナーモードに{設定|せってい}し、{通話|つうわ}は{控|ひか}えるのがルールです。{音楽|おんがく}を{聴|き}くときも、イヤホンからの{音漏|おとも}れに{気|き}をつける{人|ひと}が{多|おお}いです。",
+        "zh": "另外，在车厢内把手机调成静音模式、避免接打电话也是规矩。听音乐时，很多人也会注意不让耳机漏音。",
+        "style": "clear, balanced explanatory tone"
+      },
+      {
+        "id": "l4",
+        "speaker": "narrator",
+        "ja": "{優先席|ゆうせんせき}の{近|ちか}くでは、お{年寄|としよ}りや{体|からだ}の{不自由|ふじゆう}な{方|かた}に{席|せき}を{譲|ゆず}る{姿|すがた}がよく{見|み}られます。{少|すこ}し{疲|つか}れている{朝|あさ}でも、{互|たが}いに{声|こえ}をかけ{合|あ}うと{気持|きも}ちが{温|あたた}かくなります。",
+        "zh": "在优先席附近，经常能看到给老人或行动不便者让座的身影。哪怕是在略显疲惫的早晨，彼此轻声致意也会让心情暖和起来。",
+        "style": "warm, observant prose narration"
+      },
+      {
+        "id": "l5",
+        "speaker": "narrator",
+        "ja": "{満員電車|まんいんでんしゃ}は{決|けっ}して{快適|かいてき}とは{言|い}えませんが、{一人|ひとり}ひとりの{小|ちい}さな{心遣|こころづか}いが{毎日|まいにち}の{移動|いどう}を{支|ささ}えています。{明日|あした}も{気持|きも}ちよく{一日|いちにち}を{始|はじ}められるよう、{周囲|しゅうい}への{配慮|はいりょ}を{忘|わす}れずにいたいものです。",
+        "zh": "满员电车绝算不上舒适，但每个人的小小体贴支撑着每天的出行。为了明天也能舒心地开启一天，我们总希望不忘顾及身边的人。",
+        "style": "calm, sincere prose closing"
+      }
+    ]
   }
 ]
