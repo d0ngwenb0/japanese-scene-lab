@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import type { Scenario, Settings } from '../types';
 import { ThemeToggle } from './ThemeToggle';
-import { BgmToggle } from './BgmToggle';
 import { PaletteToggle } from './PaletteToggle';
 import { FullscreenToggle } from './FullscreenToggle';
 import { ForceRefreshButton } from './ForceRefreshButton';
@@ -19,8 +18,6 @@ import { SceneCategoryFilter } from './SceneCategoryFilter';
 interface Props {
   scenarios: Scenario[];
   settings: Settings;
-  bgm: boolean;
-  onBgmChange: (enabled: boolean) => void;
   onSettingsChange: (patch: Partial<Settings>) => void;
   onOpen: (id: string) => void;
   isFavorite: (id: string) => boolean;
@@ -65,8 +62,6 @@ function readStoredFilters(): StoredFilters {
 export function ScenarioList({
   scenarios,
   settings,
-  bgm,
-  onBgmChange,
   onSettingsChange,
   onOpen,
   isFavorite,
@@ -153,7 +148,6 @@ export function ScenarioList({
           <span className="brand-sub">场景日语</span>
         </div>
         <div className="topbar-actions">
-          <BgmToggle enabled={bgm} onChange={onBgmChange} />
           <ThemeToggle
             mode={settings.theme}
             onChange={(theme) => onSettingsChange({ theme })}

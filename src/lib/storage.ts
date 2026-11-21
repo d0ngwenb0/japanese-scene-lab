@@ -15,7 +15,6 @@ export const defaultSettings: Settings = {
   theme: 'auto',
   palette: 'default',
   view: 'card',
-  bgm: false,
 };
 
 const fallback: PersistedState = { version: VERSION, settings: defaultSettings };
@@ -46,6 +45,7 @@ export function loadState(): PersistedState {
     delete (settings as { furigana?: unknown }).furigana;
     delete (settings as { translation?: unknown }).translation;
     delete (settings as { sortMode?: unknown }).sortMode;
+    delete (settings as { bgm?: unknown }).bgm;
     // 旧版本只有浅色/夜间两档：把旧的默认浅色迁移成自动，手动选的夜间保留。
     if (parsed.version !== VERSION && settings.theme === 'light') {
       settings.theme = 'auto';

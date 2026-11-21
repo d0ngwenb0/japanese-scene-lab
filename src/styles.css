@@ -305,7 +305,6 @@ a:focus-visible {
   color: var(--ink);
 }
 
-.bgm-btn.is-on,
 .fullscreen-btn.is-on,
 .timer-btn.is-on {
   color: var(--accent);
@@ -313,7 +312,6 @@ a:focus-visible {
   border-color: color-mix(in srgb, var(--accent) 20%, transparent);
 }
 
-.bgm-btn.is-on:hover,
 .fullscreen-btn.is-on:hover,
 .timer-btn.is-on:hover {
   color: var(--accent);

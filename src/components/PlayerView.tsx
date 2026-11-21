@@ -13,7 +13,6 @@ import { usePlayer } from '../lib/usePlayer';
 import { BackIcon, CopyIcon, LoopAllIcon, LoopOneIcon, LyricsIcon, NextIcon, PauseIcon, PlayIcon, PrevIcon, ReplayIcon, ShuffleIcon, SparklesIcon, StarIcon } from './Icons';
 import { copyText, formatLine, formatScene, stripFurigana } from '../lib/copy';
 import { ThemeToggle } from './ThemeToggle';
-import { BgmToggle } from './BgmToggle';
 import { PlaybackTimer } from './PlaybackTimer';
 import { PaletteToggle } from './PaletteToggle';
 import { ForceRefreshButton } from './ForceRefreshButton';
@@ -33,9 +32,7 @@ interface Props {
   scenarios: Scenario[];
   settings: Settings;
   theme: ThemeMode;
-  bgm: boolean;
   autoPlay?: boolean;
-  onBgmChange: (enabled: boolean) => void;
   onBack: () => void;
   onThemeChange: (mode: ThemeMode) => void;
   onSettingsChange: (patch: Partial<Settings>) => void;
@@ -68,9 +65,7 @@ export function PlayerView({
   scenarios,
   settings,
   theme,
-  bgm,
   autoPlay,
-  onBgmChange,
   onBack,
   onThemeChange,
   onSettingsChange,
@@ -373,7 +368,6 @@ export function PlayerView({
             currentId={scenario.id}
             onSelect={onSceneChange}
           />
-          <BgmToggle enabled={bgm} onChange={onBgmChange} />
           <PlaybackTimer
             endAt={timerEndAt}
             activeMinutes={timerPreset}

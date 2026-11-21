@@ -157,27 +157,6 @@ export function ShuffleIcon(props: IconProps) {
   );
 }
 
-export function MusicIcon(props: IconProps) {
-  return (
-    <svg {...base} {...props}>
-      <path d="M9 18V5l10-2v13" />
-      <circle cx="6" cy="18" r="3" />
-      <circle cx="16" cy="16" r="3" />
-    </svg>
-  );
-}
-
-export function MusicOffIcon(props: IconProps) {
-  return (
-    <svg {...base} {...props}>
-      <path d="M9 18V5l10-2v13" />
-      <circle cx="6" cy="18" r="3" />
-      <circle cx="16" cy="16" r="3" />
-      <path d="M3 3l18 18" />
-    </svg>
-  );
-}
-
 export function SparklesIcon(props: IconProps) {
   return (
     <svg {...base} {...props}>

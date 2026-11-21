@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import scenariosData from './data/scenarios.json';
 import type { Scenario, Settings, ThemeMode } from './types';
 import { loadState, saveState } from './lib/storage';
-import { useBgm } from './lib/useBgm';
 import { useFavorites } from './lib/favorites';
 import { stripFurigana } from './lib/copy';
 import { ScenarioList } from './components/ScenarioList';
@@ -25,16 +24,6 @@ export default function App() {
   );
 
   const { settings } = state;
-  const activeForBgm = useMemo(
-    () => (sceneId ? scenarios.find((s) => s.id === sceneId) : undefined),
-    [sceneId],
-  );
-
-  useBgm(
-    settings.bgm || Boolean(activeForBgm?.bgm),
-    activeForBgm?.bgm,
-    activeForBgm?.bgm ? 0.14 : undefined,
-  );
 
   useEffect(() => {
     const onHashChange = () => setSceneId(readSceneId());
@@ -152,7 +141,6 @@ export default function App() {
       setTimerEndAt(null);
       setTimerPreset(null);
       setAutoPlayNext(false);
-      updateSettings({ bgm: false });
       setTimerStopTick((t) => t + 1);
       return true;
     };
@@ -169,7 +157,7 @@ export default function App() {
       window.clearTimeout(timeoutId);
       document.removeEventListener('visibilitychange', onVisibility);
     };
-  }, [timerEndAt, updateSettings]);
+  }, [timerEndAt]);
 
   const changeTheme = useCallback(
     (theme: ThemeMode) => {
@@ -188,9 +176,7 @@ export default function App() {
           scenarios={scenarios}
           settings={settings}
           theme={settings.theme}
-          bgm={settings.bgm}
           autoPlay={autoPlayNext}
-          onBgmChange={(bgm) => updateSettings({ bgm })}
           onBack={back}
           onThemeChange={changeTheme}
           onSettingsChange={updateSettings}
@@ -211,8 +197,6 @@ export default function App() {
         <ScenarioList
           scenarios={scenarios}
           settings={settings}
-          bgm={settings.bgm}
-          onBgmChange={(bgm) => updateSettings({ bgm })}
           onSettingsChange={updateSettings}
           onOpen={open}
           isFavorite={isFavorite}
