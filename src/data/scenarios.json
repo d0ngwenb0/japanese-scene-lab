@@ -1674,5 +1674,74 @@
         "style": "calm, sincere prose closing"
       }
     ]
+  },
+  {
+    "id": "limited-express-ticket-onboard",
+    "kind": "dialogue",
+    "category": "transport",
+    "title": "{特急電車|とっきゅうでんしゃ}の{車内|しゃない}：{特急券|とっきゅうけん}の{購入|こうにゅう}と{停車駅|ていしゃえき}の{確認|かくにん}",
+    "titleZh": "特急电车车内：补买特急券与确认停靠站",
+    "emoji": "🚄",
+    "accent": "#dc2626",
+    "accentDark": "#f87171",
+    "speakers": [
+      {
+        "id": "conductor",
+        "label": "車掌",
+        "voice": "Orus",
+        "style": "calm, polite, professional Japanese train conductor checking tickets onboard"
+      },
+      {
+        "id": "you",
+        "label": "わたし",
+        "self": true,
+        "voice": "Puck",
+        "style": "polite, slightly apologetic passenger buying a limited express ticket onboard"
+      }
+    ],
+    "lines": [
+      {
+        "id": "l1",
+        "speaker": "conductor",
+        "ja": "{失礼|しつれい}いたします。{特急券|とっきゅうけん}の{拝見|はいけん}をお{願|ねが}いします。",
+        "zh": "打扰一下，请出示您的特急券。",
+        "style": "courteous, formal onboard ticket inspection"
+      },
+      {
+        "id": "l2",
+        "speaker": "you",
+        "ja": "すみません、{急|いそ}いで{乗|の}ってしまって{特急券|とっきゅうけん}を{買|か}い{忘|わす}れました。{車内|しゃない}で{購入|こうにゅう}できますか。",
+        "zh": "不好意思，我急着上车忘买特急券了。可以在车上补买吗？",
+        "style": "apologetic, polite passenger inquiry"
+      },
+      {
+        "id": "l3",
+        "speaker": "conductor",
+        "ja": "はい、こちらで{発券|はっけん}できますよ。どちらの{駅|えき}までご{乗車|じょうしゃ}ですか。",
+        "zh": "可以的，我这边就可以为您出票。请问您坐到哪一站？",
+        "style": "calm, reassuring conductor response"
+      },
+      {
+        "id": "l4",
+        "speaker": "you",
+        "ja": "{箱根湯本|はこねゆもと}までお{願|ねが}いします。ちなみに、この{特急|とっきゅう}は{小田原|おだわら}にも{停|と}まりますか。",
+        "zh": "请到箱根汤本。顺便问一下，这班特急在小田原也停靠吗？",
+        "style": "polite destination and stop inquiry"
+      },
+      {
+        "id": "l5",
+        "speaker": "conductor",
+        "ja": "はい、{小田原|おだわら}の{次|つぎ}が{終点|しゅうてん}の{箱根湯本|はこねゆもと}です。{車内|しゃない}{料金|りょうきん}で{千二百円|せんにひゃくえん}になります。",
+        "zh": "是的，小田原的下一站就是终点箱根汤本。车内补票费用是1200日元。",
+        "style": "clear, polite conductor explanation"
+      },
+      {
+        "id": "l6",
+        "speaker": "you",
+        "ja": "わかりました。では、{現金|げんきん}でお{願|ねが}いします。{助|たす}かりました。",
+        "zh": "明白了，那我付现金吧。真是帮大忙了。",
+        "style": "relieved, grateful passenger closing"
+      }
+    ]
   }
 ]
