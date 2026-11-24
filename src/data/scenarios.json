@@ -158,37 +158,37 @@
       {
         "id": "l1",
         "speaker": "narrator",
-        "ja": "{週末|しゅうまつ}の{午後|ごご}、{小雨|こさめ}が{降|ふ}り{始|はじ}めたので、{駅|えき}の{近|ちか}くの{古|ふる}い{喫茶店|きっさてん}に{入|はい}りました。",
-        "zh": "周末的午后，天空下起了小雨，于是我走进了车站附近的一家老咖啡馆。",
-        "style": "warm, calm, unhurried Japanese prose opening"
+        "ja": "{週末|しゅうまつ}の{午後|ごご}、{小雨|こさめ}が{降|ふ}り{始|はじ}めたので、{駅|えき}の{近|ちか}くの{古|ふる}い{喫茶店|きっさてん}に{入|はい}りました。{傘|かさ}をたたんで{中|なか}へ{進|すす}むと、{外|そと}のにぎやかな{音|おと}がすっと{遠|とお}ざかります。",
+        "zh": "周末的午后，天空下起了小雨，于是我走进了车站附近的一家老咖啡馆。收起雨伞往里走去，外面喧闹的声音顿时渐渐远去。",
+        "style": "warm, clear Japanese prose opening at natural pace"
       },
       {
         "id": "l2",
         "speaker": "narrator",
-        "ja": "{扉|とびら}を{開|あ}けると、{焙煎|ばいせん}したコーヒーの{香|かお}りと、{静|しず}かなピアノの{音|おと}がやさしく{迎|むか}えてくれます。",
-        "zh": "推开门，烘焙咖啡的香气和轻柔的钢琴声温柔地迎面而来。",
-        "style": "gentle, descriptive, unhurried narration"
+        "ja": "{扉|とびら}を{開|あ}けると、{焙煎|ばいせん}したコーヒーの{香|かお}りと{静|しず}かなピアノの{音|おと}がやさしく{迎|むか}えてくれます。{木|き}のテーブルや{暖|あたた}かい{照明|しょうめい}に{包|つつ}まれて、{気持|きも}ちが{自然|しぜん}と{落|お}ち{着|つ}いていきます。",
+        "zh": "推开门，烘焙咖啡的香气和轻柔的钢琴声温柔地迎面而来。被木质桌椅和温暖的灯光包围，心情也自然而然地平静下来。",
+        "style": "gentle, descriptive narration at natural pace"
       },
       {
         "id": "l3",
         "speaker": "narrator",
-        "ja": "{窓際|まどぎわ}の{席|せき}に{座|すわ}って、{熱|あつ}いカフェオレを{一口|ひとくち}{飲|の}むと、{冷|ひ}えた{体|からだ}がゆっくり{温|あたた}まっていきます。",
-        "zh": "坐在靠窗的位置上，喝一口热咖啡欧蕾，微凉的身体也渐渐暖和起来。",
-        "style": "relaxed, soothing, unhurried narration"
+        "ja": "{窓際|まどぎわ}の{席|せき}に{座|すわ}って{熱|あつ}いカフェオレを{一口|ひとくち}{飲|の}むと、{冷|ひ}えた{体|からだ}がゆっくり{温|あたた}まっていきます。{雨粒|あまつぶ}がガラスをつたう{様子|ようす}を{見|み}ていると、{時間|じかん}の{流|なが}れまで{穏|おだ}やかに{感|かん}じられます。",
+        "zh": "坐在靠窗的位置喝一口热咖啡欧蕾，微凉的身体渐渐暖和起来。看着雨滴顺着玻璃滑落，连时间的流逝都变得柔和起来。",
+        "style": "relaxed, soothing narration at natural pace"
       },
       {
         "id": "l4",
         "speaker": "narrator",
-        "ja": "{窓|まど}の{外|そと}を{行|ゆ}き{交|か}う{傘|かさ}を{眺|なが}めながら、{持|も}ってきた{文庫本|ぶんこぼん}を{読|よ}むのが、{私|わたし}のささやかな{楽|たの}しみです。",
-        "zh": "一边看着窗外往来的雨伞，一边读着随身带来的文库本，是我小小的乐趣。",
-        "style": "reflective, warm, unhurried narration"
+        "ja": "{窓|まど}の{外|そと}を{行|ゆ}き{交|か}う{傘|かさ}を{眺|なが}めながら、{持|も}ってきた{文庫本|ぶんこぼん}を{読|よ}むのが{私|わたし}のささやかな{楽|たの}しみです。ときどき{手|て}を{止|と}めてカップを{両手|りょうて}で{包|つつ}むと、{頭|あたま}の{中|なか}もすっきりと{整理|せいり}されていきます。",
+        "zh": "一边看着窗外往来的雨伞，一边读着随身带来的文库本，是我小小的乐趣。偶尔停下来用双手捧起杯子，脑海里的思绪也随之清晰整理起来。",
+        "style": "reflective, warm narration at natural pace"
       },
       {
         "id": "l5",
         "speaker": "narrator",
-        "ja": "{忙|いそが}しい{毎日|まいにち}の{中|なか}でも、こんなふうに{立|た}ち{止|ど}まって{深呼吸|しんこきゅう}できる{時間|じかん}を、これからも{大切|たいせつ}にしたいと{思|おも}います。",
-        "zh": "即使在忙碌的日常里，我也希望能一直珍惜这样能停下脚步、深呼吸放松的时光。",
-        "style": "calm, sincere, unhurried prose closing"
+        "ja": "{店|みせ}を{出|で}るころには{雨|あめ}も{弱|よわ}まり、{街|まち}の{空気|くうき}がどこか{澄|す}んで{見|み}えました。{忙|いそが}しい{毎日|まいにち}の{中|なか}でも、こんなふうに{立|た}ち{止|ど}まって{深呼吸|しんこきゅう}できる{時間|じかん}をこれからも{大切|たいせつ}にしたいと{思|おも}います。",
+        "zh": "走出店门时雨势已经减弱，街头的空气似乎也显得格外清澈。即使在忙碌的日常里，我也希望能一直珍惜这样能停下脚步、深呼吸放松的时光。",
+        "style": "calm, sincere prose closing at natural pace"
       }
     ]
   },
@@ -695,29 +695,29 @@
       {
         "id": "l2",
         "speaker": "clerk",
-        "ja": "{奥|おく}から{二番目|にばんめ}の{通路|つうろ}の、{右側|みぎがわ}の{棚|たな}にございます。ご{案内|あんない}しましょうか。",
-        "zh": "在里面数第二条过道的右侧货架上。需要我带您过去吗？",
+        "ja": "すぐ{後|うし}ろの{棚|たな}の、{右側|みぎがわ}にございます。こちらから{見|み}える{場所|ばしょ}ですよ。",
+        "zh": "就在您身后货架的右侧，从这里就能看到哦。",
         "style": "courteous, helpful store clerk response"
       },
       {
         "id": "l3",
         "speaker": "you",
-        "ja": "あ、{大丈夫|だいじょうぶ}です、わかりました。それと、この{保湿|ほしつ}クリームは{詰|つ}め{替|か}え{用|よう}もありますか。",
-        "zh": "啊，不用了，我知道了。另外，这款保湿霜有替换装吗？",
-        "style": "polite decline and natural follow-up question"
+        "ja": "あ、{見|み}つかりました！それと、こちらの{保湿|ほしつ}クリームは{詰|つ}め{替|か}え{用|よう}もありますか。",
+        "zh": "啊，找到了！另外，这款保湿霜有替换装吗？",
+        "style": "pleased and natural follow-up question"
       },
       {
         "id": "l4",
         "speaker": "clerk",
-        "ja": "はい、{同|おな}じ{棚|たな}の{一番|いちばん}{下|した}の{段|だん}にございます。お{決|き}まりでしたらレジへどうぞ。",
-        "zh": "有的，就在同一个货架的最下面一层。选好了的话请到收银台这边来。",
+        "ja": "はい、ちょうどレジ{横|よこ}の{棚|たな}にございますよ。こちらでお{会計|かいけい}ご{一緒|いっしょ}にいたしましょうか。",
+        "zh": "有的，正好就在收银台旁边的货架上哦。要在这边一起为您结账吗？",
         "style": "clear, welcoming clerk guidance"
       },
       {
         "id": "l5",
         "speaker": "you",
-        "ja": "{両方|りょうほう}{見|み}つかりました、これでお{会計|かいけい}をお{願|ねが}いします。レジ{袋|ぶくろ}はいりません、{PayPay|ペイペイ}で{払|はら}えますか。",
-        "zh": "两样都找到了，麻烦帮我结一下账。不需要塑料袋，请问可以用 PayPay 支付吗？",
+        "ja": "ありがとうございます、これでまとめてお{願|ねが}いします。レジ{袋|ぶくろ}はいりません、{PayPay|ペイペイ}で{払|はら}えますか。",
+        "zh": "谢谢，那就一起结账吧。不需要塑料袋，请问可以用 PayPay 支付吗？",
         "style": "polite customer checkout request"
       },
       {
@@ -1074,19 +1074,19 @@
         "id": "narrator",
         "label": "ナレーター",
         "voice": "Aoede",
-        "style": "clear, natural Japanese narrator at normal conversational pace, no long pauses"
+        "style": "crisp, brisk Japanese narrator at lively natural pace, no pauses"
       },
       {
         "id": "student",
         "label": "男の学生",
         "voice": "Puck",
-        "style": "natural, polite Japanese male university student, speaking at normal natural Japanese pace"
+        "style": "natural, brisk Japanese male university student speaking at lively everyday speed"
       },
       {
         "id": "librarian",
         "label": "図書館の職員",
         "voice": "Kore",
-        "style": "helpful Japanese female librarian, speaking at normal natural Japanese pace"
+        "style": "bright, brisk Japanese female librarian speaking smoothly at natural everyday speed"
       }
     ],
     "jlpt": {
@@ -1109,49 +1109,49 @@
         "speaker": "narrator",
         "ja": "{大学|だいがく}の{図書館|としょかん}で{男|おとこ}の{学生|がくせい}と{職員|しょくいん}が{話|はな}しています。{男|おとこ}の{学生|がくせい}はなぜこの{本|ほん}を{延長|えんちょう}できませんか。",
         "zh": "在大学图书馆里，男学生和工作人员正在说话。男学生为什么不能续借这本书？",
-        "style": "clear, natural Japanese narration at normal pace without long pauses"
+        "style": "crisp, brisk Japanese narration at lively pace"
       },
       {
         "id": "l2",
         "speaker": "student",
         "ja": "すみません、{借|か}りているこの{本|ほん}なんですけど、{返却|へんきゃく}{期限|きげん}を{一週間|いっしゅうかん}ほど{延長|えんちょう}できますか。{学生証|がくせいしょう}はこちらです。",
         "zh": "不好意思，我借的这本书，可以把还书期限延长一周左右吗？学生证在这里。",
-        "style": "polite student request at library counter, normal conversational pace"
+        "style": "polite student request at brisk natural conversational speed"
       },
       {
         "id": "l3",
         "speaker": "librarian",
         "ja": "はい、お{調|しら}べしますね。{期限|きげん}は{明日|あした}までですし、まだ{延長|えんちょう}もされていないですね。",
         "zh": "好的，我帮您查一下。还书期限到明天为止，而且之前也还没有续借过呢。",
-        "style": "attentive librarian checking system, normal conversational pace"
+        "style": "bright, brisk librarian checking system at lively natural speed"
       },
       {
         "id": "l4",
         "speaker": "student",
         "ja": "よかった。レポートを{書|か}くのに、もう{少|すこ}し{時間|じかん}が{欲|ほ}しかったんです。",
         "zh": "太好了。写报告还需要再多一点时间。",
-        "style": "relieved, natural student remark, normal conversational pace"
+        "style": "relieved, natural student remark at brisk conversational speed"
       },
       {
         "id": "l5",
         "speaker": "librarian",
         "ja": "あ、{申|もう}し{訳|わけ}ありません。{実|じつ}は{次|つぎ}の{方|かた}から{予約|よやく}が{入|はい}っていまして、{延長|えんちょう}はできないんです。",
         "zh": "啊，非常抱歉。其实后面已经有其他人预约了，所以无法办理续借。",
-        "style": "apologetic, clear librarian explanation, normal conversational pace"
+        "style": "apologetic, brisk clear librarian explanation at natural speed"
       },
       {
         "id": "l6",
         "speaker": "student",
         "ja": "そうなんですか……わかりました。では、{明日|あした}までに{必|かなら}ず{返|かえ}します。",
         "zh": "这样啊……明白了。那我一定在明天之前归还。",
-        "style": "understanding, polite student acceptance, normal conversational pace"
+        "style": "understanding, polite student acceptance at brisk conversational speed"
       },
       {
         "id": "l7",
         "speaker": "narrator",
         "ja": "{男|おとこ}の{学生|がくせい}はなぜこの{本|ほん}を{延長|えんちょう}できませんか。",
         "zh": "男学生为什么不能续借这本书？",
-        "style": "clear, natural Japanese narration at normal pace without long pauses"
+        "style": "crisp, brisk Japanese narration at lively pace"
       }
     ]
   },
@@ -1380,7 +1380,7 @@
         "{音声|おんせい}ガイドの{返却|へんきゃく}{場所|ばしょ}"
       ],
       "answer": 1,
-      "explanation": "广播说明了常设展厅除部分作品外允许用手机拍照，但为保护展品禁止使用闪光灯和三脚架，并提醒不要妨碍他人欣赏，核心内容是拍照规则与注意事项，因此选 2。"
+      "explanation": "广播开头仅简短提醒闭馆时间（下午六点，未变更，排除1）和语音导览归还（归还入口，非核心主旨，排除4），提到二楼特别展也只是说明其禁止拍照而非购票方法（排除3）；全篇重点说明常设展厅允许手机拍照但特别展禁止、且禁用闪光灯与三脚架并注意勿妨碍他人，因此核心主旨选 2。"
     },
     "lines": [
       {
@@ -1393,19 +1393,26 @@
       {
         "id": "l2",
         "speaker": "announcer",
-        "ja": "ご{来館|らいかん}の{皆様|みなさま}にご{案内|あんない}{申|もう}し{上|あ}げます。{当館|とうかん}の{常設|じょうせつ}{展示室|てんじしつ}では、{一部|いちぶ}の{作品|さくひん}を{除|のぞ}き、スマートフォンでの{撮影|さつえい}が{可能|かのう}となっております。",
-        "zh": "各位来宾您好，向您播报一条通知。本馆常设展厅内，除部分作品外，均允许使用智能手机拍照。",
+        "ja": "ご{来館|らいかん}の{皆様|みなさま}にご{案内|あんない}{申|もう}し{上|あ}げます。{本日|ほんじつ}は{午後|ごご}{六時|ろくじ}までの{開館|かいかん}です。{音声|おんせい}ガイドはお{帰|かえ}りの{際|さい}に{入口|いりぐち}へご{返却|へんきゃく}ください。",
+        "zh": "各位来宾您好，向您播报一条通知。本馆今日开放至下午六点。租借的语音导览请在离馆时归还至入口处。",
         "style": "formal, courteous Japanese museum announcement, normal conversational pace"
       },
       {
         "id": "l3",
         "speaker": "announcer",
-        "ja": "ただし、{作品|さくひん}{保護|ほご}のためフラッシュや{三脚|さんきゃく}のご{使用|しよう}はご{遠慮|えんりょ}ください。また、{他|ほか}のお{客様|きゃくさま}の{鑑賞|かんしょう}の{妨|さまた}げにならないようご{配慮|はいりょ}をお{願|ねが}いいたします。",
-        "zh": "但为了保护展品，请勿使用闪光灯和三脚架。另外，请留意不要妨碍其他观众欣赏作品。",
-        "style": "polite, natural formal reminder, normal conversational pace"
+        "ja": "さて、{常設|じょうせつ}{展示室|てんじしつ}では{一部|いちぶ}の{作品|さくひん}を{除|のぞ}きスマートフォンでの{撮影|さつえい}が{可能|かのう}です。なお、{二階|にかい}の{特別展|とくべつてん}エリアは{撮影|さつえい}{禁止|きんし}ですのでご{注意|ちゅうい}ください。",
+        "zh": "另外，常设展厅除部分作品外允许用智能手机拍照。请注意，二楼特别展区禁止拍照。",
+        "style": "clear, courteous Japanese museum announcement, normal conversational pace"
       },
       {
         "id": "l4",
+        "speaker": "announcer",
+        "ja": "また、{作品|さくひん}{保護|ほご}のためフラッシュや{三脚|さんきゃく}のご{使用|しよう}はご{遠慮|えんりょ}ください。{他|ほか}のお{客様|きゃくさま}の{鑑賞|かんしょう}の{妨|さまた}げにならないようご{配慮|はいりょ}をお{願|ねが}いいたします。",
+        "zh": "此外，为了保护展品，请勿使用闪光灯和三脚架，并请留意不要妨碍其他观众欣赏作品。",
+        "style": "polite, natural formal reminder, normal conversational pace"
+      },
+      {
+        "id": "l5",
         "speaker": "narrator",
         "ja": "この{放送|ほうそう}で{伝|つた}えたいことは{何|なん}ですか。",
         "zh": "这段广播主要想传达什么？",
