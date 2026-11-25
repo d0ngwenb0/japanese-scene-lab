@@ -360,20 +360,6 @@ if (existsSync(lessonsDir)) {
         });
       }
 
-      if (sec.highlights !== undefined) {
-        if (!Array.isArray(sec.highlights)) {
-          errors.push(`${secWhere}: highlights 必须是数组`);
-        } else {
-          sec.highlights.forEach((h, hIdx) => {
-            checkMarkup(h?.ja, `${secWhere}.highlights[${hIdx}].ja`);
-            checkMarkup(h?.note, `${secWhere}.highlights[${hIdx}].note`);
-            if (!h?.note?.trim()) {
-              errors.push(`${secWhere}.highlights[${hIdx}]: 缺少 note`);
-            }
-          });
-        }
-      }
-
       const audioPath = join(lessonAudioRoot, lesson.sceneId, `${sec.id}.mp3`);
       if (!existsSync(audioPath)) {
         errors.push(`${secWhere}: 缺少讲解音频 public/audio-lessons/${lesson.sceneId}/${sec.id}.mp3`);

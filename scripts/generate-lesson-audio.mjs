@@ -166,6 +166,7 @@ async function synthGeminiRequest(script, style, voice, outFile, keyState) {
         'x-goog-api-key': keyState.key,
       },
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(90000),
     },
   );
 
@@ -223,7 +224,7 @@ async function synthWithKeys(script, style, voice, outFile) {
         keyState.disabled = true;
         continue;
       }
-      if (/429|rate|quota|overload|500|502|503|504/i.test(message)) {
+      if (/429|rate|quota|overload|500|502|503|504|timeout|timed out|abort|fetch failed/i.test(message) || error?.name === 'TimeoutError') {
         keyState.cooldownUntil = Date.now() + 2500;
         continue;
       }
@@ -274,6 +275,7 @@ async function main() {
   const lessons = await loadLessons();
   const manifest = await loadManifest();
 
+  const reuseValid = process.argv.includes('--reuse-valid');
   const jobs = [];
   for (const lesson of lessons) {
     if (only && lesson.sceneId !== only) continue;
@@ -283,7 +285,10 @@ async function main() {
       if (onlySection && key !== onlySection) continue;
       const hash = lessonAudioHash(lesson.voice, lesson.style, sec.script);
       const outFile = join(dir, `${sec.id}.mp3`);
-      if (!force && isValidMp3(outFile) && manifest[key] === hash) continue;
+      if (!force && isValidMp3(outFile) && (reuseValid || manifest[key] === hash)) {
+        if (reuseValid) manifest[key] = hash;
+        continue;
+      }
       jobs.push({
         key,
         sceneId: lesson.sceneId,
@@ -328,6 +333,7 @@ async function main() {
         }
         manifest[job.key] = job.hash;
         done += 1;
+        await saveManifest(manifest, lessons);
         process.stdout.write(`\r  ${done}/${jobs.length}  ${job.key}      `);
       } catch (error) {
         failures.push({ ...job, error });

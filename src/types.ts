@@ -102,12 +102,6 @@ export interface Settings {
 
 export type LessonSectionKind = 'intro' | 'walkthrough' | 'culture' | 'strategy' | 'summary';
 
-export interface LessonHighlight {
-  ja: string;
-  note: string;
-  tag?: string;
-}
-
 export interface LessonSection {
   id: string;
   kind: LessonSectionKind;
@@ -115,7 +109,6 @@ export interface LessonSection {
   lineIds?: string[];
   script: string;
   paragraphs: string[];
-  highlights?: LessonHighlight[];
 }
 
 export interface SceneLesson {

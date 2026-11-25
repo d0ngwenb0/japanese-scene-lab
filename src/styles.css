@@ -5287,13 +5287,15 @@ dialog::backdrop {
   background: var(--surface-2);
 }
 
-.mode-tab[aria-selected='true'] {
+.mode-tab[aria-selected='true'],
+.mode-tab[aria-pressed='true'] {
   color: var(--accent-text);
   font-weight: 600;
   background: transparent;
 }
 
-.mode-tab[aria-selected='true']::after {
+.mode-tab[aria-selected='true']::after,
+.mode-tab[aria-pressed='true']::after {
   content: '';
   position: absolute;
   inset: auto 8px 0;
@@ -5314,159 +5316,41 @@ dialog::backdrop {
   flex: none;
 }
 
-.subs-panel[hidden] {
-  display: none;
-}
-
-.lesson-stage {
-  max-width: 780px;
-  margin: 0 auto;
-  padding: 18px 28px 34px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.lesson-loading {
-  padding: 40px 28px;
-  text-align: center;
-  color: var(--muted);
-  font-size: 13.5px;
-}
-
-.lesson-hero {
-  padding: 18px 20px;
-  border-radius: 16px;
-  border: 1px solid color-mix(in srgb, var(--accent) 26%, var(--border));
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--accent-soft) 68%, var(--surface)),
-    var(--surface)
-  );
+.lesson-bar {
+  flex: none;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  padding: 9px 40px 10px;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface-2) 56%, var(--surface));
 }
 
-.lesson-hero-top {
+.lesson-bar-loading {
+  padding: 10px 40px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.lesson-bar-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  flex-wrap: wrap;
-}
-
-.lesson-teacher-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 9px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--surface) 75%, transparent);
-  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border));
-  color: var(--accent-text);
-  font-size: 11.5px;
-  font-weight: 600;
-}
-
-.lesson-hero-play {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 30px;
-  padding: 0 13px;
-  border-radius: 999px;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-size: 12px;
-  font-weight: 600;
-  transition: transform 0.1s ease, filter 0.15s ease;
-}
-
-.lesson-hero-play:hover {
-  filter: brightness(1.06);
-}
-
-.lesson-hero-play:active {
-  transform: scale(0.97);
-}
-
-.lesson-title {
-  margin: 2px 0 0;
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 1.4;
-  color: var(--ink);
-}
-
-.lesson-subtitle {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--muted);
-}
-
-.lesson-sticky-deck {
-  position: sticky;
-  top: 8px;
-  z-index: 5;
-  padding: 10px 12px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface) 94%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 6px 20px rgb(0 0 0 / 0.06);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
 }
 
 .lesson-nav {
-  padding: 0;
-}
-
-.lesson-deck-progress {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  padding-top: 7px;
-  border-top: 1px solid var(--border);
-}
-
-.lesson-deck-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.lesson-deck-title {
   min-width: 0;
   flex: 1;
-  font-size: 11.5px;
-  font-weight: 500;
-  color: var(--muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.lesson-deck-time {
-  flex: none;
-  font-size: 11px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  color: var(--faint);
+  padding: 0;
 }
 
 .lesson-nav-track {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   overflow-x: auto;
   scrollbar-width: none;
-  padding-bottom: 2px;
 }
 
 .lesson-nav-track::-webkit-scrollbar {
@@ -5477,8 +5361,8 @@ dialog::backdrop {
   flex: none;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  height: 28px;
+  justify-content: center;
+  height: 26px;
   padding: 0 10px;
   border-radius: 999px;
   border: 1px solid var(--border);
@@ -5486,6 +5370,7 @@ dialog::backdrop {
   color: var(--muted);
   font-size: 11.5px;
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
   transition: border-color 0.14s ease, background-color 0.14s ease, color 0.14s ease;
 }
@@ -5502,242 +5387,83 @@ dialog::backdrop {
   font-weight: 600;
 }
 
-.lesson-nav-num {
-  font-variant-numeric: tabular-nums;
-  opacity: 0.72;
-  font-size: 10.5px;
-}
-
-.lesson-chapters {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.lesson-chapter {
-  border: 1px solid var(--border);
-  border-radius: 15px;
-  background: var(--surface);
-  padding: 14px 18px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
-}
-
-.lesson-chapter.is-active {
-  border-color: color-mix(in srgb, var(--accent) 48%, transparent);
-  background: color-mix(in srgb, var(--accent-soft) 24%, var(--surface));
-  box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 8%, transparent);
-}
-
-.lesson-chapter-heading {
-  margin: 0;
-  font: inherit;
-}
-
-.lesson-chapter-head {
-  width: 100%;
+.lesson-bar-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
-  text-align: left;
-  padding: 2px 0;
-  color: var(--ink);
+  gap: 6px;
+  flex: none;
 }
 
-.lesson-chapter-meta {
+.lesson-bar-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  flex: none;
-}
-
-.lesson-chapter-num {
-  font-size: 11.5px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: var(--accent-text);
-}
-
-.lesson-chapter-kind {
-  font-size: 10px;
-  font-weight: 600;
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  color: var(--muted);
-}
-
-.lesson-chapter-title {
-  flex: 1;
-  min-width: 0;
-  font-size: 15px;
-  font-weight: 650;
-  line-height: 1.4;
-}
-
-.lesson-chapter-state {
-  flex: none;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: var(--surface-2);
-  color: var(--muted);
-  transition: background-color 0.14s ease, color 0.14s ease;
-}
-
-.lesson-chapter.is-active .lesson-chapter-state,
-.lesson-chapter-head:hover .lesson-chapter-state {
-  background: var(--accent-soft);
-  color: var(--accent-text);
-}
-
-.lesson-refs {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--surface-2) 65%, var(--surface));
-  border: 1px solid var(--border);
-}
-
-.lesson-ref-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 9px;
-}
-
-.lesson-ref-num {
-  flex: none;
-  margin-top: 3px;
-  font-size: 10.5px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  color: var(--faint);
-}
-
-.lesson-ref-text {
-  flex: 1;
-  min-width: 0;
-}
-
-.lesson-ref-ja {
-  margin: 0;
-  font-size: 14.5px;
-  line-height: 1.95;
-  color: var(--ink);
-}
-
-.lesson-ref-zh {
-  margin: 2px 0 0;
-  font-size: 12px;
-  line-height: 1.5;
-  color: var(--muted);
-}
-
-.lesson-ref-jump {
-  flex: none;
-  height: 24px;
-  padding: 0 8px;
+  gap: 4px;
+  height: 26px;
+  padding: 0 9px;
   border-radius: 999px;
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--muted);
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 500;
   white-space: nowrap;
-  transition: color 0.12s ease, border-color 0.12s ease, background-color 0.12s ease;
+  transition: border-color 0.14s ease, background-color 0.14s ease, color 0.14s ease;
 }
 
-.lesson-ref-jump:hover {
-  color: var(--accent-text);
-  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
-  background: var(--accent-soft);
-}
-
-.lesson-prose {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  font-size: 14.5px;
-  line-height: 1.9;
+.lesson-bar-btn:hover {
   color: var(--ink);
+  border-color: var(--border-strong);
 }
 
-.lesson-prose p {
-  margin: 0;
-}
-
-.lesson-board {
-  padding: 11px 13px;
-  border-radius: 11px;
-  background: color-mix(in srgb, var(--accent-soft) 28%, var(--surface-2));
-  border: 1px dashed color-mix(in srgb, var(--accent) 32%, var(--border));
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.lesson-board-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+.lesson-bar-btn.is-active {
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 42%, transparent);
   color: var(--accent-text);
+  font-weight: 600;
 }
 
-.lesson-board-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 8px;
+.lesson-bar-btn svg {
+  transition: transform 0.16s ease;
 }
 
-.lesson-board-item {
-  padding: 8px 10px;
-  border-radius: 9px;
-  background: var(--surface);
-  border: 1px solid var(--border);
+.lesson-bar-btn[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+
+.lesson-deck-progress {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.lesson-board-top {
+.lesson-deck-meta {
   display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 6px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
-.lesson-tag {
-  flex: none;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 1px 5px;
-  border-radius: 4px;
-  background: var(--accent-soft);
-  color: var(--accent-text);
-}
-
-.lesson-board-ja {
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.85;
-  color: var(--ink);
-}
-
-.lesson-board-note {
-  margin: 0;
+.lesson-deck-title {
+  min-width: 0;
+  flex: 1;
   font-size: 12px;
-  line-height: 1.5;
+  font-weight: 550;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lesson-deck-time {
+  flex: none;
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
   color: var(--muted);
+}
+
+.lesson-warn {
+  margin: 2px 0 0;
 }
 
 .lesson-seek-range {
@@ -5745,7 +5471,7 @@ dialog::backdrop {
   appearance: none;
   -webkit-appearance: none;
   width: 100%;
-  height: 18px;
+  height: 16px;
   margin: 0;
   padding: 0;
   border: 0;
@@ -5802,27 +5528,110 @@ dialog::backdrop {
   border-radius: 6px;
 }
 
+.lesson-caption-dock {
+  flex: none;
+  border-top: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 95%, var(--surface-2));
+  padding: 10px 40px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lesson-caption-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.lesson-caption-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.lesson-caption-badge {
+  flex: none;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.lesson-caption-title {
+  margin: 0;
+  min-width: 0;
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lesson-caption-close {
+  flex: none;
+  height: 24px;
+  padding: 0 9px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.lesson-caption-close:hover {
+  color: var(--ink);
+  border-color: var(--border-strong);
+}
+
+.lesson-caption-body {
+  max-height: 28vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 4px;
+  font-size: 13.5px;
+  line-height: 1.85;
+  color: var(--ink);
+  scrollbar-width: thin;
+}
+
+.lesson-caption-body p {
+  margin: 0;
+}
+
+@media (min-width: 1000px) and (min-height: 561px) and (orientation: landscape) {
+  .lesson-bar {
+    padding: 9px 28px 10px 84px;
+  }
+
+  .lesson-caption-dock {
+    padding: 10px 28px 12px 84px;
+  }
+}
+
 @media (max-width: 720px) {
-  .lesson-stage {
-    padding: 14px 12px 28px;
-    gap: 12px;
+  .lesson-bar {
+    padding: 8px 14px 9px;
   }
 
-  .lesson-hero {
-    padding: 14px 14px;
+  .lesson-caption-dock {
+    padding: 9px 14px 10px;
   }
 
-  .lesson-title {
-    font-size: 16px;
-  }
-
-  .lesson-chapter {
-    padding: 12px 13px 14px;
-  }
-
-  .lesson-sticky-deck {
-    top: 4px;
-    padding: 9px 10px;
+  .lesson-caption-body {
+    max-height: 24vh;
+    font-size: 13px;
   }
 }
 
@@ -5838,14 +5647,19 @@ dialog::backdrop {
     padding: 0 8px;
     font-size: 11.5px;
   }
+
+  .lesson-bar {
+    padding: 8px 10px 9px;
+  }
+
+  .lesson-caption-dock {
+    padding: 9px 10px 10px;
+  }
 }
 
 @media (forced-colors: active) {
-  .mode-tab[aria-selected='true']::after {
+  .mode-tab[aria-selected='true']::after,
+  .mode-tab[aria-pressed='true']::after {
     border-block-end-color: Highlight;
-  }
-
-  .lesson-chapter.is-active {
-    border-color: Highlight;
   }
 }

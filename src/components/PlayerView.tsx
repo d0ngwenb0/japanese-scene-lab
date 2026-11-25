@@ -5,11 +5,11 @@ import {
   useRef,
   useState,
   type CSSProperties,
-  type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
 } from 'react';
 import type { Line, LoopMode, Scenario, SceneLesson, Settings, ThemeMode } from '../types';
 import { Furigana } from '../lib/furigana';
+import { audioSrc } from '../lib/audio';
 import { hasLesson, loadLesson } from '../lib/lessons';
 import { useLessonPlayer, type LessonLoopMode } from '../lib/useLessonPlayer';
 import { usePlayer } from '../lib/usePlayer';
@@ -21,7 +21,7 @@ import { PaletteToggle } from './PaletteToggle';
 import { ForceRefreshButton } from './ForceRefreshButton';
 import { FullscreenToggle } from './FullscreenToggle';
 import { JlptStage } from './JlptStage';
-import { LessonStage } from './LessonStage';
+import { LessonControlBar, LessonScriptDock } from './LessonCompanion';
 import { SceneSwitcher } from './SceneSwitcher';
 import { AiChat } from './AiChat';
 import { PassageList } from './PassageList';
@@ -93,10 +93,24 @@ export function PlayerView({
   const [viewMode, setViewMode] = useState<'practice' | 'lesson'>('practice');
   const [lesson, setLesson] = useState<SceneLesson | null>(null);
   const [lessonLoading, setLessonLoading] = useState(false);
+  const [scriptOpen, setScriptOpen] = useState(false);
+  const [previewPlaying, setPreviewPlaying] = useState(false);
+  const previewAudioRef = useRef<HTMLAudioElement | null>(null);
   const inLessonView = sceneHasLesson && viewMode === 'lesson';
+
+  const stopPreview = useCallback(() => {
+    const pa = previewAudioRef.current;
+    if (pa) {
+      pa.pause();
+      pa.removeAttribute('src');
+    }
+    setPreviewPlaying(false);
+  }, []);
 
   useEffect(() => {
     setViewMode('practice');
+    setScriptOpen(false);
+    stopPreview();
     if (!hasLesson(scenario.id)) {
       setLesson(null);
       setLessonLoading(false);
@@ -112,7 +126,9 @@ export function PlayerView({
     return () => {
       cancelled = true;
     };
-  }, [scenario.id]);
+  }, [scenario.id, stopPreview]);
+
+  useEffect(() => () => stopPreview(), [stopPreview]);
 
   const { index, playing, lineProgress, sceneTime, sceneDuration, missing, toggle, pause, resume, select, next, prev, replay } = usePlayer({
     sceneId: scenario.id,
@@ -124,20 +140,46 @@ export function PlayerView({
     onSceneEnd,
   });
 
+  const handleLessonPlayStart = useCallback(() => {
+    pause();
+    stopPreview();
+  }, [pause, stopPreview]);
+
   const lessonPlayer = useLessonPlayer({
     lesson,
     rate: settings.rate,
     volume: settings.volume,
     active: inLessonView,
-    onPlayStart: pause,
+    onPlayStart: handleLessonPlayStart,
   });
 
-  const practiceTabRef = useRef<HTMLButtonElement>(null);
-  const lessonTabRef = useRef<HTMLButtonElement>(null);
+  const playPreviewLine = useCallback(
+    (lineId: string) => {
+      if (previewPlaying) {
+        stopPreview();
+        return;
+      }
+      lessonPlayer.pause();
+      pause();
+      const pa = previewAudioRef.current ?? new Audio();
+      previewAudioRef.current = pa;
+      pa.onended = () => setPreviewPlaying(false);
+      pa.onerror = () => setPreviewPlaying(false);
+      pa.src = audioSrc(scenario.id, lineId);
+      pa.playbackRate = settings.rate;
+      const clampedVol = Math.min(1, Math.max(0, settings.volume));
+      pa.muted = clampedVol === 0;
+      pa.volume = clampedVol;
+      setPreviewPlaying(true);
+      pa.play().catch(() => setPreviewPlaying(false));
+    },
+    [lessonPlayer, pause, previewPlaying, scenario.id, settings.rate, settings.volume, stopPreview],
+  );
 
   const switchViewMode = useCallback(
     (nextMode: 'practice' | 'lesson') => {
       if (nextMode === viewMode) return;
+      stopPreview();
       if (nextMode === 'lesson') {
         pause();
         setViewMode('lesson');
@@ -146,7 +188,7 @@ export function PlayerView({
         setViewMode('practice');
       }
     },
-    [lessonPlayer, pause, viewMode],
+    [lessonPlayer, pause, stopPreview, viewMode],
   );
 
   const lastNonZeroVolumeRef = useRef(settings.volume > 0 ? settings.volume : 1);
@@ -168,8 +210,9 @@ export function PlayerView({
     setPausedByAi(false);
     pause();
     lessonPlayer.pause();
+    stopPreview();
     setToast('定时时间到，已暂停播放');
-  }, [lessonPlayer, timerStopTick, pause]);
+  }, [lessonPlayer, timerStopTick, pause, stopPreview]);
   const [aiWidth, setAiWidth] = useState(() => {
     try {
       const saved = Number(localStorage.getItem('scene-lab:ai-width:v1'));
@@ -199,6 +242,7 @@ export function PlayerView({
     if (aiOpen) {
       closeAi();
     } else {
+      stopPreview();
       if (inLessonView && lessonPlayer.pause()) {
         pausedSourceByAiRef.current = 'lesson';
         setPausedByAi(true);
@@ -208,7 +252,7 @@ export function PlayerView({
       }
       onAiOpenChange(true);
     }
-  }, [aiOpen, closeAi, inLessonView, lessonPlayer, onAiOpenChange, pause]);
+  }, [aiOpen, closeAi, inLessonView, lessonPlayer, onAiOpenChange, pause, stopPreview]);
 
   useEffect(() => {
     if ((playing || lessonPlayer.playing) && pausedByAi) {
@@ -231,7 +275,15 @@ export function PlayerView({
 
   const isPassage = scenario.kind === 'passage';
   const isJlpt = scenario.kind === 'jlpt';
-  const line = scenario.lines[index];
+  const lessonActiveLineIndex = useMemo(() => {
+    if (!inLessonView || !lesson) return -1;
+    const primaryLineId = lesson.sections[lessonPlayer.sectionIndex]?.lineIds?.[0];
+    if (!primaryLineId) return -1;
+    return scenario.lines.findIndex((l) => l.id === primaryLineId);
+  }, [inLessonView, lesson, lessonPlayer.sectionIndex, scenario.lines]);
+  const displayedIndex = inLessonView ? lessonActiveLineIndex : index;
+  const displayedPlaying = inLessonView ? lessonPlayer.playing : playing;
+  const line = (displayedIndex >= 0 ? scenario.lines[displayedIndex] : undefined) ?? scenario.lines[index];
   const total = scenario.lines.length;
   const lessonTotal = lesson?.sections.length ?? 0;
   const activePlaying = inLessonView ? lessonPlayer.playing : playing;
@@ -245,6 +297,26 @@ export function PlayerView({
       : 0
     : ((index + lineProgress) / total) * 100;
   const speakerColors = useMemo(() => getSpeakerColors(scenario.speakers), [scenario.speakers]);
+
+  const handleOriginalSelect = useCallback(
+    (i: number) => {
+      if (!inLessonView) {
+        select(i);
+        return;
+      }
+      stopPreview();
+      if (!lesson) return;
+      const targetId = scenario.lines[i]?.id;
+      if (!targetId) return;
+      const secIdx = lesson.sections.findIndex((sec) => sec.lineIds?.includes(targetId));
+      if (secIdx >= 0) {
+        lessonPlayer.selectSection(secIdx);
+      } else {
+        showToast('这句暂无对应精讲章节');
+      }
+    },
+    [inLessonView, lesson, lessonPlayer, scenario.lines, select, showToast, stopPreview],
+  );
 
   useEffect(() => {
     if (!('mediaSession' in navigator)) return;
@@ -328,7 +400,8 @@ export function PlayerView({
   );
 
   useEffect(() => {
-    const el = itemRefs.current[index];
+    if (displayedIndex < 0) return;
+    const el = itemRefs.current[displayedIndex];
     const box = listRef.current;
     if (!el || !box) return;
     const boxRect = box.getBoundingClientRect();
@@ -338,7 +411,7 @@ export function PlayerView({
     if (top >= box.scrollTop && bottom <= box.scrollTop + box.clientHeight) return;
     const target = top - box.clientHeight / 2 + elRect.height / 2;
     box.scrollTo({ top: Math.max(target, 0), behavior: 'smooth' });
-  }, [index]);
+  }, [displayedIndex]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -459,19 +532,6 @@ export function PlayerView({
     [lessonPlayer],
   );
 
-  const handleTabKeyDown = (event: ReactKeyboardEvent<HTMLButtonElement>, current: 'practice' | 'lesson') => {
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === 'Home' || event.key === 'End') {
-      event.preventDefault();
-      if (event.key === 'Home') {
-        practiceTabRef.current?.focus();
-      } else if (event.key === 'End') {
-        lessonTabRef.current?.focus();
-      } else {
-        (current === 'practice' ? lessonTabRef : practiceTabRef).current?.focus();
-      }
-    }
-  };
-
   return (
     <div
       className={aiOpen ? 'page player-page is-ai-open' : 'page player-page'}
@@ -520,30 +580,20 @@ export function PlayerView({
         <div className="list-tools">
           <div className="list-tools-left">
             {sceneHasLesson && (
-              <div className="mode-tabs" role="tablist" aria-label="学习模式">
+              <div className="mode-tabs" role="group" aria-label="学习模式">
                 <button
-                  ref={practiceTabRef}
                   type="button"
-                  role="tab"
-                  id="tab-practice"
                   className="mode-tab"
-                  aria-selected={!inLessonView}
-                  tabIndex={!inLessonView ? 0 : -1}
+                  aria-pressed={!inLessonView}
                   onClick={() => switchViewMode('practice')}
-                  onKeyDown={(e) => handleTabKeyDown(e, 'practice')}
                 >
                   {isJlpt ? '听力练习' : isPassage ? '短文原文' : '对话原文'}
                 </button>
                 <button
-                  ref={lessonTabRef}
                   type="button"
-                  role="tab"
-                  id="tab-lesson"
                   className="mode-tab"
-                  aria-selected={inLessonView}
-                  tabIndex={inLessonView ? 0 : -1}
+                  aria-pressed={inLessonView}
                   onClick={() => switchViewMode('lesson')}
-                  onKeyDown={(e) => handleTabKeyDown(e, 'lesson')}
                 >
                   <LessonIcon width={14} height={14} />
                   <span>老师精讲</span>
@@ -644,37 +694,49 @@ export function PlayerView({
             </span>
           </div>
         )}
+        {inLessonView && (
+          <LessonControlBar
+            scenario={scenario}
+            lesson={lesson}
+            loading={lessonLoading}
+            sectionIndex={lessonPlayer.sectionIndex}
+            currentTime={lessonPlayer.currentTime}
+            duration={lessonPlayer.duration}
+            missing={lessonPlayer.missing}
+            scriptOpen={scriptOpen}
+            previewPlaying={previewPlaying}
+            onSelectSection={lessonPlayer.selectSection}
+            onSeek={lessonPlayer.seek}
+            onToggleScript={() => setScriptOpen((v) => !v)}
+            onPlayPreview={playPreviewLine}
+          />
+        )}
         {!inLessonView && missing && (
           <p className="warn list-warn">
             音频没加载到。先运行 <code>npm run tts</code> 生成音频。
           </p>
         )}
         <div className="subs" ref={listRef}>
-          <div
-            role="tabpanel"
-            aria-labelledby={sceneHasLesson ? 'tab-practice' : undefined}
-            className="subs-panel"
-            hidden={inLessonView}
-          >
-            {isJlpt ? (
-              <JlptStage
-                scenario={scenario}
-                index={index}
-                playing={playing}
-                itemRefs={itemRefs}
-                onSelect={select}
-              />
-            ) : isPassage ? (
-              <PassageList
-                scenario={scenario}
-                index={index}
-                playing={playing}
-                itemRefs={itemRefs}
-                onSelect={select}
-              />
-            ) : (
+          {isJlpt ? (
+            <JlptStage
+              scenario={scenario}
+              index={displayedIndex}
+              playing={displayedPlaying}
+              forceTranscript={inLessonView}
+              itemRefs={itemRefs}
+              onSelect={handleOriginalSelect}
+            />
+          ) : isPassage ? (
+            <PassageList
+              scenario={scenario}
+              index={displayedIndex}
+              playing={displayedPlaying}
+              itemRefs={itemRefs}
+              onSelect={handleOriginalSelect}
+            />
+          ) : (
             scenario.lines.map((item, i) => {
-              const active = i === index;
+              const active = i === displayedIndex;
               const speakerInfo = scenario.speakers.find((s) => s.id === item.speaker);
               const spk = speakerInfo?.label ?? item.speaker;
               const side = speakerInfo?.self ? 'right' : 'left';
@@ -694,7 +756,7 @@ export function PlayerView({
                     ref={(node) => {
                       itemRefs.current[i] = node;
                     }}
-                    className={active ? (playing ? 'bubble is-active is-playing' : 'bubble is-active') : 'bubble'}
+                    className={active ? (displayedPlaying ? 'bubble is-active is-playing' : 'bubble is-active') : 'bubble'}
                     onClick={(event) => {
                       const selection = window.getSelection();
                       if (
@@ -706,12 +768,12 @@ export function PlayerView({
                       ) {
                         return;
                       }
-                      select(i);
+                      handleOriginalSelect(i);
                     }}
                     onKeyDown={(event) => {
                       if (event.key === 'Enter') {
                         event.preventDefault();
-                        select(i);
+                        handleOriginalSelect(i);
                       } else if (event.key === ' ') {
                         event.preventDefault();
                       }
@@ -719,7 +781,7 @@ export function PlayerView({
                     onKeyUp={(event) => {
                       if (event.key === ' ') {
                         event.preventDefault();
-                        select(i);
+                        handleOriginalSelect(i);
                       }
                     }}
                     aria-current={active ? 'true' : undefined}
@@ -732,7 +794,7 @@ export function PlayerView({
                         {spk}
                       </span>
                       <span className="bubble-index">{String(i + 1).padStart(2, '0')}</span>
-                      {active && playing ? <PlayingMark /> : null}
+                      {active && displayedPlaying ? <PlayingMark /> : null}
                     </span>
                     <span className="bubble-ja" lang="ja">
                       <Furigana text={item.ja} glossary />
@@ -753,36 +815,15 @@ export function PlayerView({
                 </div>
               );
             })
-            )}
-          </div>
-          {sceneHasLesson && (
-            <div
-              role="tabpanel"
-              aria-labelledby="tab-lesson"
-              className="subs-panel"
-              hidden={!inLessonView}
-            >
-              <LessonStage
-                scenario={scenario}
-                lesson={lesson}
-                loading={lessonLoading}
-                sectionIndex={lessonPlayer.sectionIndex}
-                playing={lessonPlayer.playing}
-                missing={lessonPlayer.missing}
-                currentTime={lessonPlayer.currentTime}
-                duration={lessonPlayer.duration}
-                onSelectSection={lessonPlayer.selectSection}
-                onTogglePlay={lessonPlayer.toggle}
-                onSeek={lessonPlayer.seek}
-                onJumpToLine={(lineIdx) => {
-                  lessonPlayer.pause();
-                  setViewMode('practice');
-                  select(lineIdx);
-                }}
-              />
-            </div>
           )}
         </div>
+        {inLessonView && scriptOpen && (
+          <LessonScriptDock
+            lesson={lesson}
+            sectionIndex={lessonPlayer.sectionIndex}
+            onClose={() => setScriptOpen(false)}
+          />
+        )}
       </div>
 
       <div className="playbar" role="group" aria-label="播放控制">
