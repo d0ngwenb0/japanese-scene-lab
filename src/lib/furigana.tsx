@@ -85,21 +85,6 @@ function parseSegments(text: string) {
 }
 
 function renderRuby(seg: Extract<Segment, { kind: 'ruby' }>, key: number | string) {
-  const chars = [...seg.base];
-  if (seg.parts.length > 1 && seg.parts.length === chars.length) {
-    return (
-      <ruby key={key} className="is-mono" aria-label={`${seg.base}（${seg.reading}）`}>
-        {seg.base}
-        <rt className="rt-mono" aria-hidden="true">
-          <span className="rt-mono-flex">
-            {seg.parts.map((part, i) => (
-              <span key={i} className="rt-part" data-reading={part} />
-            ))}
-          </span>
-        </rt>
-      </ruby>
-    );
-  }
   return (
     <ruby key={key} aria-label={`${seg.base}（${seg.reading}）`}>
       {seg.base}

@@ -3189,23 +3189,8 @@ ruby {
   ruby-align: center;
 }
 
-rt[data-reading]::before,
-.rt-part::before {
+rt[data-reading]::before {
   content: attr(data-reading);
-}
-
-.rt-mono-flex {
-  display: inline-flex;
-  inline-size: 100%;
-  align-items: flex-end;
-  justify-content: space-around;
-  gap: 0.12em;
-}
-
-.rt-part {
-  flex: 1 0 auto;
-  text-align: center;
-  white-space: nowrap;
 }
 
 /* ---------- 页面内 AI 解析（BYOK，流式） ---------- */
