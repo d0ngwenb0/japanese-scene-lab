@@ -22,12 +22,12 @@
   --warn-bg: #fbf0da;
   --warn-border: #ecd9b4;
   --warn-fg: #8a5312;
-  --pos-hl-noun: rgb(59 130 246 / 0.19);
-  --pos-hl-verb: rgb(16 185 129 / 0.21);
-  --pos-hl-adj: rgb(245 158 11 / 0.25);
-  --pos-hl-adv: rgb(139 92 246 / 0.19);
-  --pos-hl-particle: rgb(244 63 94 / 0.18);
-  --pos-hl-expr: rgb(20 184 166 / 0.20);
+  --pos-hl-noun: rgb(59 130 246 / 0.14);
+  --pos-hl-verb: rgb(16 185 129 / 0.15);
+  --pos-hl-adj: rgb(245 158 11 / 0.17);
+  --pos-hl-adv: rgb(139 92 246 / 0.14);
+  --pos-hl-particle: rgb(244 63 94 / 0.13);
+  --pos-hl-expr: rgb(20 184 166 / 0.14);
   --menu-shadow: 0 10px 28px rgba(30, 24, 16, 0.14);
   --dock-shadow: 0 6px 22px rgba(30, 24, 16, 0.1);
   --card-shadow: 0 2px 10px rgba(30, 24, 16, 0.05);
@@ -67,12 +67,12 @@
   --warn-bg: #2c2214;
   --warn-border: #4a3a1f;
   --warn-fg: #e0b266;
-  --pos-hl-noun: rgb(56 189 248 / 0.22);
-  --pos-hl-verb: rgb(52 211 153 / 0.22);
-  --pos-hl-adj: rgb(251 191 36 / 0.24);
-  --pos-hl-adv: rgb(167 139 250 / 0.23);
-  --pos-hl-particle: rgb(251 113 133 / 0.22);
-  --pos-hl-expr: rgb(45 212 191 / 0.22);
+  --pos-hl-noun: rgb(56 189 248 / 0.16);
+  --pos-hl-verb: rgb(52 211 153 / 0.16);
+  --pos-hl-adj: rgb(251 191 36 / 0.17);
+  --pos-hl-adv: rgb(167 139 250 / 0.16);
+  --pos-hl-particle: rgb(251 113 133 / 0.15);
+  --pos-hl-expr: rgb(45 212 191 / 0.16);
   --menu-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
   --dock-shadow: 0 8px 26px rgba(0, 0, 0, 0.42);
   --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.24);
@@ -5125,7 +5125,6 @@ dialog::backdrop {
 
 :root[data-pos-color='on'] .gloss-word[data-pos] {
   --pos-hl: transparent;
-  padding-block: 0.06em;
   border-radius: 0.28em 0.14em 0.24em 0.16em;
   background-image: linear-gradient(
     102deg,
@@ -5136,8 +5135,8 @@ dialog::backdrop {
     color-mix(in srgb, var(--pos-hl) 62%, transparent) 98%,
     transparent 100%
   );
-  background-size: 100% 100%;
-  background-position: 0 0;
+  background-size: 100% 70%;
+  background-position: 0 92%;
   background-repeat: no-repeat;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
@@ -5205,8 +5204,8 @@ dialog::backdrop {
     color-mix(in srgb, var(--pos-hl) 62%, transparent) 98%,
     transparent 100%
   );
-  background-size: 100% 100%;
-  background-position: 0 0;
+  background-size: 100% 70%;
+  background-position: 0 92%;
   background-repeat: no-repeat;
 }
 
