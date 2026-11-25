@@ -541,7 +541,7 @@ export function PlayerView({
                     {active && playing ? <PlayingMark /> : null}
                   </span>
                   <span className="bubble-ja" lang="ja">
-                    <Furigana text={item.ja} />
+                    <Furigana text={item.ja} glossary />
                   </span>
                   <span className="bubble-zh">{item.zh}</span>
                 </div>

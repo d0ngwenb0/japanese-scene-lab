@@ -40,7 +40,7 @@ export function JlptStage({ scenario, index, playing, itemRefs, onSelect }: Prop
 
           <div className="jlpt-question">
             <p className="jlpt-question-ja ja" lang="ja">
-              <Furigana text={jlpt.question} />
+              <Furigana text={jlpt.question} glossary />
             </p>
             <p className="jlpt-question-zh zh">{jlpt.questionZh}</p>
           </div>
@@ -73,7 +73,7 @@ export function JlptStage({ scenario, index, playing, itemRefs, onSelect }: Prop
                 >
                   <span className="jlpt-opt-num">{i + 1}</span>
                   <span className="jlpt-opt-text ja" lang="ja">
-                    <Furigana text={opt} />
+                    <Furigana text={opt} glossary />
                   </span>
                 </button>
               );
@@ -156,7 +156,7 @@ export function JlptStage({ scenario, index, playing, itemRefs, onSelect }: Prop
                 <span className="jlpt-line-spk">{spk}</span>
                 <div className="jlpt-line-body">
                   <p className="ja" lang="ja">
-                    <Furigana text={item.ja} />
+                    <Furigana text={item.ja} glossary />
                   </p>
                   <p className="zh" lang="zh-CN">
                     {item.zh}

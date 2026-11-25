@@ -226,7 +226,7 @@ export function FocusLyricsOverlay({
               onClick={() => onSelect(i)}
             >
               <span className="focus-ja" lang="ja">
-                <Furigana text={item.ja} />
+                <Furigana text={item.ja} glossary />
               </span>
               <span className="focus-zh">{item.zh}</span>
             </button>

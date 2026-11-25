@@ -8,6 +8,7 @@ import { ScenarioList } from './components/ScenarioList';
 import { PlayerView } from './components/PlayerView';
 import { resetFocusChrome } from './components/FocusLyricsOverlay';
 import { PullToRefresh } from './components/PullToRefresh';
+import { GlossaryTooltip } from './components/GlossaryTooltip';
 
 const scenarios = scenariosData as Scenario[];
 
@@ -205,6 +206,7 @@ export default function App() {
         />
       )}
       <PullToRefresh />
+      <GlossaryTooltip />
     </div>
   );
 }

@@ -1,51 +1,183 @@
 import { Fragment, type ReactNode } from 'react';
+import { lookupGlossaryKey, MAX_GLOSS_KEY_LEN } from './glossary';
 
 const TOKEN = /\{([^{}|]+)\|([^{}|]+)\}/g;
+
+type Segment =
+  | {
+      kind: 'text';
+      value: string;
+      start: number;
+      end: number;
+    }
+  | {
+      kind: 'ruby';
+      base: string;
+      parts: string[];
+      reading: string;
+      start: number;
+      end: number;
+    };
+
+function kataToHira(text: string): string {
+  return text.replace(/[\u30a1-\u30f6]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
+}
+
+function parseSegments(text: string) {
+  const segments: Segment[] = [];
+  const charReadings: string[] = [];
+  const forbiddenSplits = new Set<number>();
+  let plain = '';
+  let last = 0;
+
+  const pushText = (chunk: string) => {
+    const start = plain.length;
+    for (const ch of chunk) {
+      plain += ch;
+      charReadings.push(ch);
+    }
+    segments.push({ kind: 'text', value: chunk, start, end: plain.length });
+  };
+
+  for (const match of text.matchAll(TOKEN)) {
+    const idx = match.index ?? 0;
+    if (idx > last) {
+      pushText(text.slice(last, idx));
+    }
+
+    const base = match[1];
+    const parts = match[2].trim().split(/[\s・]+/).filter(Boolean);
+    const reading = parts.join('');
+    const start = plain.length;
+    const baseChars = [...base];
+    plain += base;
+
+    if (parts.length === baseChars.length) {
+      for (const part of parts) {
+        charReadings.push(part);
+      }
+    } else {
+      charReadings.push(reading);
+      for (let i = 1; i < baseChars.length; i += 1) {
+        charReadings.push('');
+      }
+    }
+
+    const end = plain.length;
+    for (let pos = start + 1; pos < end; pos += 1) {
+      forbiddenSplits.add(pos);
+    }
+
+    segments.push({ kind: 'ruby', base, parts, reading, start, end });
+    last = idx + match[0].length;
+  }
+
+  if (last < text.length) {
+    pushText(text.slice(last));
+  }
+
+  return { segments, plain, charReadings, forbiddenSplits };
+}
+
+function renderRuby(seg: Extract<Segment, { kind: 'ruby' }>, key: number | string) {
+  const chars = [...seg.base];
+  if (seg.parts.length > 1 && seg.parts.length === chars.length) {
+    return (
+      <ruby key={key} className="is-mono" aria-label={`${seg.base}（${seg.reading}）`}>
+        {chars.map((char, i) => (
+          <Fragment key={i}>
+            {char}
+            <rt data-reading={seg.parts[i]} aria-hidden="true" />
+          </Fragment>
+        ))}
+      </ruby>
+    );
+  }
+  return (
+    <ruby key={key} aria-label={`${seg.base}（${seg.reading}）`}>
+      {seg.base}
+      <rt data-reading={seg.reading} aria-hidden="true" />
+    </ruby>
+  );
+}
+
+function renderSlice(segments: Segment[], start: number, end: number, prefix: string): ReactNode[] {
+  const nodes: ReactNode[] = [];
+  let idx = 0;
+  for (const seg of segments) {
+    if (seg.end <= start) continue;
+    if (seg.start >= end) break;
+    if (seg.kind === 'ruby') {
+      nodes.push(renderRuby(seg, `${prefix}-r-${idx++}`));
+    } else {
+      const from = Math.max(0, start - seg.start);
+      const to = Math.min(seg.value.length, end - seg.start);
+      if (to > from) {
+        nodes.push(seg.value.slice(from, to));
+      }
+    }
+  }
+  return nodes;
+}
 
 /**
  * 把 {漢字|かん じ} / {今日|きょう} 渲染成标准 HTML <ruby>：
  * - 读音用空格（或中点）分隔且段数等于字数时：单字对齐（モノルビ），保留在同一 <ruby> 内
  * - 读音不分隔时（单字或熟字训/当て字）：整词居中（グループルビ）
- * 注音由 CSS ::before 生成，不进入文本选区，避免复制/查词典时混入假名。
+ * - 传入 glossary 时，基于词典表对单词做边界安全的词元包裹，支持鼠标悬停显示释义
  */
-export function Furigana({ text }: { text: string }) {
+export function Furigana({ text, glossary = false }: { text: string; glossary?: boolean }) {
+  const { segments, plain, charReadings, forbiddenSplits } = parseSegments(text);
+
+  if (!glossary) {
+    return (
+      <>
+        {segments.map((seg, idx) =>
+          seg.kind === 'ruby' ? renderRuby(seg, idx) : <Fragment key={idx}>{seg.value}</Fragment>,
+        )}
+      </>
+    );
+  }
+
   const nodes: ReactNode[] = [];
-  let last = 0;
   let key = 0;
+  let pos = 0;
 
-  for (const match of text.matchAll(TOKEN)) {
-    const index = match.index ?? 0;
-    if (index > last) nodes.push(text.slice(last, index));
+  while (pos < plain.length) {
+    let matchedLen = 0;
+    let matchedKey: string | null = null;
+    const maxTry = Math.min(MAX_GLOSS_KEY_LEN, plain.length - pos);
 
-    const base = match[1];
-    const rawReading = match[2].trim();
-    const parts = rawReading.split(/[\s・]+/).filter(Boolean);
-    const chars = [...base];
-
-    if (parts.length > 1 && parts.length === chars.length) {
-      nodes.push(
-        <ruby key={key++} className="is-mono" aria-label={`${base}（${parts.join('')}）`}>
-          {chars.map((char, i) => (
-            <Fragment key={i}>
-              {char}
-              <rt data-reading={parts[i]} aria-hidden="true" />
-            </Fragment>
-          ))}
-        </ruby>,
-      );
-    } else {
-      const reading = parts.join('');
-      nodes.push(
-        <ruby key={key++} aria-label={`${base}（${reading}）`}>
-          {base}
-          <rt data-reading={reading} aria-hidden="true" />
-        </ruby>,
-      );
+    for (let len = maxTry; len >= 1; len -= 1) {
+      if (forbiddenSplits.has(pos + len)) continue;
+      const surface = plain.slice(pos, pos + len);
+      const reading = kataToHira(charReadings.slice(pos, pos + len).join(''));
+      const found = lookupGlossaryKey(surface, reading);
+      if (found) {
+        matchedLen = len;
+        matchedKey = found;
+        break;
+      }
     }
 
-    last = index + match[0].length;
+    if (matchedKey && matchedLen > 0) {
+      nodes.push(
+        <span key={key++} className="gloss-word" data-gloss-key={matchedKey}>
+          {renderSlice(segments, pos, pos + matchedLen, `w${key}`)}
+        </span>,
+      );
+      pos += matchedLen;
+    } else {
+      const rubySeg = segments.find((seg) => seg.kind === 'ruby' && seg.start === pos);
+      if (rubySeg) {
+        nodes.push(renderRuby(rubySeg as Extract<Segment, { kind: 'ruby' }>, key++));
+        pos = rubySeg.end;
+      } else {
+        nodes.push(plain[pos]);
+        pos += 1;
+      }
+    }
   }
-  if (last < text.length) nodes.push(text.slice(last));
 
   return <>{nodes}</>;
 }

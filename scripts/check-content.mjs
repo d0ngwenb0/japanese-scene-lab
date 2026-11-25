@@ -214,11 +214,28 @@ if (existsSync(audioRoot)) {
   }
 }
 
-for (const key of Object.keys(manifest)) {
+  for (const key of Object.keys(manifest)) {
   const [sId, lId] = key.split('/');
   const scene = scenarios.find((item) => item.id === sId);
   if (!scene?.lines?.some((line) => line.id === lId)) {
     warnings.push(`manifest.json 存在未引用条目：${key}`);
+  }
+}
+
+const glossaryPath = join(root, 'src', 'data', 'glossary.json');
+if (!existsSync(glossaryPath)) {
+  errors.push('缺少词汇释义表 src/data/glossary.json');
+} else {
+  const glossary = JSON.parse(readFileSync(glossaryPath, 'utf8'));
+  const gKeys = glossary && typeof glossary === 'object' ? Object.keys(glossary) : [];
+  if (gKeys.length < 100) {
+    errors.push(`glossary.json 词条数量过少（${gKeys.length}）`);
+  }
+  for (const gKey of gKeys) {
+    const entry = glossary[gKey];
+    if (!entry || typeof entry.p !== 'string' || !entry.p.trim() || typeof entry.z !== 'string' || !entry.z.trim()) {
+      errors.push(`glossary.json 词条格式不完整：${gKey}`);
+    }
   }
 }
 

@@ -74,7 +74,7 @@ export function PassageList({ scenario, index, playing, itemRefs, onSelect }: Pr
                   onKeyUp={(event) => handleSegmentKeyUp(event, () => onSelect(i))}
                   aria-current={active ? 'true' : undefined}
                 >
-                  <Furigana text={item.ja} />
+                  <Furigana text={item.ja} glossary />
                 </span>
               );
             })}

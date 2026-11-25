@@ -4889,3 +4889,187 @@ dialog::backdrop {
   flex-shrink: 0;
   margin-right: 10px;
 }
+
+/* ---------- 单词悬停释义（Glossary Tooltip） ---------- */
+
+.gloss-word {
+  border-radius: 3px;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+@media (hover: hover) {
+  .gloss-word {
+    border-bottom: 1px dotted color-mix(in srgb, var(--ink) 22%, transparent);
+    padding-bottom: 1px;
+  }
+
+  .gloss-word:hover,
+  .gloss-word.is-gloss-active {
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    border-bottom-color: var(--accent);
+  }
+}
+
+.gloss-popover {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+  max-inline-size: min(280px, calc(100vw - 24px));
+  z-index: 60;
+}
+
+.gloss-popover-inner {
+  position: relative;
+  padding: 9px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 97%, transparent);
+  color: var(--ink);
+  box-shadow: var(--dock-shadow);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-size: 12.5px;
+  line-height: 1.5;
+  text-align: left;
+}
+
+/* 扩大透明悬停桥接区，鼠标从词面滑向释义卡片不中断 */
+.gloss-popover-inner::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -10px;
+  height: 12px;
+}
+
+.gloss-popover[data-placement='bottom'] .gloss-popover-inner::before {
+  bottom: auto;
+  top: -10px;
+}
+
+@supports (position-area: block-start) {
+  .gloss-word.is-gloss-active {
+    anchor-name: --gloss-anchor;
+  }
+
+  .gloss-popover {
+    position: fixed;
+    position-anchor: --gloss-anchor;
+    position-area: block-start;
+    position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+    inset: auto;
+    margin: 0;
+    margin-block-end: 8px;
+    container-type: anchored;
+  }
+}
+
+@supports (container-type: anchored) {
+  .gloss-popover-inner::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -5px;
+    width: 8px;
+    height: 8px;
+    transform: translateX(-50%) rotate(45deg);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  @container anchored(fallback: flip-block) {
+    .gloss-popover-inner::before {
+      bottom: auto;
+      top: -10px;
+    }
+
+    .gloss-popover-inner::after {
+      bottom: auto;
+      top: -5px;
+      border-right: 0;
+      border-bottom: 0;
+      border-left: 1px solid var(--border);
+      border-top: 1px solid var(--border);
+    }
+  }
+}
+
+.gloss-popover.is-manual-pos {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  transform: translate(-50%, -100%);
+}
+
+.gloss-popover.is-manual-pos[data-placement='bottom'] {
+  transform: translate(-50%, 0);
+}
+
+@supports not selector(:popover-open) {
+  .gloss-popover:not(.is-fallback-open) {
+    display: none;
+  }
+
+  .gloss-popover.is-fallback-open {
+    display: block;
+  }
+}
+
+.gloss-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 5px 7px;
+  margin-bottom: 4px;
+}
+
+.gloss-term {
+  font-family: var(--jp-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.gloss-reading {
+  font-family: var(--jp);
+  font-size: 11.5px;
+  color: var(--accent-text);
+}
+
+.gloss-pos {
+  margin-left: auto;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.gloss-zh {
+  color: var(--ink);
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.gloss-base {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px dashed var(--border);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.focus-line .gloss-word {
+  border-bottom-color: rgb(255 255 255 / 0.25);
+}
+
+.focus-line .gloss-word:hover,
+.focus-line .gloss-word.is-gloss-active {
+  background: rgb(255 255 255 / 0.14);
+  border-bottom-color: rgb(255 255 255 / 0.72);
+}
