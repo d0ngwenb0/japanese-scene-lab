@@ -8,6 +8,7 @@ interface Options {
   lines: Line[];
   loop: LoopMode;
   rate: number;
+  volume?: number;
   autoPlay?: boolean;
   onSceneEnd?: () => void;
 }
@@ -72,7 +73,7 @@ const sharedPreloadAudio =
  * - 跨场景切换复用同一个已解锁的 <audio> 实例，保证随机切场自动续播不被浏览器拦截
  * - 拼接未完成或环境不支持时无缝降级为逐句播放
  */
-export function usePlayer({ sceneId, lines, loop, rate, autoPlay = false, onSceneEnd }: Options) {
+export function usePlayer({ sceneId, lines, loop, rate, volume = 1, autoPlay = false, onSceneEnd }: Options) {
   const audio = useMemo(() => sharedAudio ?? new Audio(), []);
   const preloadAudio = useMemo(() => {
     if (sharedPreloadAudio) return sharedPreloadAudio;
@@ -287,6 +288,13 @@ export function usePlayer({ sceneId, lines, loop, rate, autoPlay = false, onScen
   useEffect(() => {
     if (audio && !inGapRef.current) audio.playbackRate = rate;
   }, [rate, audio]);
+
+  useEffect(() => {
+    if (!audio) return;
+    const clamped = Math.min(1, Math.max(0, volume));
+    audio.muted = clamped === 0;
+    audio.volume = clamped;
+  }, [volume, audio]);
 
   const advance = useCallback(() => {
     const i = indexRef.current;

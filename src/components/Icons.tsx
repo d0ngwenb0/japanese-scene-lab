@@ -352,3 +352,24 @@ export function StarIcon({ filled, ...props }: IconProps & { filled?: boolean })
     </svg>
   );
 }
+
+export function VolumeIcon({
+  level = 'high',
+  ...props
+}: IconProps & { level?: 'mute' | 'low' | 'high' }) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M11 5.5 6.8 9H4a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h2.8L11 18.5z" />
+      {level === 'mute' ? (
+        <path d="m15.5 9.5 5 5M20.5 9.5l-5 5" />
+      ) : level === 'low' ? (
+        <path d="M15.2 9.4a4.2 4.2 0 0 1 0 5.2" />
+      ) : (
+        <>
+          <path d="M15.2 9.4a4.2 4.2 0 0 1 0 5.2" />
+          <path d="M18 6.8a7.8 7.8 0 0 1 0 10.4" />
+        </>
+      )}
+    </svg>
+  );
+}

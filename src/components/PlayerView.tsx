@@ -23,6 +23,7 @@ import { AiChat } from './AiChat';
 import { PassageList } from './PassageList';
 import { FocusLyricsOverlay } from './FocusLyricsOverlay';
 import { SceneTimePill } from './SceneTimePill';
+import { VolumeControl } from './VolumeControl';
 import { getSpeakerColors } from '../lib/speakerColors';
 
 const SPEEDS = [0.75, 1, 1.25];
@@ -89,9 +90,17 @@ export function PlayerView({
     lines: scenario.lines,
     loop: settings.loop,
     rate: settings.rate,
+    volume: settings.volume,
     autoPlay,
     onSceneEnd,
   });
+
+  const lastNonZeroVolumeRef = useRef(settings.volume > 0 ? settings.volume : 1);
+  useEffect(() => {
+    if (settings.volume > 0) {
+      lastNonZeroVolumeRef.current = settings.volume;
+    }
+  }, [settings.volume]);
 
   const listRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Array<HTMLElement | null>>([]);
@@ -265,6 +274,12 @@ export function PlayerView({
         case 'L':
           onSettingsChange({ loop: settings.loop === 'line' ? 'off' : 'line' });
           break;
+        case 'm':
+        case 'M':
+          onSettingsChange({
+            volume: settings.volume === 0 ? lastNonZeroVolumeRef.current : 0,
+          });
+          break;
         case 'Escape':
           if (event.defaultPrevented || document.documentElement.dataset.fullscreen === 'true') return;
           if (document.querySelector('.menu-popover')) return;
@@ -282,7 +297,7 @@ export function PlayerView({
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [toggle, next, prev, replay, onBack, onSettingsChange, settings.loop, aiOpen, closeAi, focusMode, onFocusModeChange]);
+  }, [toggle, next, prev, replay, onBack, onSettingsChange, settings.loop, settings.volume, aiOpen, closeAi, focusMode, onFocusModeChange]);
 
   const clampAiWidth = useCallback(
     (width: number) => {
@@ -631,7 +646,11 @@ export function PlayerView({
                 </button>
               ))}
             </div>
-            </div>
+            <VolumeControl
+              volume={settings.volume}
+              onChange={(volume) => onSettingsChange({ volume })}
+            />
+          </div>
         </div>
       </div>
 
@@ -680,6 +699,7 @@ export function PlayerView({
           playing={playing}
           loop={settings.loop}
           rate={settings.rate}
+          volume={settings.volume}
           speeds={SPEEDS}
           isPassage={isPassage}
           sceneTime={sceneTime}
@@ -691,6 +711,7 @@ export function PlayerView({
           onReplay={replay}
           onToggleLoop={toggleLoop}
           onRateChange={(rate) => onSettingsChange({ rate })}
+          onVolumeChange={(volume) => onSettingsChange({ volume })}
           onClose={() => onFocusModeChange(false)}
         />
       )}

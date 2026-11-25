@@ -11,6 +11,7 @@ export interface PersistedState {
 
 export const defaultSettings: Settings = {
   rate: 1,
+  volume: 1,
   loop: 'off',
   theme: 'auto',
   palette: 'default',
@@ -52,6 +53,11 @@ export function loadState(): PersistedState {
     }
     if (![0.75, 1, 1.25].includes(settings.rate)) {
       settings.rate = 1;
+    }
+    if (typeof settings.volume !== 'number' || !Number.isFinite(settings.volume)) {
+      settings.volume = 1;
+    } else {
+      settings.volume = Math.min(1, Math.max(0, Math.round(settings.volume * 100) / 100));
     }
     if (!['default', 'sakura', 'matcha', 'ocean'].includes(settings.palette)) {
       settings.palette = 'default';

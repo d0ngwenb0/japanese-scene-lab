@@ -92,6 +92,7 @@ export type ViewMode = 'list' | 'card';
 
 export interface Settings {
   rate: number;
+  volume: number;
   loop: LoopMode;
   theme: ThemeMode;
   palette: PaletteMode;

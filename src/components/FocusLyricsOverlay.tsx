@@ -13,6 +13,7 @@ import {
   ShuffleIcon,
 } from './Icons';
 import { SceneTimePill } from './SceneTimePill';
+import { VolumeControl } from './VolumeControl';
 
 const CHROME_IDLE_MS = 3800;
 let focusChromeShownOnce = false;
@@ -28,6 +29,7 @@ interface Props {
   playing: boolean;
   loop: LoopMode;
   rate: number;
+  volume: number;
   speeds: number[];
   isPassage: boolean;
   sceneTime: number;
@@ -39,6 +41,7 @@ interface Props {
   onReplay: () => void;
   onToggleLoop: (mode: Exclude<LoopMode, 'off'>) => void;
   onRateChange: (rate: number) => void;
+  onVolumeChange: (volume: number) => void;
   onClose: () => void;
 }
 
@@ -49,6 +52,7 @@ export function FocusLyricsOverlay({
   playing,
   loop,
   rate,
+  volume,
   speeds,
   isPassage,
   sceneTime,
@@ -60,6 +64,7 @@ export function FocusLyricsOverlay({
   onReplay,
   onToggleLoop,
   onRateChange,
+  onVolumeChange,
   onClose,
 }: Props) {
   const lineRefs = useRef<Array<HTMLButtonElement | null>>([]);
@@ -324,6 +329,7 @@ export function FocusLyricsOverlay({
                 </button>
               ))}
             </div>
+            <VolumeControl volume={volume} onChange={onVolumeChange} />
           </div>
         </div>
       </div>
