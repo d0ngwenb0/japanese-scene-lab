@@ -1074,19 +1074,19 @@
         "id": "narrator",
         "label": "ナレーター",
         "voice": "Aoede",
-        "style": "crisp, brisk Japanese narrator at lively natural pace, no pauses"
+        "style": "clear, natural Japanese JLPT narrator at steady normal pace, no long pauses"
       },
       {
         "id": "student",
         "label": "男の学生",
         "voice": "Puck",
-        "style": "natural, brisk Japanese male university student speaking at lively everyday speed"
+        "style": "natural, polite Japanese male university student speaking at steady normal Japanese conversational pace, no sighs or dragging"
       },
       {
         "id": "librarian",
         "label": "図書館の職員",
         "voice": "Kore",
-        "style": "bright, brisk Japanese female librarian speaking smoothly at natural everyday speed"
+        "style": "clear, courteous Japanese female librarian speaking smoothly at steady normal Japanese conversational pace, no dragging"
       }
     ],
     "jlpt": {
@@ -1109,49 +1109,49 @@
         "speaker": "narrator",
         "ja": "{大学|だい がく}の{図書館|と しょ かん}で{男|おとこ}の{学生|がく せい}と{職員|しょく いん}が{話|はな}しています。{男|おとこ}の{学生|がく せい}はなぜこの{本|ほん}を{延長|えん ちょう}できませんか。",
         "zh": "在大学图书馆里，男学生和工作人员正在说话。男学生为什么不能续借这本书？",
-        "style": "crisp, brisk Japanese narration at lively pace"
+        "style": "clear, steady Japanese JLPT narration at normal pace"
       },
       {
         "id": "l2",
         "speaker": "student",
         "ja": "すみません、{借|か}りているこの{本|ほん}なんですけど、{返却|へん きゃく}{期限|き げん}を{一週間|いっ しゅう かん}ほど{延長|えん ちょう}できますか。{学生証|がく せい しょう}はこちらです。",
         "zh": "不好意思，我借的这本书，可以把还书期限延长一周左右吗？学生证在这里。",
-        "style": "polite student request at brisk natural conversational speed"
+        "style": "polite university student making a request at steady normal conversational pace"
       },
       {
         "id": "l3",
         "speaker": "librarian",
         "ja": "はい、お{調|しら}べしますね。{期限|き げん}は{明日|あした}までですし、まだ{延長|えん ちょう}もされていないですね。",
         "zh": "好的，我帮您查一下。还书期限到明天为止，而且之前也还没有续借过呢。",
-        "style": "bright, brisk librarian checking system at lively natural speed"
+        "style": "courteous librarian checking the computer screen at steady normal conversational pace, crisp and clear"
       },
       {
         "id": "l4",
         "speaker": "student",
         "ja": "よかった。レポートを{書|か}くのに、もう{少|すこ}し{時間|じ かん}が{欲|ほ}しかったんです。",
         "zh": "太好了。写报告还需要再多一点时间。",
-        "style": "relieved, natural student remark at brisk conversational speed"
+        "style": "lightly pleased university student speaking at steady normal conversational pace, no sighing or drawn-out vowels"
       },
       {
         "id": "l5",
         "speaker": "librarian",
         "ja": "あ、{申|もう}し{訳|わけ}ありません。{実|じつ}は{次|つぎ}の{方|かた}から{予約|よ やく}が{入|はい}っていまして、{延長|えん ちょう}はできないんです。",
         "zh": "啊，非常抱歉。其实后面已经有其他人预约了，所以无法办理续借。",
-        "style": "apologetic, brisk clear librarian explanation at natural speed"
+        "style": "polite librarian explaining smoothly at steady normal conversational pace, crisp start without drawn-out hesitation"
       },
       {
         "id": "l6",
         "speaker": "student",
         "ja": "そうなんですか……わかりました。では、{明日|あした}までに{必|かなら}ず{返|かえ}します。",
         "zh": "这样啊……明白了。那我一定在明天之前归还。",
-        "style": "understanding, polite student acceptance at brisk conversational speed"
+        "style": "polite student responding calmly at steady normal conversational pace, brief natural pause only"
       },
       {
         "id": "l7",
         "speaker": "narrator",
         "ja": "{男|おとこ}の{学生|がく せい}はなぜこの{本|ほん}を{延長|えん ちょう}できませんか。",
         "zh": "男学生为什么不能续借这本书？",
-        "style": "crisp, brisk Japanese narration at lively pace"
+        "style": "clear, steady Japanese JLPT narration at normal pace"
       }
     ]
   },
