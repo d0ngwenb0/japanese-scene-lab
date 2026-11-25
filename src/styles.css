@@ -3183,6 +3183,11 @@ a,
 }
 
 /* 注音由伪元素显示，文字本身不进入选区 */
+ruby {
+  ruby-position: over;
+  ruby-align: center;
+}
+
 rt::before {
   content: attr(data-reading);
 }

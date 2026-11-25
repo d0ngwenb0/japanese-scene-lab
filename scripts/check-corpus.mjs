@@ -136,12 +136,13 @@ for (const scene of scenarios) {
     }
     for (const match of ja.matchAll(/\{([^{}|]+)\|([^{}|]+)\}([ぁ-んー]*)/g)) {
       const [, surface, reading, following] = match;
+      const normalizedReading = reading.replace(/[\s・]+/g, '');
       const expected = READING_RULES[surface];
-      if (expected && reading !== expected) {
+      if (expected && normalizedReading !== expected) {
         errors.push(`E5 ${where}: ${surface} 应读 ${expected}，实际标注 ${reading}`);
       }
       for (const rule of OKURIGANA_RULES) {
-        if (surface === rule.surface && rule.next.test(following) && reading !== rule.expected) {
+        if (surface === rule.surface && rule.next.test(following) && normalizedReading !== rule.expected) {
           errors.push(`E5 ${where}: ${surface}${following.slice(0, 2)} 应读 ${rule.expected}，实际标注 ${reading}`);
         }
       }

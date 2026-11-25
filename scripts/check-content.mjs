@@ -45,7 +45,7 @@ const kanjiRe = /[\u4e00-\u9fff々]/;
 const stripFurigana = (text) => text.replace(/\{([^{}|]+)\|([^{}|]+)\}/g, '$1');
 
 const lineAudioHash = (voice, ja) =>
-  crypto.createHash('sha1').update(`${voice}|${ja}`).digest('hex').slice(0, 16);
+  crypto.createHash('sha1').update(`${voice}|${stripFurigana(ja)}`).digest('hex').slice(0, 16);
 
 const isValidMp3 = (filePath) => {
   if (!existsSync(filePath)) return false;
@@ -63,6 +63,19 @@ const checkMarkup = (text, where) => {
   }
   if (/[{}|]/.test(text.replace(markupRe, ''))) {
     errors.push(`${where}: 假名标注 {漢字|かんじ} 格式不完整`);
+  }
+  for (const match of text.matchAll(/\{([^{}|]+)\|([^{}|]+)\}/g)) {
+    const base = match[1];
+    const reading = match[2].trim();
+    if (/[ぁ-んァ-ヶ]/.test(base)) {
+      errors.push(`${where}: 假名/送假名不应包含在注音花括号内 → ${match[0]}`);
+    }
+    const parts = reading.split(/[\s・]+/).filter(Boolean);
+    if (parts.length > 1 && parts.length !== [...base].length) {
+      errors.push(
+        `${where}: 逐字注音段数（${parts.length}）与字数（${[...base].length}）不一致 → ${match[0]}`,
+      );
+    }
   }
 };
 
