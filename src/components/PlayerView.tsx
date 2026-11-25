@@ -10,7 +10,7 @@ import {
 import type { Line, LoopMode, Scenario, Settings, ThemeMode } from '../types';
 import { Furigana } from '../lib/furigana';
 import { usePlayer } from '../lib/usePlayer';
-import { BackIcon, CopyIcon, LoopAllIcon, LoopOneIcon, LyricsIcon, NextIcon, PauseIcon, PlayIcon, PrevIcon, ReplayIcon, ShuffleIcon, SparklesIcon, StarIcon } from './Icons';
+import { BackIcon, CopyIcon, LoopAllIcon, LoopOneIcon, LyricsIcon, NextIcon, PauseIcon, PlayIcon, PosColorIcon, PrevIcon, ReplayIcon, ShuffleIcon, SparklesIcon, StarIcon } from './Icons';
 import { copyText, formatLine, formatScene, stripFurigana } from '../lib/copy';
 import { ThemeToggle } from './ThemeToggle';
 import { PlaybackTimer } from './PlaybackTimer';
@@ -427,6 +427,20 @@ export function PlayerView({
             </button>
             <button
               type="button"
+              className={settings.posColor ? 'tool-btn pos-color-btn is-active' : 'tool-btn pos-color-btn'}
+              onClick={() => {
+                const next = !settings.posColor;
+                onSettingsChange({ posColor: next });
+                showToast(next ? '已开启词性染色' : '已关闭词性染色');
+              }}
+              aria-label={settings.posColor ? '关闭词性染色' : '开启词性染色'}
+              aria-pressed={settings.posColor}
+              title={settings.posColor ? '关闭词性染色' : '开启词性染色'}
+            >
+              <PosColorIcon width={16} height={16} />
+            </button>
+            <button
+              type="button"
               className={focusMode ? 'tool-btn is-active' : 'tool-btn'}
               onClick={() => onFocusModeChange(true)}
               aria-label="字幕沉浸模式"
@@ -456,6 +470,34 @@ export function PlayerView({
             </button>
           </div>
         </div>
+        {settings.posColor && (
+          <div className="pos-legend" aria-label="词性颜色图例">
+            <span className="pos-legend-item" data-pos="名">
+              <i className="pos-legend-dot" aria-hidden="true" />
+              名词
+            </span>
+            <span className="pos-legend-item" data-pos="動">
+              <i className="pos-legend-dot" aria-hidden="true" />
+              动词
+            </span>
+            <span className="pos-legend-item" data-pos="形">
+              <i className="pos-legend-dot" aria-hidden="true" />
+              形容词
+            </span>
+            <span className="pos-legend-item" data-pos="副">
+              <i className="pos-legend-dot" aria-hidden="true" />
+              副词
+            </span>
+            <span className="pos-legend-item" data-pos="助">
+              <i className="pos-legend-dot" aria-hidden="true" />
+              助词
+            </span>
+            <span className="pos-legend-item" data-pos="敬語">
+              <i className="pos-legend-dot" aria-hidden="true" />
+              敬语・表达
+            </span>
+          </div>
+        )}
         {missing && (
           <p className="warn list-warn">
             音频没加载到。先运行 <code>npm run tts</code> 生成音频。
@@ -712,6 +754,8 @@ export function PlayerView({
           onToggleLoop={toggleLoop}
           onRateChange={(rate) => onSettingsChange({ rate })}
           onVolumeChange={(volume) => onSettingsChange({ volume })}
+          posColor={settings.posColor}
+          onTogglePosColor={() => onSettingsChange({ posColor: !settings.posColor })}
           onClose={() => onFocusModeChange(false)}
         />
       )}

@@ -285,7 +285,10 @@ export function GlossaryTooltip() {
                 {reading}
               </span>
             )}
-            <span className={entry.p === '助' ? 'gloss-pos is-particle' : 'gloss-pos'}>
+            <span
+              className={entry.p === '助' ? 'gloss-pos is-particle' : 'gloss-pos'}
+              data-pos={entry.p}
+            >
               {entry.p === '助' ? '助詞' : entry.p}
             </span>
           </div>

@@ -149,6 +149,7 @@ export function Furigana({ text, glossary = false }: { text: string; glossary?: 
           key={key++}
           className={isParticle ? 'gloss-word is-particle' : 'gloss-word'}
           data-gloss-key={spanKey}
+          data-pos={entry?.p}
         >
           {renderSlice(segments, start, end, `s${key}`)}
         </span>,
@@ -190,6 +191,7 @@ export function Furigana({ text, glossary = false }: { text: string; glossary?: 
           key={key++}
           className={isParticle ? 'gloss-word is-particle' : 'gloss-word'}
           data-gloss-key={matchedKey}
+          data-pos={entry?.p}
         >
           {renderSlice(segments, pos, pos + matchedLen, `w${key}`)}
         </span>,

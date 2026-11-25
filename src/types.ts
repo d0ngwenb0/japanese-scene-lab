@@ -97,4 +97,5 @@ export interface Settings {
   theme: ThemeMode;
   palette: PaletteMode;
   view: ViewMode;
+  posColor: boolean;
 }

@@ -8,6 +8,7 @@ import {
   NextIcon,
   PauseIcon,
   PlayIcon,
+  PosColorIcon,
   PrevIcon,
   ReplayIcon,
   ShuffleIcon,
@@ -42,6 +43,8 @@ interface Props {
   onToggleLoop: (mode: Exclude<LoopMode, 'off'>) => void;
   onRateChange: (rate: number) => void;
   onVolumeChange: (volume: number) => void;
+  posColor?: boolean;
+  onTogglePosColor?: () => void;
   onClose: () => void;
 }
 
@@ -65,6 +68,8 @@ export function FocusLyricsOverlay({
   onToggleLoop,
   onRateChange,
   onVolumeChange,
+  posColor = false,
+  onTogglePosColor,
   onClose,
 }: Props) {
   const lineRefs = useRef<Array<HTMLButtonElement | null>>([]);
@@ -315,6 +320,18 @@ export function FocusLyricsOverlay({
             >
               <ShuffleIcon width={16} height={16} />
             </button>
+            {onTogglePosColor && (
+              <button
+                type="button"
+                className={posColor ? 'pill pill-icon is-on' : 'pill pill-icon'}
+                onClick={onTogglePosColor}
+                aria-pressed={posColor}
+                aria-label={posColor ? '关闭词性染色' : '开启词性染色'}
+                title={posColor ? '关闭词性染色' : '开启词性染色'}
+              >
+                <PosColorIcon width={16} height={16} />
+              </button>
+            )}
             <div className="speed-group" role="group" aria-label="播放速度">
               {speeds.map((speed) => (
                 <button

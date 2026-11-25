@@ -16,6 +16,7 @@ export const defaultSettings: Settings = {
   theme: 'auto',
   palette: 'default',
   view: 'card',
+  posColor: false,
 };
 
 const fallback: PersistedState = { version: VERSION, settings: defaultSettings };
@@ -66,6 +67,9 @@ export function loadState(): PersistedState {
       settings.view = 'card';
     } else if (!['list', 'card'].includes(settings.view)) {
       settings.view = 'card';
+    }
+    if (typeof settings.posColor !== 'boolean') {
+      settings.posColor = false;
     }
     return {
       version: VERSION,

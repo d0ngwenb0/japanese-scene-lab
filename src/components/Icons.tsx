@@ -373,3 +373,15 @@ export function VolumeIcon({
     </svg>
   );
 }
+
+export function PosColorIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="m4.5 16.5 3.6-10h1.8l3.6 10" />
+      <path d="M6 13h6" />
+      <path d="M16.5 6.5h3.5" />
+      <path d="M16.5 11.5h3.5" />
+      <path d="M16.5 16.5h3.5" />
+    </svg>
+  );
+}
