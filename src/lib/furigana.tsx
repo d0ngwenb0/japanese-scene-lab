@@ -89,12 +89,14 @@ function renderRuby(seg: Extract<Segment, { kind: 'ruby' }>, key: number | strin
   if (seg.parts.length > 1 && seg.parts.length === chars.length) {
     return (
       <ruby key={key} className="is-mono" aria-label={`${seg.base}（${seg.reading}）`}>
-        {chars.map((char, i) => (
-          <Fragment key={i}>
-            {char}
-            <rt data-reading={seg.parts[i]} aria-hidden="true" />
-          </Fragment>
-        ))}
+        {seg.base}
+        <rt className="rt-mono" aria-hidden="true">
+          <span className="rt-mono-flex">
+            {seg.parts.map((part, i) => (
+              <span key={i} className="rt-part" data-reading={part} />
+            ))}
+          </span>
+        </rt>
       </ruby>
     );
   }

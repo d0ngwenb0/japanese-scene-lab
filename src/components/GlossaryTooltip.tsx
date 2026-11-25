@@ -10,6 +10,23 @@ type ActiveState = {
 const OPEN_DELAY_MS = 90;
 const CLOSE_DELAY_MS = 90;
 
+function hasNonCollapsedSelection(): boolean {
+  const selection = window.getSelection();
+  return Boolean(selection && !selection.isCollapsed && selection.toString().trim());
+}
+
+function hasSelectionInside(el: HTMLElement | null): boolean {
+  if (!el) return false;
+  const selection = window.getSelection();
+  return Boolean(
+    selection &&
+      !selection.isCollapsed &&
+      selection.toString().trim() &&
+      ((selection.anchorNode && el.contains(selection.anchorNode)) ||
+        (selection.focusNode && el.contains(selection.focusNode))),
+  );
+}
+
 export function GlossaryTooltip() {
   const tooltipId = useId();
   const popoverRef = useRef<HTMLDivElement>(null);
@@ -103,6 +120,7 @@ export function GlossaryTooltip() {
   useEffect(() => {
     const onPointerOver = (event: PointerEvent) => {
       if (event.pointerType !== 'mouse' && event.pointerType !== 'pen') return;
+      if (event.buttons !== 0) return;
       const target = event.target as HTMLElement | null;
       if (!target) return;
 
@@ -113,6 +131,9 @@ export function GlossaryTooltip() {
         }
         return;
       }
+
+      if (hasSelectionInside(popoverRef.current)) return;
+      if (hasNonCollapsedSelection()) return;
 
       const wordEl = target.closest('.gloss-word[data-gloss-key]') as HTMLElement | null;
       if (!wordEl) return;
@@ -145,6 +166,7 @@ export function GlossaryTooltip() {
       const target = event.target as HTMLElement | null;
       if (!target) return;
       if (!target.closest('.gloss-word') && !target.closest('.gloss-popover')) return;
+      if (hasSelectionInside(popoverRef.current)) return;
 
       const next = event.relatedTarget as HTMLElement | null;
       if (
@@ -163,12 +185,17 @@ export function GlossaryTooltip() {
       if (closeTimerRef.current === null) {
         closeTimerRef.current = window.setTimeout(() => {
           closeTimerRef.current = null;
-          hideTooltip();
+          if (!hasSelectionInside(popoverRef.current)) {
+            hideTooltip();
+          }
         }, CLOSE_DELAY_MS);
       }
     };
 
-    const onPointerDown = () => {
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('.gloss-popover')) return;
+      if (event.button === 2) return;
       if (activeWordRef.current || openTimerRef.current !== null) {
         hideTooltip();
       }
@@ -267,7 +294,8 @@ export function GlossaryTooltip() {
           </div>
           {showLemma && entry.l && (
             <div className="gloss-base">
-              原形：<span lang="ja">{entry.l}</span>
+              <span className="gloss-base-label">原形：</span>
+              <span lang="ja">{entry.l}</span>
               {entry.lr ? <span lang="ja">（{entry.lr}）</span> : null}
             </div>
           )}

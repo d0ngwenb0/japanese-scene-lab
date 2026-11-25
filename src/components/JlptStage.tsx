@@ -145,7 +145,19 @@ export function JlptStage({ scenario, index, playing, itemRefs, onSelect }: Prop
                     '--speaker-color': speakerColors.get(item.speaker) ?? 'var(--accent)',
                   } as CSSProperties
                 }
-                onClick={() => onSelect(i)}
+                onClick={(event) => {
+                  const selection = window.getSelection();
+                  if (
+                    selection &&
+                    !selection.isCollapsed &&
+                    selection.toString().trim() &&
+                    ((selection.anchorNode && event.currentTarget.contains(selection.anchorNode)) ||
+                      (selection.focusNode && event.currentTarget.contains(selection.focusNode)))
+                  ) {
+                    return;
+                  }
+                  onSelect(i);
+                }}
                 onKeyDown={(event) => {
                   if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
