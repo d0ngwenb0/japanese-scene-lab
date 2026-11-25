@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type CSSProperties } from 'react';
 import type { LessonSectionKind, Scenario, SceneLesson } from '../types';
 import { Furigana } from '../lib/furigana';
 import { LessonIcon, PauseIcon, PlayIcon } from './Icons';
@@ -10,9 +10,20 @@ interface Props {
   sectionIndex: number;
   playing: boolean;
   missing: boolean;
+  currentTime: number;
+  duration: number;
   onSelectSection: (index: number) => void;
   onTogglePlay: () => void;
+  onSeek: (seconds: number) => void;
   onJumpToLine: (lineIndex: number) => void;
+}
+
+function formatClock(sec: number): string {
+  if (!Number.isFinite(sec) || sec <= 0) return '00:00';
+  const rounded = Math.floor(sec);
+  const mins = Math.floor(rounded / 60);
+  const secs = rounded % 60;
+  return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
 
 const KIND_LABELS: Record<LessonSectionKind, string> = {
@@ -40,8 +51,11 @@ export function LessonStage({
   sectionIndex,
   playing,
   missing,
+  currentTime,
+  duration,
   onSelectSection,
   onTogglePlay,
+  onSeek,
   onJumpToLine,
 }: Props) {
   const navPillRefs = useRef<Array<HTMLButtonElement | null>>([]);
@@ -99,28 +113,57 @@ export function LessonStage({
         <p className="lesson-subtitle">{lesson.subtitle}</p>
       </header>
 
-      <nav className="lesson-nav" aria-label="课程章节导航">
-        <div className="lesson-nav-track">
-          {lesson.sections.map((sec, i) => {
-            const active = i === sectionIndex;
-            return (
-              <button
-                key={sec.id}
-                ref={(node) => {
-                  navPillRefs.current[i] = node;
-                }}
-                type="button"
-                className={active ? 'lesson-nav-pill is-active' : 'lesson-nav-pill'}
-                onClick={() => onSelectSection(i)}
-                aria-current={active ? 'step' : undefined}
-              >
-                <span className="lesson-nav-num">{String(i + 1).padStart(2, '0')}</span>
-                <span>{KIND_LABELS[sec.kind]}</span>
-              </button>
-            );
-          })}
+      <div className="lesson-sticky-deck">
+        <nav className="lesson-nav" aria-label="课程章节导航">
+          <div className="lesson-nav-track">
+            {lesson.sections.map((sec, i) => {
+              const active = i === sectionIndex;
+              return (
+                <button
+                  key={sec.id}
+                  ref={(node) => {
+                    navPillRefs.current[i] = node;
+                  }}
+                  type="button"
+                  className={active ? 'lesson-nav-pill is-active' : 'lesson-nav-pill'}
+                  onClick={() => onSelectSection(i)}
+                  aria-current={active ? 'step' : undefined}
+                >
+                  <span className="lesson-nav-num">{String(i + 1).padStart(2, '0')}</span>
+                  <span>{KIND_LABELS[sec.kind]}</span>
+                </button>
+              );
+            })}
+          </div>
+        </nav>
+
+        <div className="lesson-deck-progress">
+          <div className="lesson-deck-meta">
+            <span className="lesson-deck-title">
+              {String(sectionIndex + 1).padStart(2, '0')} · {lesson.sections[sectionIndex]?.title ?? ''}
+            </span>
+            <span className="lesson-deck-time">
+              {formatClock(currentTime)} / {formatClock(duration)}
+            </span>
+          </div>
+          <input
+            type="range"
+            className="lesson-seek-range"
+            min={0}
+            max={duration > 0 ? duration : 1}
+            step={0.1}
+            value={Math.min(currentTime, duration || 1)}
+            disabled={duration <= 0}
+            style={
+              {
+                '--seek-pct': `${duration > 0 ? Math.min(100, Math.max(0, (currentTime / duration) * 100)) : 0}%`,
+              } as CSSProperties
+            }
+            onChange={(e) => onSeek(Number(e.target.value))}
+            aria-label="讲解播放进度"
+          />
         </div>
-      </nav>
+      </div>
 
       {missing && (
         <p className="warn lesson-warn">
@@ -208,7 +251,9 @@ export function LessonStage({
                             <Furigana text={item.ja} glossary />
                           </span>
                         </div>
-                        <p className="lesson-board-note">{item.note}</p>
+                        <p className="lesson-board-note">
+                          <Furigana text={item.note} />
+                        </p>
                       </li>
                     ))}
                   </ul>

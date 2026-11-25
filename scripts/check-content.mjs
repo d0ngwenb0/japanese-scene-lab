@@ -366,6 +366,7 @@ if (existsSync(lessonsDir)) {
         } else {
           sec.highlights.forEach((h, hIdx) => {
             checkMarkup(h?.ja, `${secWhere}.highlights[${hIdx}].ja`);
+            checkMarkup(h?.note, `${secWhere}.highlights[${hIdx}].note`);
             if (!h?.note?.trim()) {
               errors.push(`${secWhere}.highlights[${hIdx}]: 缺少 note`);
             }

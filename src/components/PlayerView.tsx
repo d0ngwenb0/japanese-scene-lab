@@ -550,6 +550,7 @@ export function PlayerView({
                 </button>
               </div>
             )}
+            {sceneHasLesson && <span className="list-tools-sep" aria-hidden="true" />}
             <div className="list-progress">
               <span>
                 {inLessonView
@@ -768,8 +769,11 @@ export function PlayerView({
                 sectionIndex={lessonPlayer.sectionIndex}
                 playing={lessonPlayer.playing}
                 missing={lessonPlayer.missing}
+                currentTime={lessonPlayer.currentTime}
+                duration={lessonPlayer.duration}
                 onSelectSection={lessonPlayer.selectSection}
                 onTogglePlay={lessonPlayer.toggle}
+                onSeek={lessonPlayer.seek}
                 onJumpToLine={(lineIdx) => {
                   lessonPlayer.pause();
                   setViewMode('practice');
@@ -781,25 +785,7 @@ export function PlayerView({
         </div>
       </div>
 
-      <div className={inLessonView ? 'playbar is-lesson' : 'playbar'} role="group" aria-label="播放控制">
-        {inLessonView && lesson && (
-          <div className="lesson-scrubber">
-            <span className="lesson-scrub-label">
-              {String(lessonPlayer.sectionIndex + 1).padStart(2, '0')} · {lesson.sections[lessonPlayer.sectionIndex]?.title ?? ''}
-            </span>
-            <input
-              type="range"
-              className="lesson-seek-range"
-              min={0}
-              max={lessonPlayer.duration > 0 ? lessonPlayer.duration : 1}
-              step={0.1}
-              value={Math.min(lessonPlayer.currentTime, lessonPlayer.duration || 1)}
-              disabled={lessonPlayer.duration <= 0}
-              onChange={(e) => lessonPlayer.seek(Number(e.target.value))}
-              aria-label="讲解播放进度"
-            />
-          </div>
-        )}
+      <div className="playbar" role="group" aria-label="播放控制">
         <div className="playbar-row">
           <div className="transport">
             <button
