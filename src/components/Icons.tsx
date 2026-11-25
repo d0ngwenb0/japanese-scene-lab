@@ -373,24 +373,3 @@ export function VolumeIcon({
     </svg>
   );
 }
-
-export function PosColorIcon(props: IconProps) {
-  return (
-    <svg {...base} {...props}>
-      <path d="m4.5 16.5 3.6-10h1.8l3.6 10" />
-      <path d="M6 13h6" />
-      <path d="M16.5 6.5h3.5" />
-      <path d="M16.5 11.5h3.5" />
-      <path d="M16.5 16.5h3.5" />
-    </svg>
-  );
-}
-
-export function LessonIcon(props: IconProps) {
-  return (
-    <svg {...base} {...props}>
-      <path d="M3.5 5.5a2 2 0 0 1 2-2H11a2.5 2.5 0 0 1 2.5 2.5v13.5a2 2 0 0 0-2-2H5.5a2 2 0 0 1-2-2z" />
-      <path d="M20.5 5.5a2 2 0 0 0-2-2H13a2.5 2.5 0 0 0-2.5 2.5v13.5a2 2 0 0 1 2-2h6a2 2 0 0 0 2-2z" />
-    </svg>
-  );
-}

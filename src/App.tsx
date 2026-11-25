@@ -73,10 +73,6 @@ export default function App() {
     return () => window.cancelAnimationFrame(frame);
   }, [resolvedTheme, settings.palette, active]);
 
-  useEffect(() => {
-    document.documentElement.dataset.posColor = settings.posColor ? 'on' : 'off';
-  }, [settings.posColor]);
-
   const [autoPlayNext, setAutoPlayNext] = useState(false);
   const [replayTick, setReplayTick] = useState(0);
   const [focusMode, setFocusMode] = useState(false);

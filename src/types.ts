@@ -97,25 +97,4 @@ export interface Settings {
   theme: ThemeMode;
   palette: PaletteMode;
   view: ViewMode;
-  posColor: boolean;
-}
-
-export type LessonSectionKind = 'intro' | 'walkthrough' | 'culture' | 'strategy' | 'summary';
-
-export interface LessonSection {
-  id: string;
-  kind: LessonSectionKind;
-  title: string;
-  lineIds?: string[];
-  script: string;
-  paragraphs: string[];
-}
-
-export interface SceneLesson {
-  sceneId: string;
-  title: string;
-  subtitle: string;
-  voice: VoiceName;
-  style: string;
-  sections: LessonSection[];
 }

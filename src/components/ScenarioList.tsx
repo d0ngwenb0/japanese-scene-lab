@@ -6,7 +6,6 @@ import { FullscreenToggle } from './FullscreenToggle';
 import { ForceRefreshButton } from './ForceRefreshButton';
 import { GridIcon, ListIcon, ShuffleIcon, StarIcon } from './Icons';
 import { Furigana } from '../lib/furigana';
-import { hasLesson } from '../lib/lessons';
 import {
   CATEGORY_OPTIONS,
   isSceneCategory,
@@ -278,9 +277,6 @@ export function ScenarioList({
                       {scene.emoji}
                     </span>
                     <span className="card-head-right">
-                      {hasLesson(scene.id) ? (
-                        <span className="kind-badge is-lesson">精讲</span>
-                      ) : null}
                       {scene.kind === 'passage' ? (
                         <span className="kind-badge">短文</span>
                       ) : scene.kind === 'jlpt' ? (
@@ -335,9 +331,6 @@ export function ScenarioList({
                         <Furigana text={scene.title} />
                       </span>
                       <span className="scene-zh">{scene.titleZh}</span>
-                      {hasLesson(scene.id) ? (
-                        <span className="kind-badge is-lesson">精讲</span>
-                      ) : null}
                       {scene.kind === 'passage' ? (
                         <span className="kind-badge">短文</span>
                       ) : scene.kind === 'jlpt' ? (

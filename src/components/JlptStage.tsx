@@ -7,7 +7,6 @@ interface Props {
   scenario: Scenario;
   index: number;
   playing: boolean;
-  forceTranscript?: boolean;
   itemRefs: React.MutableRefObject<Array<HTMLElement | null>>;
   onSelect: (index: number) => void;
 }
@@ -16,7 +15,6 @@ export function JlptStage({
   scenario,
   index,
   playing,
-  forceTranscript = false,
   itemRefs,
   onSelect,
 }: Props) {
@@ -111,15 +109,13 @@ export function JlptStage({
               </button>
             )}
 
-            {!forceTranscript && (
-              <button
-                type="button"
-                className="jlpt-transcript-toggle"
-                onClick={() => setShowTranscript((v) => !v)}
-              >
-                {showTranscript ? '收起原文（盲听）' : '查看听力原文'}
-              </button>
-            )}
+            <button
+              type="button"
+              className="jlpt-transcript-toggle"
+              onClick={() => setShowTranscript((v) => !v)}
+            >
+              {showTranscript ? '收起原文（盲听）' : '查看听力原文'}
+            </button>
           </div>
 
           {checked && (
@@ -135,7 +131,7 @@ export function JlptStage({
         </section>
       )}
 
-      {(forceTranscript || showTranscript) && (
+      {showTranscript && (
         <section className="jlpt-transcript" aria-label="听力原文">
           {scenario.lines.map((item, i) => {
             const active = i === index;

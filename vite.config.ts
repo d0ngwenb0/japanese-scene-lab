@@ -44,7 +44,7 @@ export default defineConfig({
             options: {
               cacheName: 'scene-lab-audio-v1',
               expiration: {
-                maxEntries: 800,
+                maxEntries: 300,
                 maxAgeSeconds: 60 * 60 * 24 * 90,
               },
               cacheableResponse: {

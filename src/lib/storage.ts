@@ -16,7 +16,6 @@ export const defaultSettings: Settings = {
   theme: 'auto',
   palette: 'default',
   view: 'card',
-  posColor: false,
 };
 
 const fallback: PersistedState = { version: VERSION, settings: defaultSettings };
@@ -48,6 +47,7 @@ export function loadState(): PersistedState {
     delete (settings as { translation?: unknown }).translation;
     delete (settings as { sortMode?: unknown }).sortMode;
     delete (settings as { bgm?: unknown }).bgm;
+    delete (settings as { posColor?: unknown }).posColor;
     // 旧版本只有浅色/夜间两档：把旧的默认浅色迁移成自动，手动选的夜间保留。
     if (parsed.version !== VERSION && settings.theme === 'light') {
       settings.theme = 'auto';
@@ -67,9 +67,6 @@ export function loadState(): PersistedState {
       settings.view = 'card';
     } else if (!['list', 'card'].includes(settings.view)) {
       settings.view = 'card';
-    }
-    if (typeof settings.posColor !== 'boolean') {
-      settings.posColor = false;
     }
     return {
       version: VERSION,
