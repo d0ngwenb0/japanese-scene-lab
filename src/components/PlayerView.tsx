@@ -5,12 +5,15 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
 } from 'react';
-import type { Line, LoopMode, Scenario, Settings, ThemeMode } from '../types';
+import type { Line, LoopMode, Scenario, SceneLesson, Settings, ThemeMode } from '../types';
 import { Furigana } from '../lib/furigana';
+import { hasLesson, loadLesson } from '../lib/lessons';
+import { useLessonPlayer, type LessonLoopMode } from '../lib/useLessonPlayer';
 import { usePlayer } from '../lib/usePlayer';
-import { BackIcon, CopyIcon, LoopAllIcon, LoopOneIcon, LyricsIcon, NextIcon, PauseIcon, PlayIcon, PosColorIcon, PrevIcon, ReplayIcon, ShuffleIcon, SparklesIcon, StarIcon } from './Icons';
+import { BackIcon, CopyIcon, LessonIcon, LoopAllIcon, LoopOneIcon, LyricsIcon, NextIcon, PauseIcon, PlayIcon, PosColorIcon, PrevIcon, ReplayIcon, ShuffleIcon, SparklesIcon, StarIcon } from './Icons';
 import { copyText, formatLine, formatScene, stripFurigana } from '../lib/copy';
 import { ThemeToggle } from './ThemeToggle';
 import { PlaybackTimer } from './PlaybackTimer';
@@ -18,6 +21,7 @@ import { PaletteToggle } from './PaletteToggle';
 import { ForceRefreshButton } from './ForceRefreshButton';
 import { FullscreenToggle } from './FullscreenToggle';
 import { JlptStage } from './JlptStage';
+import { LessonStage } from './LessonStage';
 import { SceneSwitcher } from './SceneSwitcher';
 import { AiChat } from './AiChat';
 import { PassageList } from './PassageList';
@@ -84,6 +88,31 @@ export function PlayerView({
   onToggleFavorite,
 }: Props) {
   const [pausedByAi, setPausedByAi] = useState(false);
+  const pausedSourceByAiRef = useRef<'practice' | 'lesson' | null>(null);
+  const sceneHasLesson = hasLesson(scenario.id);
+  const [viewMode, setViewMode] = useState<'practice' | 'lesson'>('practice');
+  const [lesson, setLesson] = useState<SceneLesson | null>(null);
+  const [lessonLoading, setLessonLoading] = useState(false);
+  const inLessonView = sceneHasLesson && viewMode === 'lesson';
+
+  useEffect(() => {
+    setViewMode('practice');
+    if (!hasLesson(scenario.id)) {
+      setLesson(null);
+      setLessonLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setLessonLoading(true);
+    loadLesson(scenario.id).then((loaded) => {
+      if (cancelled) return;
+      setLesson(loaded);
+      setLessonLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [scenario.id]);
 
   const { index, playing, lineProgress, sceneTime, sceneDuration, missing, toggle, pause, resume, select, next, prev, replay } = usePlayer({
     sceneId: scenario.id,
@@ -94,6 +123,31 @@ export function PlayerView({
     autoPlay,
     onSceneEnd,
   });
+
+  const lessonPlayer = useLessonPlayer({
+    lesson,
+    rate: settings.rate,
+    volume: settings.volume,
+    active: inLessonView,
+    onPlayStart: pause,
+  });
+
+  const practiceTabRef = useRef<HTMLButtonElement>(null);
+  const lessonTabRef = useRef<HTMLButtonElement>(null);
+
+  const switchViewMode = useCallback(
+    (nextMode: 'practice' | 'lesson') => {
+      if (nextMode === viewMode) return;
+      if (nextMode === 'lesson') {
+        pause();
+        setViewMode('lesson');
+      } else {
+        lessonPlayer.pause();
+        setViewMode('practice');
+      }
+    },
+    [lessonPlayer, pause, viewMode],
+  );
 
   const lastNonZeroVolumeRef = useRef(settings.volume > 0 ? settings.volume : 1);
   useEffect(() => {
@@ -110,10 +164,12 @@ export function PlayerView({
   useEffect(() => {
     if (timerStopTick <= lastTimerStopTickRef.current) return;
     lastTimerStopTickRef.current = timerStopTick;
+    pausedSourceByAiRef.current = null;
     setPausedByAi(false);
     pause();
+    lessonPlayer.pause();
     setToast('定时时间到，已暂停播放');
-  }, [timerStopTick, pause]);
+  }, [lessonPlayer, timerStopTick, pause]);
   const [aiWidth, setAiWidth] = useState(() => {
     try {
       const saved = Number(localStorage.getItem('scene-lab:ai-width:v1'));
@@ -131,25 +187,35 @@ export function PlayerView({
   const closeAi = useCallback(() => {
     onAiOpenChange(false);
     if (pausedByAi) {
+      const src = pausedSourceByAiRef.current;
+      pausedSourceByAiRef.current = null;
       setPausedByAi(false);
-      resume();
+      if (src === 'lesson') lessonPlayer.resume();
+      else resume();
     }
-  }, [onAiOpenChange, pausedByAi, resume]);
+  }, [lessonPlayer, onAiOpenChange, pausedByAi, resume]);
 
   const toggleAi = useCallback(() => {
     if (aiOpen) {
       closeAi();
     } else {
-      if (pause()) setPausedByAi(true);
+      if (inLessonView && lessonPlayer.pause()) {
+        pausedSourceByAiRef.current = 'lesson';
+        setPausedByAi(true);
+      } else if (pause()) {
+        pausedSourceByAiRef.current = 'practice';
+        setPausedByAi(true);
+      }
       onAiOpenChange(true);
     }
-  }, [aiOpen, closeAi, onAiOpenChange, pause]);
+  }, [aiOpen, closeAi, inLessonView, lessonPlayer, onAiOpenChange, pause]);
 
   useEffect(() => {
-    if (playing && pausedByAi) {
+    if ((playing || lessonPlayer.playing) && pausedByAi) {
+      pausedSourceByAiRef.current = null;
       setPausedByAi(false);
     }
-  }, [playing, pausedByAi]);
+  }, [lessonPlayer.playing, playing, pausedByAi]);
 
   useEffect(() => {
     return () => {
@@ -167,15 +233,43 @@ export function PlayerView({
   const isJlpt = scenario.kind === 'jlpt';
   const line = scenario.lines[index];
   const total = scenario.lines.length;
-  const overall = ((index + lineProgress) / total) * 100;
+  const lessonTotal = lesson?.sections.length ?? 0;
+  const activePlaying = inLessonView ? lessonPlayer.playing : playing;
+  const activeToggle = inLessonView ? lessonPlayer.toggle : toggle;
+  const activePrev = inLessonView ? lessonPlayer.prev : prev;
+  const activeNext = inLessonView ? lessonPlayer.next : next;
+  const activeReplay = inLessonView ? lessonPlayer.replay : replay;
+  const overall = inLessonView
+    ? lessonTotal > 0
+      ? ((lessonPlayer.sectionIndex + lessonPlayer.sectionProgress) / lessonTotal) * 100
+      : 0
+    : ((index + lineProgress) / total) * 100;
   const speakerColors = useMemo(() => getSpeakerColors(scenario.speakers), [scenario.speakers]);
 
   useEffect(() => {
     if (!('mediaSession' in navigator)) return;
-    const speakerLabel = scenario.speakers.find((s) => s.id === line.speaker)?.label ?? '';
-    const artist = speakerLabel ? `${speakerLabel} · ${line.zh}` : line.zh;
 
     try {
+      if (inLessonView && lesson) {
+        const sec = lesson.sections[lessonPlayer.sectionIndex];
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: sec?.title ?? lesson.title,
+          artist: `老师精讲 · ${scenario.titleZh}`,
+          album: stripFurigana(scenario.title),
+          artwork: [
+            {
+              src: `${import.meta.env.BASE_URL}apple-touch-icon.png`,
+              sizes: '180x180',
+              type: 'image/png',
+            },
+          ],
+        });
+        navigator.mediaSession.playbackState = lessonPlayer.playing ? 'playing' : 'paused';
+        return;
+      }
+
+      const speakerLabel = scenario.speakers.find((s) => s.id === line.speaker)?.label ?? '';
+      const artist = speakerLabel ? `${speakerLabel} · ${line.zh}` : line.zh;
       navigator.mediaSession.metadata = new MediaMetadata({
         title: stripFurigana(line.ja),
         artist,
@@ -192,7 +286,7 @@ export function PlayerView({
     } catch {
       // Ignore browsers that reject MediaMetadata updates
     }
-  }, [line, playing, scenario.speakers, scenario.title]);
+  }, [inLessonView, lesson, lessonPlayer.playing, lessonPlayer.sectionIndex, line, playing, scenario.speakers, scenario.title, scenario.titleZh]);
 
   useEffect(() => {
     if (!('mediaSession' in navigator)) return;
@@ -204,17 +298,17 @@ export function PlayerView({
         // Unsupported action
       }
     };
-    safeSet('play', resume);
-    safeSet('pause', pause);
-    safeSet('previoustrack', prev);
-    safeSet('nexttrack', next);
+    safeSet('play', inLessonView ? lessonPlayer.resume : resume);
+    safeSet('pause', inLessonView ? lessonPlayer.pause : pause);
+    safeSet('previoustrack', activePrev);
+    safeSet('nexttrack', activeNext);
     return () => {
       safeSet('play', null);
       safeSet('pause', null);
       safeSet('previoustrack', null);
       safeSet('nexttrack', null);
     };
-  }, [resume, pause, prev, next]);
+  }, [activeNext, activePrev, inLessonView, lessonPlayer.pause, lessonPlayer.resume, pause, resume]);
 
   const handleCopyAll = useCallback(async () => {
     const ok = await copyText(formatScene(scenario));
@@ -256,23 +350,27 @@ export function PlayerView({
       switch (event.key) {
         case ' ':
           event.preventDefault();
-          toggle();
+          activeToggle();
           break;
         case 'ArrowRight':
           event.preventDefault();
-          next();
+          activeNext();
           break;
         case 'ArrowLeft':
           event.preventDefault();
-          prev();
+          activePrev();
           break;
         case 'r':
         case 'R':
-          replay();
+          activeReplay();
           break;
         case 'l':
         case 'L':
-          onSettingsChange({ loop: settings.loop === 'line' ? 'off' : 'line' });
+          if (inLessonView) {
+            lessonPlayer.setLoop((cur) => (cur === 'section' ? 'off' : 'section'));
+          } else {
+            onSettingsChange({ loop: settings.loop === 'line' ? 'off' : 'line' });
+          }
           break;
         case 'm':
         case 'M':
@@ -297,7 +395,7 @@ export function PlayerView({
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [toggle, next, prev, replay, onBack, onSettingsChange, settings.loop, settings.volume, aiOpen, closeAi, focusMode, onFocusModeChange]);
+  }, [activeNext, activePrev, activeReplay, activeToggle, inLessonView, lessonPlayer, onBack, onSettingsChange, settings.loop, settings.volume, aiOpen, closeAi, focusMode, onFocusModeChange]);
 
   const clampAiWidth = useCallback(
     (width: number) => {
@@ -354,6 +452,26 @@ export function PlayerView({
     [onSettingsChange, settings.loop],
   );
 
+  const toggleLessonLoop = useCallback(
+    (mode: Exclude<LessonLoopMode, 'off'>) => {
+      lessonPlayer.setLoop((cur) => (cur === mode ? 'off' : mode));
+    },
+    [lessonPlayer],
+  );
+
+  const handleTabKeyDown = (event: ReactKeyboardEvent<HTMLButtonElement>, current: 'practice' | 'lesson') => {
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === 'Home' || event.key === 'End') {
+      event.preventDefault();
+      if (event.key === 'Home') {
+        practiceTabRef.current?.focus();
+      } else if (event.key === 'End') {
+        lessonTabRef.current?.focus();
+      } else {
+        (current === 'practice' ? lessonTabRef : practiceTabRef).current?.focus();
+      }
+    }
+  };
+
   return (
     <div
       className={aiOpen ? 'page player-page is-ai-open' : 'page player-page'}
@@ -401,9 +519,42 @@ export function PlayerView({
       <div className="list-pane">
         <div className="list-tools">
           <div className="list-tools-left">
+            {sceneHasLesson && (
+              <div className="mode-tabs" role="tablist" aria-label="学习模式">
+                <button
+                  ref={practiceTabRef}
+                  type="button"
+                  role="tab"
+                  id="tab-practice"
+                  className="mode-tab"
+                  aria-selected={!inLessonView}
+                  tabIndex={!inLessonView ? 0 : -1}
+                  onClick={() => switchViewMode('practice')}
+                  onKeyDown={(e) => handleTabKeyDown(e, 'practice')}
+                >
+                  {isJlpt ? '听力练习' : isPassage ? '短文原文' : '对话原文'}
+                </button>
+                <button
+                  ref={lessonTabRef}
+                  type="button"
+                  role="tab"
+                  id="tab-lesson"
+                  className="mode-tab"
+                  aria-selected={inLessonView}
+                  tabIndex={inLessonView ? 0 : -1}
+                  onClick={() => switchViewMode('lesson')}
+                  onKeyDown={(e) => handleTabKeyDown(e, 'lesson')}
+                >
+                  <LessonIcon width={14} height={14} />
+                  <span>老师精讲</span>
+                </button>
+              </div>
+            )}
             <div className="list-progress">
               <span>
-                第 {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')} {isPassage ? '段' : '句'}
+                {inLessonView
+                  ? `第 ${String(lessonPlayer.sectionIndex + 1).padStart(2, '0')} / ${String(Math.max(lessonTotal, 1)).padStart(2, '0')} 节`
+                  : `第 ${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')} ${isPassage ? '段' : '句'}`}
               </span>
               <div className="list-progress-track">
                 <div className="list-progress-fill" style={{ width: `${overall}%` }} />
@@ -492,182 +643,276 @@ export function PlayerView({
             </span>
           </div>
         )}
-        {missing && (
+        {!inLessonView && missing && (
           <p className="warn list-warn">
             音频没加载到。先运行 <code>npm run tts</code> 生成音频。
           </p>
         )}
         <div className="subs" ref={listRef}>
-          {isJlpt ? (
-            <JlptStage
-              scenario={scenario}
-              index={index}
-              playing={playing}
-              itemRefs={itemRefs}
-              onSelect={select}
-            />
-          ) : isPassage ? (
-            <PassageList
-              scenario={scenario}
-              index={index}
-              playing={playing}
-              itemRefs={itemRefs}
-              onSelect={select}
-            />
-          ) : (
-          scenario.lines.map((item, i) => {
-            const active = i === index;
-            const speakerInfo = scenario.speakers.find((s) => s.id === item.speaker);
-            const spk = speakerInfo?.label ?? item.speaker;
-            const side = speakerInfo?.self ? 'right' : 'left';
-            return (
-              <div
-                key={item.id}
-                className={active ? `turn ${side} is-active` : `turn ${side}`}
-                style={
-                  {
-                    '--speaker-color': speakerColors.get(item.speaker) ?? 'var(--accent)',
-                  } as CSSProperties
-                }
-              >
+          <div
+            role="tabpanel"
+            aria-labelledby={sceneHasLesson ? 'tab-practice' : undefined}
+            className="subs-panel"
+            hidden={inLessonView}
+          >
+            {isJlpt ? (
+              <JlptStage
+                scenario={scenario}
+                index={index}
+                playing={playing}
+                itemRefs={itemRefs}
+                onSelect={select}
+              />
+            ) : isPassage ? (
+              <PassageList
+                scenario={scenario}
+                index={index}
+                playing={playing}
+                itemRefs={itemRefs}
+                onSelect={select}
+              />
+            ) : (
+            scenario.lines.map((item, i) => {
+              const active = i === index;
+              const speakerInfo = scenario.speakers.find((s) => s.id === item.speaker);
+              const spk = speakerInfo?.label ?? item.speaker;
+              const side = speakerInfo?.self ? 'right' : 'left';
+              return (
                 <div
-                  role="button"
-                  tabIndex={0}
-                  ref={(node) => {
-                    itemRefs.current[i] = node;
-                  }}
-                  className={active ? (playing ? 'bubble is-active is-playing' : 'bubble is-active') : 'bubble'}
-                  onClick={(event) => {
-                    const selection = window.getSelection();
-                    if (
-                      selection &&
-                      !selection.isCollapsed &&
-                      selection.toString().trim() &&
-                      ((selection.anchorNode && event.currentTarget.contains(selection.anchorNode)) ||
-                        (selection.focusNode && event.currentTarget.contains(selection.focusNode)))
-                    ) {
-                      return;
-                    }
-                    select(i);
-                  }}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter') {
-                      event.preventDefault();
-                      select(i);
-                    } else if (event.key === ' ') {
-                      event.preventDefault();
-                    }
-                  }}
-                  onKeyUp={(event) => {
-                    if (event.key === ' ') {
-                      event.preventDefault();
-                      select(i);
-                    }
-                  }}
-                  aria-current={active ? 'true' : undefined}
+                  key={item.id}
+                  className={active ? `turn ${side} is-active` : `turn ${side}`}
+                  style={
+                    {
+                      '--speaker-color': speakerColors.get(item.speaker) ?? 'var(--accent)',
+                    } as CSSProperties
+                  }
                 >
-                  <span className="bubble-meta">
-                    <span className="bubble-avatar" aria-hidden="true">
-                      {spk.slice(0, 1)}
-                    </span>
-                    <span className="bubble-speaker" lang="ja">
-                      {spk}
-                    </span>
-                    <span className="bubble-index">{String(i + 1).padStart(2, '0')}</span>
-                    {active && playing ? <PlayingMark /> : null}
-                  </span>
-                  <span className="bubble-ja" lang="ja">
-                    <Furigana text={item.ja} glossary />
-                  </span>
-                  <span className="bubble-zh">{item.zh}</span>
-                </div>
-                <div className="bubble-actions">
-                  <button
-                    type="button"
-                    className="bubble-copy"
-                    onClick={() => copySentence(item)}
-                    aria-label={`复制第 ${i + 1} 句`}
-                    title="复制本句"
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    ref={(node) => {
+                      itemRefs.current[i] = node;
+                    }}
+                    className={active ? (playing ? 'bubble is-active is-playing' : 'bubble is-active') : 'bubble'}
+                    onClick={(event) => {
+                      const selection = window.getSelection();
+                      if (
+                        selection &&
+                        !selection.isCollapsed &&
+                        selection.toString().trim() &&
+                        ((selection.anchorNode && event.currentTarget.contains(selection.anchorNode)) ||
+                          (selection.focusNode && event.currentTarget.contains(selection.focusNode)))
+                      ) {
+                        return;
+                      }
+                      select(i);
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        event.preventDefault();
+                        select(i);
+                      } else if (event.key === ' ') {
+                        event.preventDefault();
+                      }
+                    }}
+                    onKeyUp={(event) => {
+                      if (event.key === ' ') {
+                        event.preventDefault();
+                        select(i);
+                      }
+                    }}
+                    aria-current={active ? 'true' : undefined}
                   >
-                    <CopyIcon width={16} height={16} strokeWidth={2} />
-                  </button>
+                    <span className="bubble-meta">
+                      <span className="bubble-avatar" aria-hidden="true">
+                        {spk.slice(0, 1)}
+                      </span>
+                      <span className="bubble-speaker" lang="ja">
+                        {spk}
+                      </span>
+                      <span className="bubble-index">{String(i + 1).padStart(2, '0')}</span>
+                      {active && playing ? <PlayingMark /> : null}
+                    </span>
+                    <span className="bubble-ja" lang="ja">
+                      <Furigana text={item.ja} glossary />
+                    </span>
+                    <span className="bubble-zh">{item.zh}</span>
+                  </div>
+                  <div className="bubble-actions">
+                    <button
+                      type="button"
+                      className="bubble-copy"
+                      onClick={() => copySentence(item)}
+                      aria-label={`复制第 ${i + 1} 句`}
+                      title="复制本句"
+                    >
+                      <CopyIcon width={16} height={16} strokeWidth={2} />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            );
-          })
+              );
+            })
+            )}
+          </div>
+          {sceneHasLesson && (
+            <div
+              role="tabpanel"
+              aria-labelledby="tab-lesson"
+              className="subs-panel"
+              hidden={!inLessonView}
+            >
+              <LessonStage
+                scenario={scenario}
+                lesson={lesson}
+                loading={lessonLoading}
+                sectionIndex={lessonPlayer.sectionIndex}
+                playing={lessonPlayer.playing}
+                missing={lessonPlayer.missing}
+                onSelectSection={lessonPlayer.selectSection}
+                onTogglePlay={lessonPlayer.toggle}
+                onJumpToLine={(lineIdx) => {
+                  lessonPlayer.pause();
+                  setViewMode('practice');
+                  select(lineIdx);
+                }}
+              />
+            </div>
           )}
         </div>
       </div>
 
-      <div className="playbar" role="group" aria-label="播放控制">
+      <div className={inLessonView ? 'playbar is-lesson' : 'playbar'} role="group" aria-label="播放控制">
+        {inLessonView && lesson && (
+          <div className="lesson-scrubber">
+            <span className="lesson-scrub-label">
+              {String(lessonPlayer.sectionIndex + 1).padStart(2, '0')} · {lesson.sections[lessonPlayer.sectionIndex]?.title ?? ''}
+            </span>
+            <input
+              type="range"
+              className="lesson-seek-range"
+              min={0}
+              max={lessonPlayer.duration > 0 ? lessonPlayer.duration : 1}
+              step={0.1}
+              value={Math.min(lessonPlayer.currentTime, lessonPlayer.duration || 1)}
+              disabled={lessonPlayer.duration <= 0}
+              onChange={(e) => lessonPlayer.seek(Number(e.target.value))}
+              aria-label="讲解播放进度"
+            />
+          </div>
+        )}
         <div className="playbar-row">
           <div className="transport">
-            <button type="button" className="ctrl" onClick={prev} aria-label={isPassage ? '上一段' : '上一句'} title={isPassage ? '上一段' : '上一句'} aria-keyshortcuts="ArrowLeft">
+            <button
+              type="button"
+              className="ctrl"
+              onClick={activePrev}
+              aria-label={inLessonView ? '上一节' : isPassage ? '上一段' : '上一句'}
+              title={inLessonView ? '上一节' : isPassage ? '上一段' : '上一句'}
+              aria-keyshortcuts="ArrowLeft"
+            >
               <PrevIcon width={18} height={18} />
             </button>
             <button
               type="button"
-              className={playing ? 'ctrl ctrl-play is-playing' : 'ctrl ctrl-play'}
-              onClick={toggle}
-              aria-label={playing ? '暂停' : '播放'}
-              title={playing ? '暂停' : '播放'}
+              className={activePlaying ? 'ctrl ctrl-play is-playing' : 'ctrl ctrl-play'}
+              onClick={activeToggle}
+              aria-label={activePlaying ? '暂停' : '播放'}
+              title={activePlaying ? '暂停' : '播放'}
               aria-keyshortcuts="Space"
             >
-              {playing ? (
+              {activePlaying ? (
                 <PauseIcon width={20} height={20} />
               ) : (
                 <PlayIcon width={20} height={20} />
               )}
             </button>
-            <button type="button" className="ctrl" onClick={next} aria-label={isPassage ? '下一段' : '下一句'} title={isPassage ? '下一段' : '下一句'} aria-keyshortcuts="ArrowRight">
+            <button
+              type="button"
+              className="ctrl"
+              onClick={activeNext}
+              aria-label={inLessonView ? '下一节' : isPassage ? '下一段' : '下一句'}
+              title={inLessonView ? '下一节' : isPassage ? '下一段' : '下一句'}
+              aria-keyshortcuts="ArrowRight"
+            >
               <NextIcon width={18} height={18} />
             </button>
             <button
               type="button"
               className="ctrl ctrl-replay"
-              onClick={replay}
-              aria-label={isPassage ? '重播本段' : '重播本句'}
-              title={isPassage ? '重播本段' : '重播本句'}
+              onClick={activeReplay}
+              aria-label={inLessonView ? '重播本节' : isPassage ? '重播本段' : '重播本句'}
+              title={inLessonView ? '重播本节' : isPassage ? '重播本段' : '重播本句'}
               aria-keyshortcuts="R"
             >
               <ReplayIcon width={17} height={17} />
             </button>
           </div>
 
-          <SceneTimePill current={sceneTime} duration={sceneDuration} />
+          <SceneTimePill
+            current={inLessonView ? lessonPlayer.currentTime : sceneTime}
+            duration={inLessonView ? lessonPlayer.duration : sceneDuration}
+          />
 
           <div className="modes">
-            <button
-              type="button"
-              className={settings.loop === 'line' ? 'pill pill-icon is-on' : 'pill pill-icon'}
-              onClick={() => toggleLoop('line')}
-              aria-pressed={settings.loop === 'line'}
-              aria-label={isPassage ? '单段循环' : '单句循环'}
-              title={isPassage ? '单段循环（L）' : '单句循环（L）'}
-              aria-keyshortcuts="L"
-            >
-              <LoopOneIcon width={18} height={18} />
-            </button>
-            <button
-              type="button"
-              className={settings.loop === 'all' ? 'pill pill-icon is-on' : 'pill pill-icon'}
-              onClick={() => toggleLoop('all')}
-              aria-pressed={settings.loop === 'all'}
-              aria-label={isPassage ? '整篇循环' : '整段循环'}
-              title={isPassage ? '整篇循环' : '整段循环'}
-            >
-              <LoopAllIcon width={18} height={18} />
-            </button>
-            <button
-              type="button"
-              className={settings.loop === 'scenes' ? 'pill pill-icon is-on' : 'pill pill-icon'}
-              onClick={() => toggleLoop('scenes')}
-              aria-pressed={settings.loop === 'scenes'}
-              aria-label="所有场景随机循环"
-              title="所有场景随机循环"
-            >
-              <ShuffleIcon width={17} height={17} />
-            </button>
+            {inLessonView ? (
+              <>
+                <button
+                  type="button"
+                  className={lessonPlayer.loop === 'section' ? 'pill pill-icon is-on' : 'pill pill-icon'}
+                  onClick={() => toggleLessonLoop('section')}
+                  aria-pressed={lessonPlayer.loop === 'section'}
+                  aria-label="单节循环"
+                  title="单节循环（L）"
+                  aria-keyshortcuts="L"
+                >
+                  <LoopOneIcon width={18} height={18} />
+                </button>
+                <button
+                  type="button"
+                  className={lessonPlayer.loop === 'all' ? 'pill pill-icon is-on' : 'pill pill-icon'}
+                  onClick={() => toggleLessonLoop('all')}
+                  aria-pressed={lessonPlayer.loop === 'all'}
+                  aria-label="整讲循环"
+                  title="整讲循环"
+                >
+                  <LoopAllIcon width={18} height={18} />
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className={settings.loop === 'line' ? 'pill pill-icon is-on' : 'pill pill-icon'}
+                  onClick={() => toggleLoop('line')}
+                  aria-pressed={settings.loop === 'line'}
+                  aria-label={isPassage ? '单段循环' : '单句循环'}
+                  title={isPassage ? '单段循环（L）' : '单句循环（L）'}
+                  aria-keyshortcuts="L"
+                >
+                  <LoopOneIcon width={18} height={18} />
+                </button>
+                <button
+                  type="button"
+                  className={settings.loop === 'all' ? 'pill pill-icon is-on' : 'pill pill-icon'}
+                  onClick={() => toggleLoop('all')}
+                  aria-pressed={settings.loop === 'all'}
+                  aria-label={isPassage ? '整篇循环' : '整段循环'}
+                  title={isPassage ? '整篇循环' : '整段循环'}
+                >
+                  <LoopAllIcon width={18} height={18} />
+                </button>
+                <button
+                  type="button"
+                  className={settings.loop === 'scenes' ? 'pill pill-icon is-on' : 'pill pill-icon'}
+                  onClick={() => toggleLoop('scenes')}
+                  aria-pressed={settings.loop === 'scenes'}
+                  aria-label="所有场景随机循环"
+                  title="所有场景随机循环"
+                >
+                  <ShuffleIcon width={17} height={17} />
+                </button>
+              </>
+            )}
             <div className="speed-group" role="group" aria-label="播放速度">
               {SPEEDS.map((speed) => (
                 <button

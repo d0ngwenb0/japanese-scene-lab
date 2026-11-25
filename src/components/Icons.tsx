@@ -385,3 +385,12 @@ export function PosColorIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function LessonIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M3.5 5.5a2 2 0 0 1 2-2H11a2.5 2.5 0 0 1 2.5 2.5v13.5a2 2 0 0 0-2-2H5.5a2 2 0 0 1-2-2z" />
+      <path d="M20.5 5.5a2 2 0 0 0-2-2H13a2.5 2.5 0 0 0-2.5 2.5v13.5a2 2 0 0 1 2-2h6a2 2 0 0 0 2-2z" />
+    </svg>
+  );
+}

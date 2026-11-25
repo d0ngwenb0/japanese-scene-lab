@@ -10,6 +10,7 @@
     "tts": "node scripts/generate-audio.mjs",
     "tts:force": "node scripts/generate-audio.mjs --force",
     "tts:passages": "node scripts/generate-audio.mjs --passages --force",
+    "lesson:tts": "node scripts/generate-lesson-audio.mjs",
     "scene:new": "node scripts/generate-scene.mjs",
     "glossary:gen": "node scripts/generate-glossary.mjs",
     "check": "node scripts/check-content.mjs",

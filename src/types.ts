@@ -99,3 +99,30 @@ export interface Settings {
   view: ViewMode;
   posColor: boolean;
 }
+
+export type LessonSectionKind = 'intro' | 'walkthrough' | 'culture' | 'strategy' | 'summary';
+
+export interface LessonHighlight {
+  ja: string;
+  note: string;
+  tag?: string;
+}
+
+export interface LessonSection {
+  id: string;
+  kind: LessonSectionKind;
+  title: string;
+  lineIds?: string[];
+  script: string;
+  paragraphs: string[];
+  highlights?: LessonHighlight[];
+}
+
+export interface SceneLesson {
+  sceneId: string;
+  title: string;
+  subtitle: string;
+  voice: VoiceName;
+  style: string;
+  sections: LessonSection[];
+}

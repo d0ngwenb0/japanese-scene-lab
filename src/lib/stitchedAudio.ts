@@ -65,23 +65,23 @@ function mixToMonoInt16(audioBuffer: AudioBuffer, target: Int16Array, offset: nu
 }
 
 /**
- * 将一个场景的多句音频在内存中拼接成单条连续 WAV Blob，并记录每句的起止时间戳。
- * 单条长音频可避免安卓锁屏/后台切句时反复调用 audio.load() 导致中断。
+ * 将多条音频 URL 在内存中拼接成单条连续 WAV Blob，并记录每段的起止时间戳与分段 Blob URL。
+ * 单条长音频可避免安卓锁屏/后台切段时反复调用 audio.load() 导致中断；
+ * 分段 Blob URL 可在单句/单章试听或循环时物理隔离前后段音频。
  */
-export async function buildStitchedTrack(
-  sceneId: string,
-  lines: Line[],
+export async function buildStitchedTrackFromUrls(
+  urls: string[],
   gapMs: number,
   signal?: AbortSignal,
 ): Promise<StitchedTrack | null> {
   const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-  if (!AudioCtx || lines.length === 0) return null;
+  if (!AudioCtx || urls.length === 0) return null;
 
   const ctx = new AudioCtx();
   try {
     const arrayBuffers = await Promise.all(
-      lines.map(async (line) => {
-        const res = await fetch(audioSrc(sceneId, line.id), { signal });
+      urls.map(async (url) => {
+        const res = await fetch(url, { signal });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.arrayBuffer();
       }),
@@ -160,6 +160,22 @@ export async function buildStitchedTrack(
   } finally {
     ctx.close().catch(() => {});
   }
+}
+
+/**
+ * 将一个场景的多句音频在内存中拼接成单条连续 WAV Blob，并记录每句的起止时间戳。
+ */
+export function buildStitchedTrack(
+  sceneId: string,
+  lines: Line[],
+  gapMs: number,
+  signal?: AbortSignal,
+): Promise<StitchedTrack | null> {
+  return buildStitchedTrackFromUrls(
+    lines.map((line) => audioSrc(sceneId, line.id)),
+    gapMs,
+    signal,
+  );
 }
 
 export function findCueIndex(cues: Cue[], currentTime: number): number {

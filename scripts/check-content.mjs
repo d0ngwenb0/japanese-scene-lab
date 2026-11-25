@@ -47,6 +47,9 @@ const stripFurigana = (text) => text.replace(/\{([^{}|]+)\|([^{}|]+)\}/g, '$1');
 const lineAudioHash = (voice, ja) =>
   crypto.createHash('sha1').update(`${voice}|${stripFurigana(ja)}`).digest('hex').slice(0, 16);
 
+const lessonAudioHash = (voice, style, script) =>
+  crypto.createHash('sha1').update(`${voice}|${style}|${script}`).digest('hex').slice(0, 16);
+
 const isValidMp3 = (filePath) => {
   if (!existsSync(filePath)) return false;
   const buf = readFileSync(filePath);
@@ -279,12 +282,135 @@ if (!existsSync(glossaryPath)) {
 }
 
 for (const warning of warnings) console.warn(`⚠ ${warning}`);
+
+// 检查老师精讲文件（src/data/lessons/*.json）与音频（public/audio-lessons/）
+const lessonsDir = join(root, 'src', 'data', 'lessons');
+const lessonAudioRoot = join(root, 'public', 'audio-lessons');
+const lessonManifestPath = join(lessonAudioRoot, 'manifest.json');
+const lessonManifest = existsSync(lessonManifestPath)
+  ? JSON.parse(readFileSync(lessonManifestPath, 'utf8'))
+  : {};
+const VALID_LESSON_KINDS = new Set(['intro', 'walkthrough', 'culture', 'strategy', 'summary']);
+let lessonCount = 0;
+let lessonSectionCount = 0;
+let lessonAudioCount = 0;
+
+if (existsSync(lessonsDir)) {
+  const lessonFiles = readdirSync(lessonsDir).filter((f) => f.endsWith('.json')).sort();
+  const lessonBySceneId = new Map();
+  for (const file of lessonFiles) {
+    lessonCount += 1;
+    const lessonWhere = `精讲 ${file}`;
+    const lesson = JSON.parse(readFileSync(join(lessonsDir, file), 'utf8'));
+    const expectedSceneId = file.replace(/\.json$/, '');
+    if (lesson.sceneId !== expectedSceneId) {
+      errors.push(`${lessonWhere}: sceneId (${lesson.sceneId}) 必须与文件名 ${expectedSceneId} 一致`);
+    }
+    const targetScene = scenarios.find((s) => s.id === lesson.sceneId);
+    if (!targetScene) {
+      errors.push(`${lessonWhere}: 找不到对应场景 ${lesson.sceneId}`);
+    }
+    lessonBySceneId.set(lesson.sceneId, lesson);
+    if (!lesson.title?.trim()) errors.push(`${lessonWhere}: 缺少 title`);
+    if (!lesson.subtitle?.trim()) errors.push(`${lessonWhere}: 缺少 subtitle`);
+    if (!ALLOWED_VOICES.has(lesson.voice)) {
+      errors.push(`${lessonWhere}: voice 无效（${lesson.voice ?? '未设置'}）`);
+    }
+    if (!lesson.style?.trim()) errors.push(`${lessonWhere}: 缺少 style`);
+    if (!Array.isArray(lesson.sections) || lesson.sections.length === 0) {
+      errors.push(`${lessonWhere}: 缺少 sections`);
+      continue;
+    }
+
+    const secIds = new Set();
+    const validLineIds = new Set((targetScene?.lines ?? []).map((l) => l.id));
+    for (const sec of lesson.sections) {
+      lessonSectionCount += 1;
+      const secWhere = `${lessonWhere}.${sec.id ?? '(缺 id)'}`;
+      if (!sec.id) errors.push(`${secWhere}: 缺少 id`);
+      else if (secIds.has(sec.id)) errors.push(`${secWhere}: section id 重复`);
+      else secIds.add(sec.id);
+
+      if (!VALID_LESSON_KINDS.has(sec.kind)) {
+        errors.push(`${secWhere}: kind 无效（${sec.kind}）`);
+      }
+      if (!sec.title?.trim()) errors.push(`${secWhere}: 缺少 title`);
+      if (!sec.script?.trim()) errors.push(`${secWhere}: 缺少 script`);
+      else if (/[{}|]/.test(sec.script)) {
+        errors.push(`${secWhere}.script: 语音脚本不应包含 {漢字|かんじ} 标注括号`);
+      }
+
+      if (sec.lineIds !== undefined) {
+        if (!Array.isArray(sec.lineIds)) {
+          errors.push(`${secWhere}: lineIds 必须是数组`);
+        } else {
+          for (const lid of sec.lineIds) {
+            if (!validLineIds.has(lid)) {
+              errors.push(`${secWhere}: lineIds 引用了不存在的句子 ${lid}`);
+            }
+          }
+        }
+      }
+
+      if (!Array.isArray(sec.paragraphs) || sec.paragraphs.length === 0) {
+        errors.push(`${secWhere}: 缺少 paragraphs`);
+      } else {
+        sec.paragraphs.forEach((p, pIdx) => {
+          checkMarkup(p, `${secWhere}.paragraphs[${pIdx}]`);
+        });
+      }
+
+      if (sec.highlights !== undefined) {
+        if (!Array.isArray(sec.highlights)) {
+          errors.push(`${secWhere}: highlights 必须是数组`);
+        } else {
+          sec.highlights.forEach((h, hIdx) => {
+            checkMarkup(h?.ja, `${secWhere}.highlights[${hIdx}].ja`);
+            if (!h?.note?.trim()) {
+              errors.push(`${secWhere}.highlights[${hIdx}]: 缺少 note`);
+            }
+          });
+        }
+      }
+
+      const audioPath = join(lessonAudioRoot, lesson.sceneId, `${sec.id}.mp3`);
+      if (!existsSync(audioPath)) {
+        errors.push(`${secWhere}: 缺少讲解音频 public/audio-lessons/${lesson.sceneId}/${sec.id}.mp3`);
+      } else if (!isValidMp3(audioPath)) {
+        errors.push(`${secWhere}: 讲解音频损坏或过小 public/audio-lessons/${lesson.sceneId}/${sec.id}.mp3`);
+      } else {
+        lessonAudioCount += 1;
+        const expectedHash = lessonAudioHash(lesson.voice ?? '', lesson.style ?? '', sec.script ?? '');
+        if (lessonManifest[`${lesson.sceneId}/${sec.id}`] !== expectedHash) {
+          errors.push(`${secWhere}: 讲解音频与脚本或声线哈希不一致，请运行 npm run lesson:tts 更新`);
+        }
+      }
+    }
+  }
+
+  if (existsSync(lessonAudioRoot)) {
+    for (const sceneDir of readdirSync(lessonAudioRoot, { withFileTypes: true })) {
+      if (!sceneDir.isDirectory()) continue;
+      const lesson = lessonBySceneId.get(sceneDir.name);
+      for (const file of readdirSync(join(lessonAudioRoot, sceneDir.name))) {
+        const secId = file.replace(/\.mp3$/, '');
+        if (!lesson?.sections?.some((sec) => sec.id === secId)) {
+          console.warn(`⚠ 未引用的讲解音频：audio-lessons/${sceneDir.name}/${file}`);
+        }
+      }
+    }
+  }
+}
+
 if (errors.length) {
   console.error(`\n内容检查失败（${errors.length} 项）：`);
   for (const error of errors) console.error(`- ${error}`);
   process.exit(1);
 }
 
+const lessonSummary = lessonCount
+  ? ` / ${lessonCount} 份精讲（${lessonSectionCount} 节 / ${lessonAudioCount} 段讲解音频）`
+  : '';
 console.log(
-  `内容检查通过：${scenarios.length} 个场景 / ${lineCount} 句 / ${audioCount} 段音频`,
+  `内容检查通过：${scenarios.length} 个场景 / ${lineCount} 句 / ${audioCount} 段音频${lessonSummary}`,
 );
