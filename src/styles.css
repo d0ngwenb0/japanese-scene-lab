@@ -5125,17 +5125,19 @@ dialog::backdrop {
 
 :root[data-pos-color='on'] .gloss-word[data-pos] {
   --pos-hl: transparent;
+  padding-block: 0.06em;
+  border-radius: 0.28em 0.14em 0.24em 0.16em;
   background-image: linear-gradient(
-    104deg,
-    transparent 0.4%,
-    color-mix(in srgb, var(--pos-hl) 68%, transparent) 2.5%,
-    var(--pos-hl) 12%,
-    color-mix(in srgb, var(--pos-hl) 92%, transparent) 84%,
-    color-mix(in srgb, var(--pos-hl) 58%, transparent) 97%,
-    transparent 99.6%
+    102deg,
+    transparent 0%,
+    color-mix(in srgb, var(--pos-hl) 68%, transparent) 2%,
+    var(--pos-hl) 10%,
+    color-mix(in srgb, var(--pos-hl) 90%, transparent) 90%,
+    color-mix(in srgb, var(--pos-hl) 62%, transparent) 98%,
+    transparent 100%
   );
-  background-size: 100% 0.56em;
-  background-position: 0 92%;
+  background-size: 100% 100%;
+  background-position: 0 0;
   background-repeat: no-repeat;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
@@ -5190,20 +5192,21 @@ dialog::backdrop {
 .pos-legend-item {
   --pos-hl: transparent;
   display: inline-block;
-  padding: 0 4px;
+  padding: 1px 6px;
+  border-radius: 0.28em 0.14em 0.24em 0.16em;
   font-weight: 500;
   white-space: nowrap;
   background-image: linear-gradient(
-    104deg,
-    transparent 0.4%,
-    color-mix(in srgb, var(--pos-hl) 68%, transparent) 2.5%,
-    var(--pos-hl) 12%,
-    color-mix(in srgb, var(--pos-hl) 92%, transparent) 84%,
-    color-mix(in srgb, var(--pos-hl) 58%, transparent) 97%,
-    transparent 99.6%
+    102deg,
+    transparent 0%,
+    color-mix(in srgb, var(--pos-hl) 68%, transparent) 2%,
+    var(--pos-hl) 10%,
+    color-mix(in srgb, var(--pos-hl) 90%, transparent) 90%,
+    color-mix(in srgb, var(--pos-hl) 62%, transparent) 98%,
+    transparent 100%
   );
-  background-size: 100% 0.56em;
-  background-position: 0 92%;
+  background-size: 100% 100%;
+  background-position: 0 0;
   background-repeat: no-repeat;
 }
 
