@@ -207,10 +207,6 @@ function toTtsScript(text) {
   return converted.replace(/\s+/g, '');
 }
 
-function stripFurigana(text) {
-  return text.replace(/\{([^{}|]+)\|([^{}|]+)\}/g, '$1');
-}
-
 function lineAudioHash(voice, ja) {
   return crypto.createHash('sha1').update(`${voice}|${stripFurigana(ja)}`).digest('hex').slice(0, 16);
 }

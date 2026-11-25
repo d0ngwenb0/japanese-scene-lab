@@ -91,6 +91,42 @@ const OKURIGANA_RULES = [
   { surface: '出', next: /^[てたる]/, expected: 'で' },
 ];
 
+// E8：常见敬语误用、打工敬语（バイト敬語）、二重敬语与语体割裂红线
+const KEIGO_RULES = [
+  {
+    re: /(?:の?(?:拝見|頂戴|拝受|拝聴)[を]?お願)/,
+    reason: '谦让语名词不应接「をお願いします」（主客错位，应用「〜を拝見いたします」等）',
+  },
+  {
+    re: /こちらになります/,
+    reason: '疑似打工敬语「こちらになります」，建议改用「こちらでございます」或「こちらです」',
+  },
+  {
+    re: /[円えん]になります/,
+    reason: '疑似打工敬语「〜円になります」，建议改用「〜円です」或「〜円でございます」',
+  },
+  {
+    re: /(?:どちら|何番線|何階|いくら)になりますか/,
+    reason: '疑似打工敬语「〜になりますか」，建议改用「〜でしょうか」或「〜ですか」',
+  },
+  {
+    re: /ご案内になります/,
+    reason: '疑似打工敬语「ご案内になります」，建议改用「ご案内となります」或「ご案内しております」',
+  },
+  {
+    re: /(?:ご覧|お越し|お見え|お召し上がり)になられ|(?:おっしゃられ|いらっしゃられ|召し上がられ)/,
+    reason: '疑似二重敬语，请改用标准尊敬语',
+  },
+  {
+    re: /承知(?:しました|いたしました)[。、\s]*じゃあ/,
+    reason: '高阶商务谦让语「承知しました」与口语「じゃあ」同句混用，语体不统一',
+  },
+  {
+    re: /お預けして.*てもいいですか/,
+    reason: '高阶谦让语「お預けして」与口语「〜てもいいですか」同句混用，建议改用「預けて」',
+  },
+];
+
 // E4 / E5 / E6 / E7 + W3
 for (const scene of scenarios) {
   const isPassage = scene.kind === 'passage';
@@ -133,6 +169,12 @@ for (const scene of scenarios) {
   for (const { where, ja } of texts) {
     if (!where.endsWith('/title') && /\s/.test(strip(ja))) {
       errors.push(`E6 ${where}: 日文正文含多余空格 → ${strip(ja)}`);
+    }
+    const plainText = strip(ja);
+    for (const rule of KEIGO_RULES) {
+      if (rule.re.test(plainText)) {
+        errors.push(`E8 ${where}: ${rule.reason} → ${plainText}`);
+      }
     }
     for (const match of ja.matchAll(/\{([^{}|]+)\|([^{}|]+)\}([ぁ-んー]*)/g)) {
       const [, surface, reading, following] = match;

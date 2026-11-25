@@ -67,7 +67,7 @@ const checkMarkup = (text, where) => {
   for (const match of text.matchAll(/\{([^{}|]+)\|([^{}|]+)\}/g)) {
     const base = match[1];
     const reading = match[2].trim();
-    if (/[ぁ-んァ-ヶ]/.test(base)) {
+    if (/[ぁ-んァ-ンヵ]/.test(base)) {
       errors.push(`${where}: 假名/送假名不应包含在注音花括号内 → ${match[0]}`);
     }
     const parts = reading.split(/[\s・]+/).filter(Boolean);
