@@ -1,5 +1,10 @@
 import { Fragment, type ReactNode } from 'react';
-import { lookupGlossaryKey, MAX_GLOSS_KEY_LEN } from './glossary';
+import {
+  getGlossaryEntry,
+  getSentenceSpans,
+  lookupGlossaryKey,
+  MAX_GLOSS_KEY_LEN,
+} from './glossary';
 
 const TOKEN = /\{([^{}|]+)\|([^{}|]+)\}/g;
 
@@ -124,7 +129,7 @@ function renderSlice(segments: Segment[], start: number, end: number, prefix: st
  * 把 {漢字|かん じ} / {今日|きょう} 渲染成标准 HTML <ruby>：
  * - 读音用空格（或中点）分隔且段数等于字数时：单字对齐（モノルビ），保留在同一 <ruby> 内
  * - 读音不分隔时（单字或熟字训/当て字）：整词居中（グループルビ）
- * - 传入 glossary 时，基于词典表对单词做边界安全的词元包裹，支持鼠标悬停显示释义
+ * - 传入 glossary 时，优先按逐句语境词元跨度渲染（含助词精确语法解释），回退最长匹配
  */
 export function Furigana({ text, glossary = false }: { text: string; glossary?: boolean }) {
   const { segments, plain, charReadings, forbiddenSplits } = parseSegments(text);
@@ -137,6 +142,36 @@ export function Furigana({ text, glossary = false }: { text: string; glossary?: 
         )}
       </>
     );
+  }
+
+  const sentenceSpans = getSentenceSpans(plain);
+  if (sentenceSpans) {
+    const nodes: ReactNode[] = [];
+    let key = 0;
+    let cursor = 0;
+
+    for (const [start, end, spanKey] of sentenceSpans) {
+      if (start < cursor || end > plain.length) continue;
+      if (start > cursor) {
+        nodes.push(...renderSlice(segments, cursor, start, `g${key++}`));
+      }
+      const entry = getGlossaryEntry(spanKey);
+      const isParticle = entry?.p === '助';
+      nodes.push(
+        <span
+          key={key++}
+          className={isParticle ? 'gloss-word is-particle' : 'gloss-word'}
+          data-gloss-key={spanKey}
+        >
+          {renderSlice(segments, start, end, `s${key}`)}
+        </span>,
+      );
+      cursor = end;
+    }
+    if (cursor < plain.length) {
+      nodes.push(...renderSlice(segments, cursor, plain.length, `t${key++}`));
+    }
+    return <>{nodes}</>;
   }
 
   const nodes: ReactNode[] = [];
@@ -161,8 +196,14 @@ export function Furigana({ text, glossary = false }: { text: string; glossary?: 
     }
 
     if (matchedKey && matchedLen > 0) {
+      const entry = getGlossaryEntry(matchedKey);
+      const isParticle = entry?.p === '助';
       nodes.push(
-        <span key={key++} className="gloss-word" data-gloss-key={matchedKey}>
+        <span
+          key={key++}
+          className={isParticle ? 'gloss-word is-particle' : 'gloss-word'}
+          data-gloss-key={matchedKey}
+        >
           {renderSlice(segments, pos, pos + matchedLen, `w${key}`)}
         </span>,
       );

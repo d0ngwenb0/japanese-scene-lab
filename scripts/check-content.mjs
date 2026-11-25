@@ -227,14 +227,53 @@ if (!existsSync(glossaryPath)) {
   errors.push('缺少词汇释义表 src/data/glossary.json');
 } else {
   const glossary = JSON.parse(readFileSync(glossaryPath, 'utf8'));
-  const gKeys = glossary && typeof glossary === 'object' ? Object.keys(glossary) : [];
-  if (gKeys.length < 100) {
-    errors.push(`glossary.json 词条数量过少（${gKeys.length}）`);
-  }
-  for (const gKey of gKeys) {
-    const entry = glossary[gKey];
-    if (!entry || typeof entry.p !== 'string' || !entry.p.trim() || typeof entry.z !== 'string' || !entry.z.trim()) {
-      errors.push(`glossary.json 词条格式不完整：${gKey}`);
+  const gEntries = glossary?.entries && typeof glossary.entries === 'object' ? glossary.entries : null;
+  const gSpans = glossary?.spans && typeof glossary.spans === 'object' ? glossary.spans : null;
+  if (!gEntries || !gSpans) {
+    errors.push('glossary.json 必须包含 entries 和 spans 对象');
+  } else {
+    const gKeys = Object.keys(gEntries);
+    if (gKeys.length < 500) {
+      errors.push(`glossary.json 词条数量过少（${gKeys.length}）`);
+    }
+    let particleCount = 0;
+    for (const gKey of gKeys) {
+      const entry = gEntries[gKey];
+      if (!entry || typeof entry.p !== 'string' || !entry.p.trim() || typeof entry.z !== 'string' || !entry.z.trim()) {
+        errors.push(`glossary.json 词条格式不完整：${gKey}`);
+      } else if (entry.p === '助') {
+        particleCount += 1;
+      }
+    }
+    if (particleCount === 0) {
+      errors.push('glossary.json 缺少助词（p === "助"）词条');
+    }
+    for (const scene of Array.isArray(scenarios) ? scenarios : []) {
+      const texts = [
+        ...scene.lines.map((l) => ({ where: `${scene.id}.${l.id}`, ja: l.ja })),
+        ...(scene.jlpt
+          ? [
+              { where: `${scene.id}.jlpt.question`, ja: scene.jlpt.question },
+              ...scene.jlpt.options.map((opt, idx) => ({ where: `${scene.id}.jlpt.options[${idx}]`, ja: opt })),
+            ]
+          : []),
+      ];
+      for (const { where, ja } of texts) {
+        const plain = stripFurigana(ja);
+        const spanList = gSpans[plain];
+        if (!Array.isArray(spanList) || spanList.length === 0) {
+          errors.push(`glossary.json 缺少句子切分：${where}`);
+          continue;
+        }
+        for (const [start, end, key] of spanList) {
+          if (typeof start !== 'number' || typeof end !== 'number' || start < 0 || end <= start || end > plain.length) {
+            errors.push(`glossary.json 词元索引越界：${where} [${start}, ${end}]`);
+          }
+          if (!Object.hasOwn(gEntries, key)) {
+            errors.push(`glossary.json 词元键不存在：${where} -> ${key}`);
+          }
+        }
+      }
     }
   }
 }

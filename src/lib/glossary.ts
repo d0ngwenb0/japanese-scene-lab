@@ -13,16 +13,30 @@ export interface GlossaryEntry {
   z: string;
 }
 
-const entries = glossaryData as Record<string, GlossaryEntry>;
+export type GlossarySpan = [start: number, end: number, key: string];
+
+interface GlossaryPayload {
+  entries: Record<string, GlossaryEntry>;
+  spans: Record<string, GlossarySpan[]>;
+}
+
+const payload = glossaryData as unknown as GlossaryPayload;
+const entries = payload.entries;
+const spans = payload.spans;
 
 let maxLen = 1;
 for (const key of Object.keys(entries)) {
-  const sep = key.indexOf('|');
-  const len = sep === -1 ? key.length : sep;
+  const clean = key.replace(/#\d+$/, '');
+  const sep = clean.indexOf('|');
+  const len = sep === -1 ? clean.length : sep;
   if (len > maxLen) maxLen = len;
 }
 
 export const MAX_GLOSS_KEY_LEN = maxLen;
+
+export function getSentenceSpans(plain: string): readonly GlossarySpan[] | null {
+  return Object.hasOwn(spans, plain) ? spans[plain] : null;
+}
 
 /**
  * 结合语境读音优先匹配多音词键（`表层|读音`），否则回退精确表层键。
@@ -38,7 +52,8 @@ export function lookupGlossaryKey(surface: string, reading: string): string | nu
 
 export function getGlossaryEntry(key: string): (GlossaryEntry & { surface: string }) | null {
   if (!Object.hasOwn(entries, key)) return null;
-  const sep = key.indexOf('|');
-  const surface = sep === -1 ? key : key.slice(0, sep);
+  const clean = key.replace(/#\d+$/, '');
+  const sep = clean.indexOf('|');
+  const surface = sep === -1 ? clean : clean.slice(0, sep);
   return { ...entries[key], surface };
 }

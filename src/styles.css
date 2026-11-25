@@ -4908,6 +4908,16 @@ dialog::backdrop {
     background: color-mix(in srgb, var(--accent) 14%, transparent);
     border-bottom-color: var(--accent);
   }
+
+  .gloss-word.is-particle {
+    border-bottom-color: transparent;
+  }
+
+  .gloss-word.is-particle:hover,
+  .gloss-word.is-particle.is-gloss-active {
+    background: color-mix(in srgb, var(--accent) 16%, transparent);
+    border-bottom-color: color-mix(in srgb, var(--accent) 70%, transparent);
+  }
 }
 
 .gloss-popover {
@@ -5048,6 +5058,12 @@ dialog::backdrop {
   font-size: 10.5px;
   font-weight: 600;
   color: var(--muted);
+}
+
+.gloss-pos.is-particle {
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  color: var(--accent-text);
 }
 
 .gloss-zh {

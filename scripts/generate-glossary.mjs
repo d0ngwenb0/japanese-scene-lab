@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 /**
- * 从 src/data/scenarios.json 提取全部日语语料的实词与固定表达，
- * 调用 Gemini 生成高质量中文释义，并结合 {漢字|かん じ} 上下文读音进行多音词消歧，
- * 输出到 src/data/glossary.json。
+ * 从 src/data/scenarios.json 对每句话进行语境化词元切分与释义标注（含每一个助词的精确语法解释），
+ * 结合 {漢字|かん じ} 上下文读音与出现位置生成 `{ entries, spans }` 到 src/data/glossary.json。
  *
  * 用法：
  *   npm run glossary:gen
@@ -44,6 +43,11 @@ if (!apiKeys.length) {
 
 const TOKEN_RE = /\{([^{}|]+)\|([^{}|]+)\}/g;
 const MODEL = 'gemini-4-hydrogen';
+const ALLOWED_POS = new Set(['名', '動', '形', '副', '助', '接', '感', '表現', '敬語']);
+
+function kataToHira(text) {
+  return text.replace(/[\u30a1-\u30f6]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
+}
 
 function parseSentence(ja) {
   let plain = '';
@@ -94,21 +98,14 @@ function parseSentence(ja) {
   }
 
   const readingForRange = (start, end) =>
-    charReadings
-      .slice(start, end)
-      .join('')
-      .replace(/[\u30a1-\u30f6]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
+    kataToHira(charReadings.slice(start, end).join(''));
 
   return { ja, plain, forbiddenSplits, tokens, readingForRange };
 }
 
-function kataToHira(text) {
-  return text.replace(/[\u30a1-\u30f6]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
-}
-
 async function callGemini(prompt, keyOffset = 0) {
   let lastErr = null;
-  for (let attempt = 0; attempt < apiKeys.length * 2; attempt += 1) {
+  for (let attempt = 0; attempt < apiKeys.length * 3; attempt += 1) {
     const key = apiKeys[(keyOffset + attempt) % apiKeys.length];
     try {
       const res = await fetch(
@@ -119,7 +116,7 @@ async function callGemini(prompt, keyOffset = 0) {
           body: JSON.stringify({
             contents: [{ role: 'user', parts: [{ text: prompt }] }],
             generationConfig: {
-              temperature: 0.2,
+              temperature: 0.15,
               responseMimeType: 'application/json',
             },
           }),
@@ -141,252 +138,253 @@ async function callGemini(prompt, keyOffset = 0) {
 }
 
 const scenarios = JSON.parse(readFileSync(scenariosPath, 'utf8'));
-const parsedSentences = [];
+
+// 按纯日文句子去重（例如 JLPT 问句与最后一句台词完全一致）
+const sentenceByPlain = new Map();
 for (const scene of scenarios) {
-  for (const line of scene.lines) {
-    parsedSentences.push({ id: `${scene.id}/${line.id}`, ...parseSentence(line.ja) });
-  }
-  if (scene.jlpt) {
-    parsedSentences.push({ id: `${scene.id}/q`, ...parseSentence(scene.jlpt.question) });
-    scene.jlpt.options.forEach((opt, idx) => {
-      parsedSentences.push({ id: `${scene.id}/o${idx}`, ...parseSentence(opt) });
-    });
+  const candidates = [
+    ...scene.lines.map((l) => ({ id: `${scene.id}/${l.id}`, ja: l.ja })),
+    ...(scene.jlpt
+      ? [
+          { id: `${scene.id}/q`, ja: scene.jlpt.question },
+          ...scene.jlpt.options.map((opt, idx) => ({ id: `${scene.id}/o${idx}`, ja: opt })),
+        ]
+      : []),
+  ];
+  for (const item of candidates) {
+    const parsed = parseSentence(item.ja);
+    if (!sentenceByPlain.has(parsed.plain)) {
+      sentenceByPlain.set(parsed.plain, { id: item.id, ...parsed });
+    }
   }
 }
 
-const BATCH_SIZE = 5;
-const batches = [];
-for (let i = 0; i < scenarios.length; i += BATCH_SIZE) {
-  batches.push(scenarios.slice(i, i + BATCH_SIZE));
+const allSentences = [...sentenceByPlain.values()];
+
+function buildPrompt(batchSentences) {
+  const items = batchSentences.map((s, idx) => ({
+    i: idx,
+    id: s.id,
+    plain: s.plain,
+    ja: s.ja,
+  }));
+
+  return `你是一位专业日语语法与词典编纂专家。请对下面每一句日语学习语料做**逐词切分与语境释义标注**（必须包含每一个助词在当前句子中的准确语法解释）。
+
+待标注句子 JSON：
+${JSON.stringify(items, null, 2)}
+
+请返回一个 JSON 对象，键为每个句子的 "id"，值为按句子从左到右顺序排列的词元数组：
+{
+  "<id>": [
+    { "s": "原句精确子串", "p": "词性", "z": "语境释义", "l": "原形(可选)", "lr": "原形读音(可选)" }
+  ]
 }
 
-function buildPrompt(batchScenarios) {
-  const linesText = [];
-  for (const s of batchScenarios) {
-    linesText.push(`【${s.id}】`);
-    for (const l of s.lines) {
-      linesText.push(`- ${parseSentence(l.ja).plain}`);
-    }
-    if (s.jlpt) {
-      linesText.push(`- ${parseSentence(s.jlpt.question).plain}`);
-      for (const opt of s.jlpt.options) {
-        linesText.push(`- ${parseSentence(opt).plain}`);
-      }
-    }
-  }
-
-  return `你是一位专业日语词典编纂专家。请从下面日语学习场景台词中，提取所有有学习价值的**实词、动词短语、形容词、副词、外来语、重要寒暄/敬语/连词表达**。
-
-台词列表：
-${linesText.join('\n')}
-
-要求：
-1. 返回一个 JSON 数组（不要 markdown 代码块），每个元素格式：
-   {
-     "s": "原句中完全一致的表层字符串（如 届いて、特急券、冷たい、ノイズキャンセリング、かしこまりました、ちなみに）",
-     "r": "s 的平假名读音（如果 s 本身已是纯平假名或纯片假名则可省略或留空）",
-     "l": "仅当 s 为活用/变形时填写辞书形原形（如 届いて -> 届く、乗り換え -> 乗り換える、安くて -> 安い）；否则省略",
-     "lr": "仅当填写了 l 时填写 l 的平假名读音（如 とどく）；否则省略",
-     "p": "词性标签，只能从以下选一个：名 / 動 / 形 / 副 / 接 / 感 / 表現 / 敬語",
-     "z": "准确简洁的中文释义（不超过22个字；敬语请标注如：查看（「見る」的谦让语）；注意贴合台词中的真实语义）"
-   }
-2. 抽取规范：
-   - 必须尽量完整覆盖句中的每一个实词（所有汉字词、汉字+送假名的动词/形容词活用片段、片假名外来语、常见功能副词/接续词如 ちなみに / ばっちり / さっそく / ぜんぜん / できるだけ / しみる / すっかり）。
-   - 对于复合词，优先保留完整的常用词（例如「特急券」「本人確認書類」「振替輸送」「定期検診」「ノイズキャンセリング」「予約アプリ」），同时也可适度拆出高频子词。
-   - **不要**提取单独的助词（は、が、を、に、で、と、の、も、か、よ、ね、へ、から、まで 等）或光秃秃的助动词/敬体词尾（です、ます、ました、ません、でした、て、いる 等），也不要提取标点符号。
-   - 动词/形容词的 "s" 应是原句中真实出现的词形（例如原句是「冷たいものを飲むと」，可提「冷たい」「もの」「飲む」，其中「冷たい」「飲む」本身就是原形则不填 l；若原句是「届いていないか」，提 "s": "届いて", "l": "届く", "lr": "とどく"；若原句是「降りられた」，提 "s": "降りられた", "l": "降りる" 或提「降り」）。
-   - "s" 必须严格逐字匹配上述台词里的字符（含全半角一致）。`;
+严格规范：
+1. **p（词性）只能选一个**："名" / "動" / "形" / "副" / "助" / "接" / "感" / "表現" / "敬語"。
+2. **所有助词必须标注（p: "助"）**，并给出**在该句中的最合理、最准确的语法解释**（中文 ≤ 22 字）：
+   - 格助词/提示助词/副助词/接续助词/终助词全部单独提取：如 は、が、を、に、で、と、の、も、へ、や、か、よ、ね、から、まで、までに、ので、のに、けど、けれど、ほど、くらい、だけ、など、でも、って、つつ、より、しか、ながら、ずつ 等。
+   - **禁止**把 です / でしょう / でした / できます 误拆成助词「で」；禁止把 デプロイはいつ 误切为「はい」+「つ」；禁止把 いかがですか 误切为「はい」+「かが」；禁止把 しやすく / かもしれません 误切为「もし」。
+   - 同一助词在不同句子要给出符合当前语境的解释，例如：
+     - 「渋谷で降りて」中的 で → "表动作发生的场所（在…）"
+     - 「現金でお願いします」中的 で → "表支付方式或手段（用…）"
+     - 「人身事故で止まっている」中的 で → "表原因、理由（因为…）"
+     - 「駅に着く」中的 に → "表移动到达点（到…）"
+     - 「六時半に変更」中的 に → "表变更后的结果（改为…）"
+     - 「行くのをやめました」中的 の → "将前面动词短语名词化"
+     - 「駅の近く」中的 の → "表所属或修饰（相当于「的」）"
+     - 「お願いしたいのですが」中的 のですが → "表委婉铺垫，引出请求或说明"（或者 ので/が 各自准确解释）
+     - 複合助词如「には」「にも」「では」「とは」「への」「での」「との」「からの」「までの」可拆成两个单助词（例如 の + は / に + は），以便分别看清每个助词的作用，除非作为固定语法（如「までに」表截止期限、「ので」表原因、「のに」表转折）。
+3. **所有实词与关键表达必须覆盖**：
+   - 覆盖全部汉字词、汉字+送假名动词/形容词（活用形填写 "l" 辞书形和 "lr" 平假名读音，如 "s":"届いて", "l":"届く", "lr":"とどく"）、片假名外来语、副词、接续词、感叹词、敬语表达。
+   - 句末常见「です / ます / ました / ません / でした」可整体标为 "敬語" 或省略（绝对不要拆开标「で」）。
+   - 标点符号（、。？！…「」・）不要提取。
+4. **字形精确对齐**：每一个 "s" 必须与该句 "plain" 字段中的连续字符完全一致（不得修改汉字、假名或全半角），且大致按从左到右顺序出现，不得把 {漢字|かん じ} 标签拆成半截。`;
 }
 
-console.log(`正在从 ${scenarios.length} 个场景（${parsedSentences.length} 句）抽取词条，共 ${batches.length} 批…`);
-const rawItems = [];
+function isFalseParticleSplit(sent, idx, end, surface, pos) {
+  const ctx2 = sent.plain.slice(idx, idx + 2);
+  const ctx3 = sent.plain.slice(idx, idx + 3);
+  const ctx4 = sent.plain.slice(idx, idx + 4);
+  if (surface === 'で' && /^(?:です|でし|でき)/.test(ctx2)) return true;
+  if (surface === 'はい' && (ctx3 === 'はいつ' || ctx4 === 'はいかが')) return true;
+  if (surface === 'もし' && (ctx4 === 'もしやす' || sent.plain.slice(Math.max(0, idx - 1), idx + 5).includes('かもしれ'))) return true;
+  if (pos === '助' && /^[、。？！…「」・\s]$/.test(surface)) return true;
+  return false;
+}
 
-const batchResults = await Promise.all(
-  batches.map(async (batch, idx) => {
-    const res = await callGemini(buildPrompt(batch), idx);
-    console.log(`  批次 ${idx + 1}/${batches.length} 完成（${Array.isArray(res) ? res.length : 0} 条）`);
-    return Array.isArray(res) ? res : [];
-  }),
-);
-for (const arr of batchResults) rawItems.push(...arr);
+function alignSentenceTokens(sent, rawTokens) {
+  const spans = [];
+  let cursor = 0;
 
-// 验证每个词条是否在语料中按合法边界出现，并收集其上下文读音
-const ALLOWED_POS = new Set(['名', '動', '形', '副', '接', '感', '表現', '敬語']);
-const SKIP_SURFACES = new Set([
-  'は', 'が', 'を', 'に', 'で', 'と', 'の', 'も', 'か', 'よ', 'ね', 'へ', 'や', 'な',
-  'です', 'ます', 'ました', 'ません', 'でした', 'でしょう', 'たい', 'ない', 'いる', 'ある', 'する',
-  'こと', 'もの', 'よう', 'ほう', 'ため',
-]);
+  for (const tok of rawTokens) {
+    if (!tok || typeof tok.s !== 'string' || typeof tok.z !== 'string' || typeof tok.p !== 'string') continue;
+    const s = tok.s.trim();
+    const p = ALLOWED_POS.has(tok.p.trim()) ? tok.p.trim() : '名';
+    const z = tok.z.trim();
+    if (!s || !z) continue;
+    if (/^[、。？！…「」・\s]+$/.test(s)) continue;
 
-function collectValidItems(items, targetMap) {
-  for (const item of items) {
-    if (!item || typeof item.s !== 'string' || typeof item.z !== 'string' || typeof item.p !== 'string') {
-      continue;
-    }
-    const surface = item.s.trim();
-    const pos = ALLOWED_POS.has(item.p.trim()) ? item.p.trim() : '名';
-    const zh = item.z.trim();
-    if (!surface || !zh || surface.length > 16) continue;
-    if (SKIP_SURFACES.has(surface)) continue;
-    if (/^[ぁ-んー、。？！…「」・\s]+$/.test(surface) && surface.length < 2) continue;
-
-    // 在语料中匹配所有合法非切分边界的出现位置
-    const observedReadings = new Set();
-    for (const sent of parsedSentences) {
-      let from = 0;
-      while (true) {
-        const idx = sent.plain.indexOf(surface, from);
-        if (idx === -1) break;
-        const end = idx + surface.length;
-        if (!sent.forbiddenSplits.has(idx) && !sent.forbiddenSplits.has(end)) {
-          observedReadings.add(sent.readingForRange(idx, end));
-        }
-        from = idx + 1;
-      }
-    }
-    if (!observedReadings.size) continue;
-
-    const lemma = typeof item.l === 'string' && item.l.trim() && item.l.trim() !== surface ? item.l.trim() : undefined;
-    const lemmaReading = lemma && typeof item.lr === 'string' && item.lr.trim() ? kataToHira(item.lr.trim()) : undefined;
-    const itemReading = typeof item.r === 'string' && item.r.trim() ? kataToHira(item.r.trim()) : undefined;
-
-    if (!targetMap.has(surface)) {
-      targetMap.set(surface, new Map());
-    }
-    const readingBucket = targetMap.get(surface);
-
-    // 若语料里同一表层词出现多个上下文读音，或 AI 给出的读音能匹配其中之一
-    for (const ctxRead of observedReadings) {
-      // 如果同一 surface 有多个不同读音，且 item 明确提供了 r 且与当前 ctxRead 差异较大，则跳过不匹配的读音
-      if (observedReadings.size > 1 && itemReading && ctxRead !== itemReading) {
+    let searchFrom = cursor;
+    let foundIdx = -1;
+    while (searchFrom < sent.plain.length) {
+      const idx = sent.plain.indexOf(s, searchFrom);
+      if (idx === -1) break;
+      const end = idx + s.length;
+      if (sent.forbiddenSplits.has(idx) || sent.forbiddenSplits.has(end)) {
+        searchFrom = idx + 1;
         continue;
       }
-      if (!readingBucket.has(ctxRead)) {
-        const entry = { p: pos, z: zh };
-        if (!/^[ぁ-んァ-ヶー]+$/.test(surface)) {
-          entry.r = ctxRead;
-        }
-        if (lemma) {
-          entry.l = lemma;
-          if (lemmaReading && lemmaReading !== lemma) {
-            entry.lr = lemmaReading;
-          }
-        }
-        readingBucket.set(ctxRead, entry);
+      if (isFalseParticleSplit(sent, idx, end, s, p)) {
+        searchFrom = idx + 1;
+        continue;
       }
+      foundIdx = idx;
+      break;
     }
 
-    // 兜底：若该 surface 在语料中有多个读音且上面的过筛导致某个读音未写入，先暂存第一个条目待缺口补全
-    if (observedReadings.size > 1 && itemReading) {
-      for (const ctxRead of observedReadings) {
-        if (!readingBucket.has(ctxRead) && !targetMap.get(surface).size) {
-          const entry = { p: pos, z: zh };
-          if (!/^[ぁ-んァ-ヶー]+$/.test(surface)) entry.r = ctxRead;
-          if (lemma) {
-            entry.l = lemma;
-            if (lemmaReading && lemmaReading !== lemma) entry.lr = lemmaReading;
-          }
-          readingBucket.set(ctxRead, entry);
-        }
-      }
-    }
+    if (foundIdx === -1) continue;
+    const end = foundIdx + s.length;
+    const reading = sent.readingForRange(foundIdx, end);
+    const l = typeof tok.l === 'string' && tok.l.trim() && tok.l.trim() !== s ? tok.l.trim() : undefined;
+    const lr = l && typeof tok.lr === 'string' && tok.lr.trim() ? kataToHira(tok.lr.trim()) : undefined;
+
+    spans.push({ start: foundIdx, end, s, r: reading, p, z, l, lr });
+    cursor = end;
   }
+
+  return spans;
 }
 
-const surfaceMap = new Map();
-collectValidItems(rawItems, surfaceMap);
+const BATCH_SIZE = 12;
+const batches = [];
+for (let i = 0; i < allSentences.length; i += BATCH_SIZE) {
+  batches.push(allSentences.slice(i, i + BATCH_SIZE));
+}
 
-// 检查哪些语料中的汉字/片假名词尚未被任何已收录词条覆盖，做一次精准补漏
-function findMissingTokens() {
-  const allKeys = new Set(surfaceMap.keys());
-  const maxLen = Math.max(1, ...[...allKeys].map((k) => k.length));
-  const uncovered = new Set();
+console.log(`正在为 ${allSentences.length} 个去重句子生成含助词的语境切分与释义，共 ${batches.length} 批…`);
 
-  for (const sent of parsedSentences) {
+const alignedByPlain = new Map();
+
+async function processBatch(batch, idx) {
+  const result = await callGemini(buildPrompt(batch), idx);
+  let okCount = 0;
+  for (const sent of batch) {
+    const rawTokens = result?.[sent.id];
+    if (!Array.isArray(rawTokens)) continue;
+    const aligned = alignSentenceTokens(sent, rawTokens);
+    if (aligned.length > 0) {
+      alignedByPlain.set(sent.plain, aligned);
+      okCount += 1;
+    }
+  }
+  console.log(`  批次 ${idx + 1}/${batches.length} 完成（命中 ${okCount}/${batch.length} 句）`);
+}
+
+// 控制并发为 5，避免触发速率限制
+for (let i = 0; i < batches.length; i += 5) {
+  await Promise.all(batches.slice(i, i + 5).map((b, j) => processBatch(b, i + j)));
+}
+
+// 补漏：若有个别句子遗漏或缺少核心实词/常见助词，单独重试一次
+function findMissingOrWeakSentences() {
+  const missing = [];
+  for (const sent of allSentences) {
+    const aligned = alignedByPlain.get(sent.plain);
+    if (!aligned || aligned.length === 0) {
+      missing.push(sent);
+      continue;
+    }
     const covered = new Uint8Array(sent.plain.length);
-    for (let pos = 0; pos < sent.plain.length; ) {
-      let matched = 0;
-      for (let len = Math.min(maxLen, sent.plain.length - pos); len >= 1; len -= 1) {
-        if (sent.forbiddenSplits.has(pos + len)) continue;
-        const sub = sent.plain.slice(pos, pos + len);
-        if (allKeys.has(sub)) {
-          matched = len;
-          break;
-        }
-      }
-      if (matched) {
-        for (let k = pos; k < pos + matched; k += 1) covered[k] = 1;
-        pos += matched;
-      } else {
-        pos += 1;
-      }
+    for (const sp of aligned) {
+      for (let k = sp.start; k < sp.end; k += 1) covered[k] = 1;
     }
+    let uncoveredKanji = false;
     for (const tok of sent.tokens) {
-      let allCovered = true;
       for (let k = tok.start; k < tok.end; k += 1) {
-        if (!covered[k]) {
-          allCovered = false;
-          break;
-        }
-      }
-      if (!allCovered) {
-        // 尽量连带紧随的送假名一起看
-        const tailMatch = sent.plain.slice(tok.end).match(/^[ぁ-ん]{1,3}/);
-        const contextWord = tok.base + (tailMatch ? tailMatch[0] : '');
-        uncovered.add(`${tok.base}（上下文：${sent.plain.slice(Math.max(0, tok.start - 2), Math.min(sent.plain.length, tok.end + 5))}）`);
+        if (!covered[k]) uncoveredKanji = true;
       }
     }
-    for (const m of sent.plain.matchAll(/[ァ-ヴー]{2,}/g)) {
-      const idx = m.index ?? 0;
-      if (!covered[idx]) {
-        uncovered.add(m[0]);
-      }
-    }
+    if (uncoveredKanji) missing.push(sent);
   }
-  return [...uncovered];
+  return missing;
 }
 
-const missingTokens = findMissingTokens();
-console.log(`初轮有效词条 ${surfaceMap.size} 个；未覆盖汉字/片假名线索 ${missingTokens.length} 条`);
-
-if (missingTokens.length > 0) {
-  const CHUNK = 80;
-  for (let i = 0; i < missingTokens.length; i += CHUNK) {
-    const chunk = missingTokens.slice(i, i + CHUNK);
-    const fillPrompt = `以下是日语学习语料中尚未收入词典的单词及所在上下文片段，请为每个词（如需要可连带后面的送假名动词/形容词活用一起截取为完整词形）生成词典条目：
-
-${chunk.join('\n')}
-
-要求返回 JSON 数组，每项格式：
-{"s":"原句中出现的表层字符串（包含必要送假名）","r":"平假名读音","l":"若为活用形则填辞书形，否则省略","lr":"l的读音","p":"名/動/形/副/接/感/表現/敬語","z":"准确简洁中文释义（≤22字）"}`;
-    const filled = await callGemini(fillPrompt, i);
-    if (Array.isArray(filled)) {
-      collectValidItems(filled, surfaceMap);
-    }
+const retryList = findMissingOrWeakSentences();
+if (retryList.length > 0) {
+  console.log(`发现 ${retryList.length} 句存在遗漏词元，正在自动补标注…`);
+  for (let i = 0; i < retryList.length; i += 10) {
+    await processBatch(retryList.slice(i, i + 10), i + 3);
   }
 }
 
-// 组装最终 glossary.json：
-// - 同一 surface 有多个不同读音 -> 以 "surface|reading" 存储（并确保多音字每个读音都有释义）
-// - 唯一读音 -> 直接以 "surface" 存储
-const finalGlossary = {};
-for (const [surface, readingBucket] of surfaceMap.entries()) {
-  if (readingBucket.size === 1) {
-    const [, entry] = [...readingBucket.entries()][0];
-    finalGlossary[surface] = entry;
-  } else if (readingBucket.size > 1) {
-    for (const [reading, entry] of readingBucket.entries()) {
-      finalGlossary[`${surface}|${reading}`] = entry;
-    }
+for (const sent of allSentences) {
+  const aligned = alignedByPlain.get(sent.plain);
+  if (!aligned || aligned.length === 0) {
+    throw new Error(`句子未能对齐生成词元：${sent.id} ${sent.plain}`);
   }
 }
 
-const sortedGlossary = Object.fromEntries(
-  Object.keys(finalGlossary)
+// 组装去重后的 entries 与 spans
+const entries = {};
+const surfaceVariants = new Map(); // surface -> Map<signature, key>
+
+function getOrCreateEntryKey(sp) {
+  const isPureKana = /^[ぁ-んァ-ヶー]+$/.test(sp.s);
+  const reading = isPureKana ? undefined : sp.r;
+  const sig = JSON.stringify([sp.s, reading ?? '', sp.l ?? '', sp.lr ?? '', sp.p, sp.z]);
+
+  if (!surfaceVariants.has(sp.s)) {
+    surfaceVariants.set(sp.s, new Map());
+  }
+  const variants = surfaceVariants.get(sp.s);
+  if (variants.has(sig)) {
+    return variants.get(sig);
+  }
+
+  let key = sp.s;
+  if (Object.hasOwn(entries, key)) {
+    let idx = 2;
+    while (Object.hasOwn(entries, `${sp.s}#${idx}`)) {
+      idx += 1;
+    }
+    key = `${sp.s}#${idx}`;
+  }
+
+  const entry = { p: sp.p, z: sp.z };
+  if (reading) entry.r = reading;
+  if (sp.l) {
+    entry.l = sp.l;
+    if (sp.lr && sp.lr !== sp.l) entry.lr = sp.lr;
+  }
+  entries[key] = entry;
+  variants.set(sig, key);
+  return key;
+}
+
+const spans = {};
+for (const sent of allSentences) {
+  const aligned = alignedByPlain.get(sent.plain);
+  spans[sent.plain] = aligned.map((sp) => [sp.start, sp.end, getOrCreateEntryKey(sp)]);
+}
+
+const sortedEntries = Object.fromEntries(
+  Object.keys(entries)
     .sort((a, b) => a.localeCompare(b, 'ja'))
-    .map((k) => [k, finalGlossary[k]]),
+    .map((k) => [k, entries[k]]),
+);
+const sortedSpans = Object.fromEntries(
+  Object.keys(spans)
+    .sort((a, b) => a.localeCompare(b, 'ja'))
+    .map((k) => [k, spans[k]]),
 );
 
-writeFileSync(glossaryPath, `${JSON.stringify(sortedGlossary, null, 2)}\n`, 'utf8');
-const remaining = findMissingTokens();
-console.log(`已写入 src/data/glossary.json：共 ${Object.keys(sortedGlossary).length} 个词条（剩余未覆盖零星线索 ${remaining.length} 条）`);
+const payload = { entries: sortedEntries, spans: sortedSpans };
+writeFileSync(glossaryPath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+
+const particleEntries = Object.values(sortedEntries).filter((e) => e.p === '助').length;
+const totalSpans = Object.values(sortedSpans).reduce((sum, arr) => sum + arr.length, 0);
+console.log(
+  `已写入 src/data/glossary.json：${Object.keys(sortedEntries).length} 个词条（其中助词 ${particleEntries} 条），${Object.keys(sortedSpans).length} 句 / ${totalSpans} 个词元跨度`,
+);
