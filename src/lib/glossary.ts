@@ -1,5 +1,3 @@
-import glossaryData from '../data/glossary.json';
-
 export interface GlossaryEntry {
   /** 表层读音（平假名） */
   r?: string;
@@ -20,21 +18,58 @@ interface GlossaryPayload {
   spans: Record<string, GlossarySpan[]>;
 }
 
-const payload = glossaryData as unknown as GlossaryPayload;
-const entries = payload.entries;
-const spans = payload.spans;
-
+let entries: Record<string, GlossaryEntry> = {};
+let spans: Record<string, GlossarySpan[]> = {};
 let maxLen = 1;
-for (const key of Object.keys(entries)) {
-  const clean = key.replace(/#\d+$/, '');
-  const sep = clean.indexOf('|');
-  const len = sep === -1 ? clean.length : sep;
-  if (len > maxLen) maxLen = len;
+let ready = false;
+let loadPromise: Promise<void> | null = null;
+const listeners = new Set<() => void>();
+
+export function isGlossaryReady(): boolean {
+  return ready;
 }
 
-export const MAX_GLOSS_KEY_LEN = maxLen;
+export function subscribeGlossary(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+export function ensureGlossaryLoaded(): Promise<void> {
+  if (ready) return Promise.resolve();
+  if (!loadPromise) {
+    loadPromise = import('../data/glossary.json')
+      .then((mod) => {
+        const payload = (mod.default ?? mod) as unknown as GlossaryPayload;
+        entries = payload.entries;
+        spans = payload.spans;
+        let nextMax = 1;
+        for (const key of Object.keys(entries)) {
+          const clean = key.replace(/#\d+$/, '');
+          const sep = clean.indexOf('|');
+          const len = sep === -1 ? clean.length : sep;
+          if (len > nextMax) nextMax = len;
+        }
+        maxLen = nextMax;
+        ready = true;
+        for (const listener of listeners) {
+          listener();
+        }
+      })
+      .catch(() => {
+        loadPromise = null;
+      });
+  }
+  return loadPromise;
+}
+
+export function getMaxGlossKeyLen(): number {
+  return maxLen;
+}
 
 export function getSentenceSpans(plain: string): readonly GlossarySpan[] | null {
+  if (!ready) return null;
   return Object.hasOwn(spans, plain) ? spans[plain] : null;
 }
 
@@ -42,6 +77,7 @@ export function getSentenceSpans(plain: string): readonly GlossarySpan[] | null 
  * 结合语境读音优先匹配多音词键（`表层|读音`），否则回退精确表层键。
  */
 export function lookupGlossaryKey(surface: string, reading: string): string | null {
+  if (!ready) return null;
   if (reading) {
     const exact = `${surface}|${reading}`;
     if (Object.hasOwn(entries, exact)) return exact;
@@ -51,7 +87,7 @@ export function lookupGlossaryKey(surface: string, reading: string): string | nu
 }
 
 export function getGlossaryEntry(key: string): (GlossaryEntry & { surface: string }) | null {
-  if (!Object.hasOwn(entries, key)) return null;
+  if (!ready || !Object.hasOwn(entries, key)) return null;
   const clean = key.replace(/#\d+$/, '');
   const sep = clean.indexOf('|');
   const surface = sep === -1 ? clean : clean.slice(0, sep);

@@ -49,7 +49,7 @@ export function PassageList({ scenario, index, playing, itemRefs, onSelect }: Pr
           <span><span aria-hidden="true">📖</span> 短文</span>
           <span className="passage-kicker-status">
             {playing ? <i className="passage-live-dot" aria-hidden="true" /> : null}
-            {playing ? '朗读中' : '点击句子跳转'} · {index + 1} / {scenario.lines.length} 句
+            {playing ? '朗读中' : '点击段落跳转'} · {index + 1} / {scenario.lines.length} 段
           </span>
         </div>
 
@@ -106,7 +106,7 @@ export function PassageList({ scenario, index, playing, itemRefs, onSelect }: Pr
 
         <div className="passage-bottom">
           <div className="passage-footer">
-            <span>{scenario.lines.length} 句 · 约 {minutes} 分钟</span>
+            <span>{scenario.lines.length} 段 · 约 {minutes} 分钟</span>
             <span>整段连读 · 句内双色同步高亮</span>
           </div>
         </div>

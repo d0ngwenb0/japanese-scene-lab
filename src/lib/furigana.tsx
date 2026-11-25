@@ -1,9 +1,12 @@
-import { Fragment, type ReactNode } from 'react';
+import { Fragment, useEffect, useSyncExternalStore, type ReactNode } from 'react';
 import {
+  ensureGlossaryLoaded,
   getGlossaryEntry,
+  getMaxGlossKeyLen,
   getSentenceSpans,
+  isGlossaryReady,
   lookupGlossaryKey,
-  MAX_GLOSS_KEY_LEN,
+  subscribeGlossary,
 } from './glossary';
 
 const TOKEN = /\{([^{}|]+)\|([^{}|]+)\}/g;
@@ -119,9 +122,17 @@ function renderSlice(segments: Segment[], start: number, end: number, prefix: st
  * - 传入 glossary 时，优先按逐句语境词元跨度渲染（含助词精确语法解释），回退最长匹配
  */
 export function Furigana({ text, glossary = false }: { text: string; glossary?: boolean }) {
+  const glossaryReady = useSyncExternalStore(subscribeGlossary, isGlossaryReady, isGlossaryReady);
+
+  useEffect(() => {
+    if (glossary && !glossaryReady) {
+      void ensureGlossaryLoaded();
+    }
+  }, [glossary, glossaryReady]);
+
   const { segments, plain, charReadings, forbiddenSplits } = parseSegments(text);
 
-  if (!glossary) {
+  if (!glossary || !glossaryReady) {
     return (
       <>
         {segments.map((seg, idx) =>
@@ -169,7 +180,7 @@ export function Furigana({ text, glossary = false }: { text: string; glossary?: 
   while (pos < plain.length) {
     let matchedLen = 0;
     let matchedKey: string | null = null;
-    const maxTry = Math.min(MAX_GLOSS_KEY_LEN, plain.length - pos);
+    const maxTry = Math.min(getMaxGlossKeyLen(), plain.length - pos);
 
     for (let len = maxTry; len >= 1; len -= 1) {
       if (forbiddenSplits.has(pos + len)) continue;

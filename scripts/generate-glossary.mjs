@@ -313,7 +313,10 @@ function alignSentenceTokens(sent, rawTokens) {
   for (const tok of rawTokens) {
     if (!tok || typeof tok.s !== 'string' || typeof tok.z !== 'string' || typeof tok.p !== 'string') continue;
     const s = tok.s.trim();
-    const p = ALLOWED_POS.has(tok.p.trim()) ? tok.p.trim() : '名';
+    let p = ALLOWED_POS.has(tok.p.trim()) ? tok.p.trim() : '名';
+    if (p === '助' && /[\u4e00-\u9fff々ァ-ヶ]/.test(s)) {
+      p = '表現';
+    }
     const z = tok.z.trim();
     if (!s || !z) continue;
     if (/^[、。？！…「」・\s]+$/.test(s)) continue;

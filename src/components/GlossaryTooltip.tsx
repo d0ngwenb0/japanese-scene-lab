@@ -60,7 +60,7 @@ export function GlossaryTooltip() {
     const pop = popoverRef.current;
     if (pop && 'hidePopover' in pop && typeof pop.hidePopover === 'function') {
       try {
-        if (pop.matches(':popover-open') || pop.classList.contains(':popover-open')) {
+        if (pop.matches(':popover-open')) {
           pop.hidePopover();
         }
       } catch {
@@ -92,7 +92,8 @@ export function GlossaryTooltip() {
       if (!supportsAnchor) {
         const rect = wordEl.getBoundingClientRect();
         placement = rect.top < 96 ? 'bottom' : 'top';
-        const x = Math.min(Math.max(rect.left + rect.width / 2, 140), window.innerWidth - 140);
+        const half = Math.min(168, window.innerWidth / 2 - 12);
+        const x = Math.min(Math.max(rect.left + rect.width / 2, half), window.innerWidth - half);
         const y = placement === 'top' ? rect.top - 10 : rect.bottom + 10;
         coords = { x, y };
       }
@@ -103,7 +104,7 @@ export function GlossaryTooltip() {
       if (pop && 'showPopover' in pop && typeof pop.showPopover === 'function') {
         try {
           // 切换锚点时重触发顶部层以刷新 CSS Anchor Positioning 的 fallback 计算
-          if (pop.matches(':popover-open') || pop.classList.contains(':popover-open')) {
+          if (pop.matches(':popover-open')) {
             pop.hidePopover();
           }
           pop.showPopover();

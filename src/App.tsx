@@ -9,6 +9,7 @@ import { PlayerView } from './components/PlayerView';
 import { resetFocusChrome } from './components/FocusLyricsOverlay';
 import { PullToRefresh } from './components/PullToRefresh';
 import { GlossaryTooltip } from './components/GlossaryTooltip';
+import { ensureGlossaryLoaded } from './lib/glossary';
 
 const scenarios = scenariosData as Scenario[];
 
@@ -72,6 +73,24 @@ export default function App() {
     });
     return () => window.cancelAnimationFrame(frame);
   }, [resolvedTheme, settings.palette, active]);
+
+  useEffect(() => {
+    if (active) {
+      void ensureGlossaryLoaded();
+      return;
+    }
+    const ric = (window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    }).requestIdleCallback;
+    const cic = (window as Window & { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback;
+    if (typeof ric === 'function') {
+      const id = ric(() => void ensureGlossaryLoaded(), { timeout: 1200 });
+      return () => cic?.(id);
+    }
+    const timer = window.setTimeout(() => void ensureGlossaryLoaded(), 300);
+    return () => window.clearTimeout(timer);
+  }, [active]);
 
   const [autoPlayNext, setAutoPlayNext] = useState(false);
   const [replayTick, setReplayTick] = useState(0);

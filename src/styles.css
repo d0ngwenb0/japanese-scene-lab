@@ -5081,12 +5081,6 @@ dialog::backdrop {
   -webkit-user-select: none;
 }
 
-.gloss-pos.is-particle {
-  background: var(--accent-soft);
-  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
-  color: var(--accent-text);
-}
-
 .gloss-zh {
   color: var(--ink);
   font-weight: 500;
@@ -5107,13 +5101,13 @@ dialog::backdrop {
 }
 
 .focus-line .gloss-word {
-  border-bottom-color: rgb(255 255 255 / 0.25);
+  border-bottom-color: color-mix(in srgb, var(--ink) 26%, transparent);
 }
 
 .focus-line .gloss-word:hover,
 .focus-line .gloss-word.is-gloss-active {
-  background-color: rgb(255 255 255 / 0.14);
-  border-bottom-color: rgb(255 255 255 / 0.72);
+  background-color: color-mix(in srgb, var(--ink) 12%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--ink) 68%, transparent);
 }
 
 /* ---------- 词性笔刷高光背景（常驻） ---------- */
@@ -5219,6 +5213,10 @@ dialog::backdrop {
   background-size: 100% 70%;
   background-position: 0 92%;
   background-repeat: no-repeat;
+}
+
+.gloss-pos[data-pos] {
+  color: var(--ink);
 }
 
 .gloss-pos[data-pos='名'] {

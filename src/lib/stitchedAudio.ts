@@ -69,7 +69,7 @@ function mixToMonoInt16(audioBuffer: AudioBuffer, target: Int16Array, offset: nu
  * 单条长音频可避免安卓锁屏/后台切段时反复调用 audio.load() 导致中断；
  * 分段 Blob URL 可在单句/单章试听或循环时物理隔离前后段音频。
  */
-export async function buildStitchedTrackFromUrls(
+async function buildStitchedTrackFromUrls(
   urls: string[],
   gapMs: number,
   signal?: AbortSignal,
