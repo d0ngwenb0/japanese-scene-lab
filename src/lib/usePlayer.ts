@@ -100,6 +100,9 @@ export function usePlayer({ sceneId, lines, loop, rate, volume = 1, autoPlay = f
   const stitchedRef = useRef<StitchedTrack | null>(null);
   const pendingStitchedSwapRef = useRef(false);
   const pendingSeekRef = useRef<number | null>(null);
+  const sourceModeRef = useRef<
+    { kind: 'fallback' } | { kind: 'stitched' } | { kind: 'single'; index: number; loopGap: boolean }
+  >({ kind: 'fallback' });
 
   indexRef.current = index;
   playingRef.current = playing;
@@ -109,7 +112,14 @@ export function usePlayer({ sceneId, lines, loop, rate, volume = 1, autoPlay = f
 
   const syncLoopFlag = useCallback(() => {
     if (!audio) return;
-    audio.loop = Boolean(stitchedRef.current) && loopRef.current === 'all' && !oneShot.current;
+    const mode = sourceModeRef.current;
+    if (mode.kind === 'single') {
+      audio.loop = mode.loopGap && !oneShot.current;
+    } else if (mode.kind === 'stitched') {
+      audio.loop = Boolean(stitchedRef.current) && loopRef.current === 'all' && !oneShot.current;
+    } else {
+      audio.loop = false;
+    }
   }, [audio]);
 
   const safePlay = useCallback(() => {
@@ -133,27 +143,106 @@ export function usePlayer({ sceneId, lines, loop, rate, volume = 1, autoPlay = f
     }
   }, [audio]);
 
-  const activateStitched = useCallback(
-    (track: StitchedTrack, targetIndex: number, autoplay: boolean) => {
+  const loadStitchedAt = useCallback(
+    (track: StitchedTrack, targetIndex: number, offsetSec: number, autoplay: boolean) => {
       pendingStitchedSwapRef.current = false;
       inGapRef.current = false;
-      internalTransitionRef.current = autoplay;
-      const cue = track.cues[Math.min(Math.max(targetIndex, 0), track.cues.length - 1)];
-      setSceneDuration(track.cues[track.cues.length - 1]?.end ?? 0);
-      setSceneTime(cue.start);
-      pendingSeekRef.current = cue.start > 0 ? cue.start : null;
-      audio.src = track.blobUrl;
+      sourceModeRef.current = { kind: 'stitched' };
+      const clampedIndex = Math.min(Math.max(targetIndex, 0), track.cues.length - 1);
+      const cue = track.cues[clampedIndex];
+      const total = track.cues[track.cues.length - 1]?.end ?? 0;
+      const lineDur = Math.max(cue.end - cue.start, 0.01);
+      const safeOffset = Math.min(Math.max(offsetSec, 0), lineDur);
+      const seekTime = cue.start + safeOffset;
+
+      setSceneDuration(total);
+      setSceneTime(Math.min(seekTime, total));
       audio.loop = loopRef.current === 'all' && !oneShot.current;
       audio.playbackRate = rateRef.current;
-      audio.load();
+
+      if (audio.src !== track.blobUrl) {
+        internalTransitionRef.current = true;
+        pendingSeekRef.current = seekTime > 0 ? seekTime : null;
+        audio.src = track.blobUrl;
+        audio.load();
+      } else if (audio.readyState < 1) {
+        pendingSeekRef.current = seekTime > 0 ? seekTime : null;
+      } else {
+        pendingSeekRef.current = null;
+        audio.currentTime = seekTime;
+      }
+
       if (autoplay) {
+        internalTransitionRef.current = true;
         setPlaying(true);
         safePlay();
       } else {
+        internalTransitionRef.current = false;
         setPlaying(false);
       }
     },
     [audio, safePlay],
+  );
+
+  const loadSingleLine = useCallback(
+    (track: StitchedTrack, targetIndex: number, loopGap: boolean, offsetSec: number, autoplay: boolean) => {
+      pendingStitchedSwapRef.current = false;
+      inGapRef.current = false;
+      const clampedIndex = Math.min(Math.max(targetIndex, 0), track.cues.length - 1);
+      const cue = track.cues[clampedIndex];
+      const total = track.cues[track.cues.length - 1]?.end ?? 0;
+      const lineDur = Math.max(cue.end - cue.start, 0.01);
+      const safeOffset = Math.min(Math.max(offsetSec, 0), lineDur);
+      const url = track.getLineBlobUrl(clampedIndex, loopGap);
+
+      sourceModeRef.current = { kind: 'single', index: clampedIndex, loopGap };
+      setSceneDuration(total);
+      setSceneTime(Math.min(cue.start + safeOffset, total));
+      audio.loop = loopGap;
+      audio.playbackRate = rateRef.current;
+
+      if (audio.src !== url) {
+        internalTransitionRef.current = true;
+        pendingSeekRef.current = safeOffset > 0 ? safeOffset : null;
+        audio.src = url;
+        audio.load();
+      } else if (audio.readyState < 1) {
+        pendingSeekRef.current = safeOffset > 0 ? safeOffset : null;
+      } else {
+        pendingSeekRef.current = null;
+        audio.currentTime = safeOffset;
+      }
+
+      if (autoplay) {
+        internalTransitionRef.current = true;
+        setPlaying(true);
+        safePlay();
+      } else {
+        internalTransitionRef.current = false;
+        setPlaying(false);
+      }
+    },
+    [audio, safePlay],
+  );
+
+  const getCurrentLineOffset = useCallback(
+    (track: StitchedTrack, targetIndex: number): number => {
+      const cue = track.cues[targetIndex];
+      if (!cue || audio.ended) return 0;
+      const lineDur = Math.max(cue.end - cue.start, 0.01);
+      const mode = sourceModeRef.current;
+      let offset = 0;
+      if (mode.kind === 'single' && mode.index === targetIndex) {
+        offset = audio.currentTime;
+      } else if (mode.kind === 'stitched' && audio.src === track.blobUrl) {
+        offset = audio.currentTime - cue.start;
+      }
+      if (!Number.isFinite(offset) || offset <= 0 || offset >= lineDur - 0.05) {
+        return 0;
+      }
+      return offset;
+    },
+    [audio],
   );
 
   /** 载入第 i 句；同一句会从头重放。 */
@@ -173,24 +262,18 @@ export function usePlayer({ sceneId, lines, loop, rate, volume = 1, autoPlay = f
 
       const track = stitchedRef.current;
       if (track) {
-        if (pendingStitchedSwapRef.current || audio.src !== track.blobUrl) {
-          activateStitched(track, target, autoplay);
-          return;
-        }
-        syncLoopFlag();
-        audio.playbackRate = rateRef.current;
-        audio.currentTime = track.cues[target].start;
-        setSceneTime(track.cues[target].start);
-        if (autoplay) {
-          setPlaying(true);
-          safePlay();
+        if (oneShot.current) {
+          loadSingleLine(track, target, false, 0, autoplay);
+        } else if (loopRef.current === 'line') {
+          loadSingleLine(track, target, true, 0, autoplay);
         } else {
-          setPlaying(false);
+          loadStitchedAt(track, target, 0, autoplay);
         }
         return;
       }
 
-      internalTransitionRef.current = autoplay;
+      sourceModeRef.current = { kind: 'fallback' };
+      internalTransitionRef.current = true;
       audio.loop = false;
       audio.src = audioSrc(sceneId, lines[target].id);
       audio.load();
@@ -200,10 +283,11 @@ export function usePlayer({ sceneId, lines, loop, rate, volume = 1, autoPlay = f
         setPlaying(true);
         safePlay();
       } else {
+        internalTransitionRef.current = false;
         setPlaying(false);
       }
     },
-    [activateStitched, audio, lines, safePlay, sceneId, syncLoopFlag],
+    [audio, lines, loadSingleLine, loadStitchedAt, safePlay, sceneId],
   );
 
   // 后台将整场音频拼接为单条连续 Blob，实现安卓锁屏/后台零中断播放。
@@ -212,19 +296,27 @@ export function usePlayer({ sceneId, lines, loop, rate, volume = 1, autoPlay = f
     let activeTrack: StitchedTrack | null = null;
     stitchedRef.current = null;
     pendingStitchedSwapRef.current = false;
+    pendingSeekRef.current = null;
+    sourceModeRef.current = { kind: 'fallback' };
     setSceneDuration(0);
     setSceneTime(0);
 
     buildStitchedTrack(sceneId, lines, INTER_LINE_GAP_MS, controller.signal).then((track) => {
       if (!track || controller.signal.aborted) {
-        if (track) URL.revokeObjectURL(track.blobUrl);
+        if (track) track.dispose();
         return;
       }
       activeTrack = track;
       stitchedRef.current = track;
       setSceneDuration(track.cues[track.cues.length - 1]?.end ?? 0);
       if (!playingRef.current) {
-        activateStitched(track, indexRef.current, false);
+        if (oneShot.current) {
+          loadSingleLine(track, indexRef.current, false, 0, false);
+        } else if (loopRef.current === 'line') {
+          loadSingleLine(track, indexRef.current, true, 0, false);
+        } else {
+          loadStitchedAt(track, indexRef.current, 0, false);
+        }
       } else {
         pendingStitchedSwapRef.current = true;
       }
@@ -234,9 +326,11 @@ export function usePlayer({ sceneId, lines, loop, rate, volume = 1, autoPlay = f
       controller.abort();
       stitchedRef.current = null;
       pendingStitchedSwapRef.current = false;
-      if (activeTrack) URL.revokeObjectURL(activeTrack.blobUrl);
+      pendingSeekRef.current = null;
+      sourceModeRef.current = { kind: 'fallback' };
+      if (activeTrack) activeTrack.dispose();
     };
-  }, [activateStitched, lines, sceneId]);
+  }, [lines, loadSingleLine, loadStitchedAt, sceneId]);
 
   // 首次进入只载入，不自动播放；若由「所有场景随机循环」切入，则自动续播。
   useEffect(() => {
@@ -262,8 +356,25 @@ export function usePlayer({ sceneId, lines, loop, rate, volume = 1, autoPlay = f
     if (loop === 'line' && playingRef.current) {
       oneShot.current = false;
     }
+    const track = stitchedRef.current;
+    if (!track || !audio) {
+      syncLoopFlag();
+      return;
+    }
+    const mode = sourceModeRef.current;
+    if (loop === 'line') {
+      if (!(mode.kind === 'single' && mode.index === indexRef.current && mode.loopGap && !pendingStitchedSwapRef.current)) {
+        const offset = getCurrentLineOffset(track, indexRef.current);
+        loadSingleLine(track, indexRef.current, true, offset, playingRef.current);
+        return;
+      }
+    } else if (mode.kind === 'single' && !oneShot.current) {
+      const offset = getCurrentLineOffset(track, indexRef.current);
+      loadStitchedAt(track, indexRef.current, offset, playingRef.current);
+      return;
+    }
     syncLoopFlag();
-  }, [loop, syncLoopFlag]);
+  }, [audio, getCurrentLineOffset, loadSingleLine, loadStitchedAt, loop, syncLoopFlag]);
 
   useEffect(() => {
     if (stitchedRef.current) {
@@ -310,6 +421,7 @@ export function usePlayer({ sceneId, lines, loop, rate, volume = 1, autoPlay = f
     if (!a) return;
 
     const onLoadedMetadata = () => {
+      a.playbackRate = rateRef.current;
       if (pendingSeekRef.current !== null) {
         a.currentTime = pendingSeekRef.current;
         pendingSeekRef.current = null;
@@ -318,12 +430,30 @@ export function usePlayer({ sceneId, lines, loop, rate, volume = 1, autoPlay = f
 
     const onTime = () => {
       const track = stitchedRef.current;
-      if (track && a.src === track.blobUrl) {
+      const mode = sourceModeRef.current;
+      if (track && mode.kind === 'single') {
+        if (a.seeking || pendingSeekRef.current !== null) return;
+        const cue = track.cues[mode.index];
+        if (!cue) return;
+        const dur = Math.max(cue.end - cue.start, 0.01);
+        const clamped = Math.min(Math.max(a.currentTime, 0), dur);
+        setLineProgress(clamped / dur);
+        const total = track.cues[track.cues.length - 1]?.end ?? 0;
+        if (total > 0) setSceneDuration(total);
+        setSceneTime(Math.min(cue.start + clamped, total || cue.start + clamped));
+        return;
+      }
+
+      if (track && mode.kind === 'stitched' && a.src === track.blobUrl) {
+        if (a.seeking || pendingSeekRef.current !== null) return;
         const t = a.currentTime;
         if (oneShot.current) {
           const targetCue = track.cues[oneShotTargetRef.current];
           if (targetCue && t >= targetCue.end) {
             oneShot.current = false;
+            internalTransitionRef.current = true;
+            a.pause();
+            internalTransitionRef.current = false;
             setPlaying(false);
             setLineProgress(0);
             a.currentTime = targetCue.start;
@@ -357,6 +487,7 @@ export function usePlayer({ sceneId, lines, loop, rate, volume = 1, autoPlay = f
 
     const onPlaying = () => {
       internalTransitionRef.current = false;
+      a.playbackRate = rateRef.current;
     };
 
     const onPause = () => {
@@ -390,9 +521,34 @@ export function usePlayer({ sceneId, lines, loop, rate, volume = 1, autoPlay = f
     };
   }, [audio, advance]);
 
-  const play = useCallback(() => {
+  const startContinuousOrLoopLine = useCallback(() => {
     if (!audio) return;
     oneShot.current = false;
+    const track = stitchedRef.current;
+    if (track) {
+      const targetIndex = indexRef.current;
+      const mode = sourceModeRef.current;
+      if (loopRef.current === 'line') {
+        const loopUrl = track.getLineBlobUrl(targetIndex, true);
+        if (mode.kind === 'single' && mode.index === targetIndex && mode.loopGap && !pendingStitchedSwapRef.current && audio.src === loopUrl) {
+          syncLoopFlag();
+          setPlaying(true);
+          safePlay();
+          return;
+        }
+        loadSingleLine(track, targetIndex, true, getCurrentLineOffset(track, targetIndex), true);
+        return;
+      }
+      if (mode.kind === 'stitched' && !pendingStitchedSwapRef.current && audio.src === track.blobUrl) {
+        syncLoopFlag();
+        setPlaying(true);
+        safePlay();
+        return;
+      }
+      loadStitchedAt(track, targetIndex, getCurrentLineOffset(track, targetIndex), true);
+      return;
+    }
+
     syncLoopFlag();
     if (inGapRef.current) {
       inGapRef.current = false;
@@ -401,7 +557,11 @@ export function usePlayer({ sceneId, lines, loop, rate, volume = 1, autoPlay = f
     }
     setPlaying(true);
     safePlay();
-  }, [advance, audio, safePlay, syncLoopFlag]);
+  }, [advance, audio, getCurrentLineOffset, loadSingleLine, loadStitchedAt, safePlay, syncLoopFlag]);
+
+  const play = useCallback(() => {
+    startContinuousOrLoopLine();
+  }, [startContinuousOrLoopLine]);
 
   const toggle = useCallback(() => {
     if (playingRef.current) setPlaying(false);
@@ -416,16 +576,8 @@ export function usePlayer({ sceneId, lines, loop, rate, volume = 1, autoPlay = f
 
   const resume = useCallback(() => {
     if (!audio || playingRef.current) return;
-    oneShot.current = false;
-    syncLoopFlag();
-    if (inGapRef.current) {
-      inGapRef.current = false;
-      advance();
-      return;
-    }
-    setPlaying(true);
-    safePlay();
-  }, [advance, audio, safePlay, syncLoopFlag]);
+    startContinuousOrLoopLine();
+  }, [audio, startContinuousOrLoopLine]);
 
   const select = useCallback(
     (i: number) => {
@@ -456,7 +608,27 @@ export function usePlayer({ sceneId, lines, loop, rate, volume = 1, autoPlay = f
     if (!playingRef.current) return;
 
     const track = stitchedRef.current;
-    if (track && audio.src === track.blobUrl) {
+    const mode = sourceModeRef.current;
+    if (track && mode.kind === 'single') {
+      if (oneShot.current) {
+        oneShot.current = false;
+        setPlaying(false);
+        setLineProgress(0);
+        audio.currentTime = 0;
+        setSceneTime(track.cues[mode.index]?.start ?? 0);
+        return;
+      }
+      if (loopRef.current === 'line') {
+        audio.currentTime = 0;
+        safePlay();
+        return;
+      }
+      setPlaying(false);
+      setLineProgress(0);
+      return;
+    }
+
+    if (track && mode.kind === 'stitched' && audio.src === track.blobUrl) {
       if (oneShot.current) {
         oneShot.current = false;
         setPlaying(false);
@@ -485,10 +657,21 @@ export function usePlayer({ sceneId, lines, loop, rate, volume = 1, autoPlay = f
       inGapRef.current = false;
       if (pendingStitchedSwapRef.current && stitchedRef.current) {
         const nextIdx = indexRef.current + 1;
-        if (nextIdx < lines.length) activateStitched(stitchedRef.current, nextIdx, true);
-        else if (loopRef.current === 'all') activateStitched(stitchedRef.current, 0, true);
-        else if (loopRef.current === 'scenes') onSceneEndRef.current?.();
-        else setPlaying(false);
+        if (loopRef.current === 'line') {
+          const targetIdx = Math.min(nextIdx, lines.length - 1);
+          setIndex(targetIdx);
+          loadSingleLine(stitchedRef.current, targetIdx, true, 0, true);
+        } else if (nextIdx < lines.length) {
+          setIndex(nextIdx);
+          loadStitchedAt(stitchedRef.current, nextIdx, 0, true);
+        } else if (loopRef.current === 'all') {
+          setIndex(0);
+          loadStitchedAt(stitchedRef.current, 0, 0, true);
+        } else if (loopRef.current === 'scenes') {
+          onSceneEndRef.current?.();
+        } else {
+          setPlaying(false);
+        }
         return;
       }
       advance();
@@ -496,6 +679,7 @@ export function usePlayer({ sceneId, lines, loop, rate, volume = 1, autoPlay = f
     }
 
     if (oneShot.current) {
+      oneShot.current = false;
       setPlaying(false);
       return;
     }
@@ -525,7 +709,7 @@ export function usePlayer({ sceneId, lines, loop, rate, volume = 1, autoPlay = f
     audio.playbackRate = 1;
     audio.load();
     safePlay();
-  }, [activateStitched, advance, audio, lines.length, safePlay]);
+  }, [advance, audio, lines.length, loadSingleLine, loadStitchedAt, safePlay]);
 
   useEffect(() => {
     const a = audio;

@@ -9,6 +9,8 @@ export interface Cue {
 export interface StitchedTrack {
   blobUrl: string;
   cues: Cue[];
+  getLineBlobUrl: (index: number, withLoopGap?: boolean) => string;
+  dispose: () => void;
 }
 
 function encodeMonoWav(samples: Int16Array, sampleRate: number): Blob {
@@ -99,21 +101,59 @@ export async function buildStitchedTrack(
 
     const pcm = new Int16Array(totalSamples);
     const cues: Cue[] = [];
+    const sampleRanges: Array<{ startSample: number; endSample: number }> = [];
     let offset = 0;
 
     for (const buf of decoded) {
+      const startSample = offset;
+      const endSample = offset + buf.length;
       mixToMonoInt16(buf, pcm, offset);
+      sampleRanges.push({ startSample, endSample });
       cues.push({
-        start: offset / sampleRate,
-        end: (offset + buf.length) / sampleRate,
+        start: startSample / sampleRate,
+        end: endSample / sampleRate,
       });
       offset += buf.length + gapSamples;
     }
 
     const blob = encodeMonoWav(pcm, sampleRate);
+    const blobUrl = URL.createObjectURL(blob);
+    const lineUrls: Array<string | undefined> = [];
+    const loopLineUrls: Array<string | undefined> = [];
+
+    const getLineBlobUrl = (index: number, withLoopGap = false): string => {
+      const clamped = Math.min(Math.max(index, 0), sampleRanges.length - 1);
+      const cache = withLoopGap ? loopLineUrls : lineUrls;
+      const cached = cache[clamped];
+      if (cached) return cached;
+
+      const range = sampleRanges[clamped];
+      const endSample = withLoopGap
+        ? Math.min(range.endSample + gapSamples, pcm.length)
+        : range.endSample;
+      const lineBlob = encodeMonoWav(pcm.subarray(range.startSample, endSample), sampleRate);
+      const url = URL.createObjectURL(lineBlob);
+      cache[clamped] = url;
+      return url;
+    };
+
+    const dispose = () => {
+      URL.revokeObjectURL(blobUrl);
+      for (const url of lineUrls) {
+        if (url) URL.revokeObjectURL(url);
+      }
+      for (const url of loopLineUrls) {
+        if (url) URL.revokeObjectURL(url);
+      }
+      lineUrls.length = 0;
+      loopLineUrls.length = 0;
+    };
+
     return {
-      blobUrl: URL.createObjectURL(blob),
+      blobUrl,
       cues,
+      getLineBlobUrl,
+      dispose,
     };
   } catch {
     return null;
