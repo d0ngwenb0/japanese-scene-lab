@@ -11,14 +11,51 @@ export interface ModelOption {
 }
 
 export const GEMINI_MODELS: ModelOption[] = [
-  { id: 'gemini-4-carbon', label: 'Gemini 4 Carbon（智力最强）' },
-  { id: 'gemini-4-argon', label: 'Gemini 4 Argon（高阶推理）' },
+  { id: 'gemini-4-argon', label: 'Gemini 4 Argon（高阶推理・推荐）' },
   { id: 'gemini-4-hydrogen', label: 'Gemini 4 Hydrogen（均衡快）' },
-  { id: 'gemini-3.8-flash', label: 'Gemini 3.8 Flash（极速）' },
+  { id: 'gemini-3.8-flash', label: 'Gemini 3.8 Flash（极速稳定）' },
+  { id: 'gemini-4-carbon', label: 'Gemini 4 Carbon（深度推理・较慢）' },
 ];
 
 const NON_CHAT_MODEL_RE =
-  /tts|image|imagen|veo|lyria|embedding|aqa|robotics|computer-use|native-audio|live|learnlm|vision|gemma|bison|gecko|dialog/i;
+  /tts|image|imagen|veo|lyria|embedding|aqa|robotics|computer-use|native-audio|live|learnlm|vision|gemma|bison|gecko|dialog|transcribe|customtools/i;
+
+const SLOW_AUTO_MODEL_RE = /\b(?:carbon|ultra)\b/i;
+
+/**
+ * 为「自动模式」挑选兼顾推理质量与首字响应速度的候选链：
+ * - 避开极易长时间挂起的 carbon / ultra（用户仍可在下拉框手动切换）
+ * - 按高阶均衡 -> 轻量均衡 -> 标准 Flash 排序，且确保始终包含快速 Flash 兜底
+ */
+export function pickAutoCandidates(availableModels: ModelOption[]): string[] {
+  const usable = availableModels
+    .map((m) => m.id)
+    .filter((id) => id && !NON_CHAT_MODEL_RE.test(id) && !SLOW_AUTO_MODEL_RE.test(id));
+
+  const picked: string[] = [];
+  const pushUnique = (id: string | undefined) => {
+    if (id && !picked.includes(id)) picked.push(id);
+  };
+
+  pushUnique(usable.find((id) => /\bargon\b|\bpro\b/i.test(id)));
+  pushUnique(usable.find((id) => /\bhydrogen\b/i.test(id)));
+  const topFlash =
+    usable.find((id) => /\bflash\b/i.test(id) && !/lite|mini|nano/i.test(id)) ??
+    usable.find((id) => /\bflash\b/i.test(id));
+  pushUnique(topFlash);
+
+  for (const id of usable) {
+    if (picked.length >= 4) break;
+    pushUnique(id);
+  }
+
+  if (!picked.some((id) => /\bflash\b/i.test(id))) {
+    if (picked.length >= 4) picked.pop();
+    pushUnique('gemini-3.8-flash');
+  }
+
+  return picked.length ? picked.slice(0, 4) : ['gemini-4-argon', 'gemini-4-hydrogen', 'gemini-3.8-flash'];
+}
 
 function scoreGeminiModel(id: string): number {
   const lower = id.toLowerCase();
@@ -84,14 +121,22 @@ export async function fetchAvailableModels(
     return cached.models;
   }
 
-  const response = await fetch(
-    'https://generativelanguage.googleapis.com/v1beta/models?pageSize=200',
-    {
-      method: 'GET',
-      headers: { 'x-goog-api-key': trimmed },
-      signal: options?.signal,
-    },
-  );
+  const timeoutGuard = createTimeoutSignal(options?.signal, 6000);
+  let response: Response;
+  try {
+    response = await fetch(
+      'https://generativelanguage.googleapis.com/v1beta/models?pageSize=200',
+      {
+        method: 'GET',
+        headers: { 'x-goog-api-key': trimmed },
+        signal: timeoutGuard.signal,
+      },
+    );
+  } catch {
+    return cached.models;
+  } finally {
+    timeoutGuard.cleanup();
+  }
   if (!response.ok) {
     return cached.models;
   }
@@ -199,6 +244,43 @@ export function saveModel(model: string): void {
 export interface InteractionError extends Error {
   status?: number;
   detail?: string;
+  isTimeout?: boolean;
+}
+
+function createTimeoutSignal(
+  parentSignal: AbortSignal | undefined,
+  timeoutMs: number,
+): { signal: AbortSignal; didTimeout: () => boolean; clearTimer: () => void; cleanup: () => void } {
+  const controller = new AbortController();
+  let timedOut = false;
+  const onParentAbort = () => controller.abort();
+  if (parentSignal) {
+    if (parentSignal.aborted) {
+      controller.abort();
+    } else {
+      parentSignal.addEventListener('abort', onParentAbort, { once: true });
+    }
+  }
+  const timer =
+    timeoutMs > 0
+      ? globalThis.setTimeout(() => {
+          timedOut = true;
+          controller.abort();
+        }, timeoutMs)
+      : null;
+  const clearTimer = () => {
+    if (timer !== null) globalThis.clearTimeout(timer);
+  };
+  const cleanup = () => {
+    clearTimer();
+    parentSignal?.removeEventListener('abort', onParentAbort);
+  };
+  return {
+    signal: controller.signal,
+    didTimeout: () => timedOut && !parentSignal?.aborted,
+    clearTimer,
+    cleanup,
+  };
 }
 
 function errorMessage(status: number, detail: string): string {
@@ -250,10 +332,19 @@ export async function streamChat(options: {
   model: string;
   contents: GeminiContent[];
   signal?: AbortSignal;
+  firstTokenTimeoutMs?: number;
   disableThinkingConfig?: boolean;
   onDelta: (text: string) => void;
 }): Promise<{ text: string }> {
-  const { key, model, contents, signal, disableThinkingConfig, onDelta } = options;
+  const {
+    key,
+    model,
+    contents,
+    signal,
+    firstTokenTimeoutMs = 20000,
+    disableThinkingConfig,
+    onDelta,
+  } = options;
   const generationConfig: Record<string, unknown> = {
     temperature: 0.4,
     maxOutputTokens: 8192,
@@ -261,107 +352,127 @@ export async function streamChat(options: {
   if (!disableThinkingConfig) {
     generationConfig.thinkingConfig = { thinkingLevel: 'low' };
   }
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'text/event-stream',
-        'x-goog-api-key': key,
+
+  const timeoutGuard = createTimeoutSignal(signal, firstTokenTimeoutMs);
+  let clearedOnText = false;
+
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'text/event-stream',
+          'x-goog-api-key': key,
+        },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
+          contents,
+          generationConfig,
+        }),
+        signal: timeoutGuard.signal,
       },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
-        contents,
-        generationConfig,
-      }),
-      signal,
-    },
-  );
+    );
 
-  if (!response.ok) {
-    const detail = await response.text().catch(() => '');
-    const error: InteractionError = new Error(errorMessage(response.status, detail));
-    error.status = response.status;
-    error.detail = detail;
-    throw error;
-  }
-  if (!response.body) throw new Error('浏览器不支持流式读取，请换一个浏览器。');
+    if (!response.ok) {
+      timeoutGuard.clearTimer();
+      const detail = await response.text().catch(() => '');
+      const error: InteractionError = new Error(errorMessage(response.status, detail));
+      error.status = response.status;
+      error.detail = detail;
+      throw error;
+    }
+    if (!response.body) throw new Error('浏览器不支持流式读取，请换一个浏览器。');
 
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
-  let text = '';
-  let finishReason = '';
-  let blockReason = '';
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let text = '';
+    let finishReason = '';
+    let blockReason = '';
 
-  const handleEvent = (raw: string) => {
-    for (const line of raw.split(/\r?\n/)) {
-      if (!line.startsWith('data:')) continue;
-      const payload = line.slice(5).trim();
-      if (!payload || payload === '[DONE]') continue;
-      let chunk: {
-        candidates?: Array<{
-          content?: { parts?: Array<{ text?: string; thought?: boolean }> };
-          finishReason?: string;
-        }>;
-        promptFeedback?: { blockReason?: string };
-        error?: { message?: string; code?: number; status?: string };
-      };
-      try {
-        chunk = JSON.parse(payload);
-      } catch {
-        continue;
-      }
-      if (chunk.error?.message) {
-        const error: InteractionError = new Error(chunk.error.message);
-        error.status = chunk.error.code;
-        error.detail = chunk.error.status ?? '';
-        throw error;
-      }
-      if (chunk.promptFeedback?.blockReason) {
-        blockReason = chunk.promptFeedback.blockReason;
-      }
-      const candidate = chunk.candidates?.[0];
-      if (candidate?.finishReason) {
-        finishReason = candidate.finishReason;
-      }
-      const parts = candidate?.content?.parts;
-      if (Array.isArray(parts)) {
-        for (const part of parts) {
-          if (part.thought) continue;
-          if (part.text) {
-            text += part.text;
-            onDelta(part.text);
+    const handleEvent = (raw: string) => {
+      for (const line of raw.split(/\r?\n/)) {
+        if (!line.startsWith('data:')) continue;
+        const payload = line.slice(5).trim();
+        if (!payload || payload === '[DONE]') continue;
+        let chunk: {
+          candidates?: Array<{
+            content?: { parts?: Array<{ text?: string; thought?: boolean }> };
+            finishReason?: string;
+          }>;
+          promptFeedback?: { blockReason?: string };
+          error?: { message?: string; code?: number; status?: string };
+        };
+        try {
+          chunk = JSON.parse(payload);
+        } catch {
+          continue;
+        }
+        if (chunk.error?.message) {
+          const error: InteractionError = new Error(chunk.error.message);
+          error.status = chunk.error.code;
+          error.detail = chunk.error.status ?? '';
+          throw error;
+        }
+        if (chunk.promptFeedback?.blockReason) {
+          blockReason = chunk.promptFeedback.blockReason;
+        }
+        const candidate = chunk.candidates?.[0];
+        if (candidate?.finishReason) {
+          finishReason = candidate.finishReason;
+        }
+        const parts = candidate?.content?.parts;
+        if (Array.isArray(parts)) {
+          for (const part of parts) {
+            if (part.thought) continue;
+            if (part.text) {
+              if (!clearedOnText) {
+                clearedOnText = true;
+                timeoutGuard.clearTimer();
+              }
+              text += part.text;
+              onDelta(part.text);
+            }
           }
         }
       }
-    }
-  };
+    };
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true }).replace(/\r\n/g, '\n');
-    let index = buffer.indexOf('\n\n');
-    while (index >= 0) {
-      handleEvent(buffer.slice(0, index));
-      buffer = buffer.slice(index + 2);
-      index = buffer.indexOf('\n\n');
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true }).replace(/\r\n/g, '\n');
+      let index = buffer.indexOf('\n\n');
+      while (index >= 0) {
+        handleEvent(buffer.slice(0, index));
+        buffer = buffer.slice(index + 2);
+        index = buffer.indexOf('\n\n');
+      }
     }
+    if (buffer.trim()) handleEvent(buffer);
+
+    if (!text) {
+      if (blockReason) {
+        throw new Error(`请求被安全策略拦截（${blockReason}），请换个问法再试。`);
+      }
+      if (finishReason && finishReason !== 'STOP') {
+        throw new Error(`生成中断（${finishReason}），请再试一次。`);
+      }
+    }
+
+    return { text };
+  } catch (err) {
+    if (timeoutGuard.didTimeout()) {
+      const timeoutError: InteractionError = new Error('模型响应超时，请稍后再试或切换更快的模型。');
+      timeoutError.isTimeout = true;
+      throw timeoutError;
+    }
+    throw err;
+  } finally {
+    timeoutGuard.cleanup();
   }
-  if (buffer.trim()) handleEvent(buffer);
-
-  if (!text) {
-    if (blockReason) {
-      throw new Error(`请求被安全策略拦截（${blockReason}），请换个问法再试。`);
-    }
-    if (finishReason && finishReason !== 'STOP') {
-      throw new Error(`生成中断（${finishReason}），请再试一次。`);
-    }
-  }
-
-  return { text };
 }
 
 function isThinkingConfigError(error: unknown): boolean {
@@ -373,6 +484,7 @@ function isThinkingConfigError(error: unknown): boolean {
 function isFallbackableModelError(error: unknown): boolean {
   const err = error as InteractionError | null;
   if (!err) return false;
+  if (err.isTimeout) return true;
   if (err.status && [403, 404, 429, 500, 502, 503, 504].includes(err.status)) return true;
   if (err.status === 400 && /model|not found|not supported|unsupported/i.test(`${err.message} ${err.detail ?? ''}`)) {
     return true;
@@ -383,21 +495,35 @@ function isFallbackableModelError(error: unknown): boolean {
 /**
  * 按候选优先级调用流式对话：
  * - 单模型若因不支持 thinkingConfig 报 400，自动去掉 thinkingConfig 重试一次；
- * - 多候选（如「自动最强」模式）若在未输出任何内容前遇权限/下线/限流/5xx，自动顺延下一档最强模型。
+ * - 若首选模型首字超时（10s 无回复）或在未输出前遇权限/下线/限流/5xx，自动顺延下一档候选模型。
  */
 export async function streamChatWithFallback(options: {
   key: string;
   candidates: string[];
   contents: GeminiContent[];
   signal?: AbortSignal;
+  onAttempt?: (info: {
+    model: string;
+    index: number;
+    total: number;
+    fallbackReason?: 'timeout' | 'error';
+  }) => void;
   onDelta: (text: string) => void;
 }): Promise<{ text: string; usedModel: string }> {
-  const { key, candidates, contents, signal, onDelta } = options;
-  const list = candidates.length ? candidates : [GEMINI_MODELS[0].id];
+  const { key, candidates, contents, signal, onAttempt, onDelta } = options;
+  const list = candidates.length ? candidates : ['gemini-4-argon', 'gemini-3.8-flash'];
   let lastError: unknown;
+  let lastFallbackReason: 'timeout' | 'error' | undefined;
 
   for (let i = 0; i < list.length; i += 1) {
     const model = list[i];
+    const firstTokenTimeoutMs = i < list.length - 1 ? 10000 : 25000;
+    onAttempt?.({
+      model,
+      index: i,
+      total: list.length,
+      fallbackReason: i > 0 ? lastFallbackReason : undefined,
+    });
     let emitted = false;
     const wrappedOnDelta = (delta: string) => {
       emitted = true;
@@ -410,6 +536,7 @@ export async function streamChatWithFallback(options: {
         model,
         contents,
         signal,
+        firstTokenTimeoutMs,
         onDelta: wrappedOnDelta,
       });
       return { text: res.text, usedModel: model };
@@ -422,6 +549,7 @@ export async function streamChatWithFallback(options: {
             model,
             contents,
             signal,
+            firstTokenTimeoutMs,
             disableThinkingConfig: true,
             onDelta: wrappedOnDelta,
           });
@@ -429,11 +557,13 @@ export async function streamChatWithFallback(options: {
         } catch (retryErr) {
           if (signal?.aborted || emitted) throw retryErr;
           lastError = retryErr;
+          lastFallbackReason = (retryErr as InteractionError | null)?.isTimeout ? 'timeout' : 'error';
           if (i < list.length - 1 && isFallbackableModelError(retryErr)) continue;
           throw retryErr;
         }
       }
       lastError = err;
+      lastFallbackReason = (err as InteractionError | null)?.isTimeout ? 'timeout' : 'error';
       if (i < list.length - 1 && isFallbackableModelError(err)) continue;
       throw err;
     }
@@ -588,48 +718,60 @@ export async function transcribeMixedAudio(options: {
     .filter(Boolean)
     .join('\n');
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: 'user',
-            parts: [
-              { inlineData: { mimeType, data: base64 } },
-              { text: prompt },
-            ],
+  const timeoutGuard = createTimeoutSignal(signal, 20000);
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: 'user',
+              parts: [
+                { inlineData: { mimeType, data: base64 } },
+                { text: prompt },
+              ],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.1,
+            maxOutputTokens: 512,
           },
-        ],
-        generationConfig: {
-          temperature: 0.1,
-          maxOutputTokens: 512,
-        },
-      }),
-      signal,
-    },
-  );
+        }),
+        signal: timeoutGuard.signal,
+      },
+    );
 
-  if (!response.ok) {
-    const detail = await response.text().catch(() => '');
-    const error: InteractionError = new Error(errorMessage(response.status, detail));
-    error.status = response.status;
-    error.detail = detail;
-    throw error;
-  }
+    if (!response.ok) {
+      const detail = await response.text().catch(() => '');
+      const error: InteractionError = new Error(errorMessage(response.status, detail));
+      error.status = response.status;
+      error.detail = detail;
+      throw error;
+    }
 
-  const data = (await response.json()) as {
-    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-  };
-  const text =
-    data.candidates?.[0]?.content?.parts
-      ?.map((part) => part.text ?? '')
-      .join('')
-      .trim() ?? '';
-  if (!text || /^(?:无|静音|空白|none|silence|\(?silence\)?|\[?silence\]?|（静音）|（无语音）|（无内容）)$/i.test(text)) {
-    return '';
+    const data = (await response.json()) as {
+      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+    };
+    const text =
+      data.candidates?.[0]?.content?.parts
+        ?.map((part) => part.text ?? '')
+        .join('')
+        .trim() ?? '';
+    if (!text || /^(?:无|静音|空白|none|silence|\(?silence\)?|\[?silence\]?|（静音）|（无语音）|（无内容）)$/i.test(text)) {
+      return '';
+    }
+    return text;
+  } catch (err) {
+    if (timeoutGuard.didTimeout()) {
+      const timeoutError: InteractionError = new Error('语音识别超时，请重试。');
+      timeoutError.isTimeout = true;
+      throw timeoutError;
+    }
+    throw err;
+  } finally {
+    timeoutGuard.cleanup();
   }
-  return text;
 }

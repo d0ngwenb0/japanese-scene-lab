@@ -9,6 +9,7 @@ import {
   loadCachedModels,
   loadKey,
   loadModel,
+  pickAutoCandidates,
   saveKey,
   saveModel,
   streamChatWithFallback,
@@ -208,6 +209,7 @@ export function AiChat({
   const [draft, setDraft] = useState('');
   const [busy, setBusy] = useState(false);
   const [thinking, setThinking] = useState(false);
+  const [thinkingStatus, setThinkingStatus] = useState('');
   const [recording, setRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
   const [error, setError] = useState('');
@@ -656,6 +658,7 @@ export function AiChat({
     setDraft('');
     setBusy(false);
     setThinking(false);
+    setThinkingStatus('');
   }, [scenario.id]);
 
   useEffect(() => {
@@ -801,6 +804,7 @@ export function AiChat({
       setError('');
       setBusy(true);
       setThinking(true);
+      setThinkingStatus('');
       pendingRef.current = '';
       shownRef.current = '';
       endedRef.current = false;
@@ -810,20 +814,34 @@ export function AiChat({
       abortRef.current = controller;
       let received = false;
 
+      const labelFor = (modelId: string) =>
+        availableModels.find((item) => item.id === modelId)?.label ??
+        GEMINI_MODELS.find((item) => item.id === modelId)?.label ??
+        modelId;
+
       try {
         const candidates =
-          model === AUTO_MODEL_ID
-            ? availableModels.slice(0, 4).map((item) => item.id)
-            : [model];
+          model === AUTO_MODEL_ID ? pickAutoCandidates(availableModels) : [model];
         const result = await streamChatWithFallback({
           key,
           candidates,
           contents,
           signal: controller.signal,
+          onAttempt: ({ model: attemptModel, fallbackReason }) => {
+            const name = labelFor(attemptModel);
+            if (fallbackReason === 'timeout') {
+              setThinkingStatus(`响应较慢，已切换至 ${name}…`);
+            } else if (fallbackReason === 'error') {
+              setThinkingStatus(`当前模型暂不可用，已切换至 ${name}…`);
+            } else {
+              setThinkingStatus(`正在由 ${name} 解析…`);
+            }
+          },
           onDelta: (delta) => {
             if (!received) {
               received = true;
               setThinking(false);
+              setThinkingStatus('');
             }
             pendingRef.current += delta;
             startTicker();
@@ -836,6 +854,7 @@ export function AiChat({
           setError('模型没有返回内容，请换个问法或稍后再试。');
           setBusy(false);
           setThinking(false);
+          setThinkingStatus('');
           return;
         }
         if (!pendingRef.current) {
@@ -849,6 +868,7 @@ export function AiChat({
           stopTicker();
           setBusy(false);
           setThinking(false);
+          setThinkingStatus('');
           if (!shownRef.current) {
             setMessages((prev) => prev.slice(0, -1));
           }
@@ -862,6 +882,7 @@ export function AiChat({
         }
         setBusy(false);
         setThinking(false);
+        setThinkingStatus('');
       } finally {
         abortRef.current = null;
       }
@@ -913,6 +934,7 @@ export function AiChat({
     stopTicker();
     setBusy(false);
     setThinking(false);
+    setThinkingStatus('');
   };
 
   const submitKey = (event: FormEvent) => {
@@ -951,6 +973,7 @@ export function AiChat({
     setError('');
     setBusy(false);
     setThinking(false);
+    setThinkingStatus('');
   };
 
   const copyAnswer = async (text: string, index: number) => {
@@ -960,6 +983,12 @@ export function AiChat({
     if (copiedTimer.current) window.clearTimeout(copiedTimer.current);
     copiedTimer.current = window.setTimeout(() => setCopiedIndex(-1), 1500);
   };
+
+  const autoPrimaryId = pickAutoCandidates(availableModels)[0] ?? GEMINI_MODELS[0].id;
+  const autoPrimaryLabel =
+    availableModels.find((item) => item.id === autoPrimaryId)?.label ??
+    GEMINI_MODELS.find((item) => item.id === autoPrimaryId)?.label ??
+    autoPrimaryId;
 
   return (
     <>
@@ -1078,7 +1107,7 @@ export function AiChat({
               }}
             >
               <option value={AUTO_MODEL_ID}>
-                ✨ 自动最强（当前：{availableModels[0]?.label ?? GEMINI_MODELS[0].label}）
+                ✨ 自动优先（首选：{autoPrimaryLabel}）
               </option>
               {availableModels.map((item) => (
                 <option key={item.id} value={item.id}>
@@ -1151,7 +1180,7 @@ export function AiChat({
                     <i />
                     <i />
                   </span>
-                  正在解析…
+                  {thinkingStatus || '正在解析…'}
                 </div>
               ) : null}
 
