@@ -22,12 +22,12 @@
   --warn-bg: #fbf0da;
   --warn-border: #ecd9b4;
   --warn-fg: #8a5312;
-  --pos-noun: #1d4ed8;
-  --pos-verb: #047857;
-  --pos-adj: #b45309;
-  --pos-adv: #6d28d9;
-  --pos-particle: #be123c;
-  --pos-expr: #0f766e;
+  --pos-hl-noun: rgb(59 130 246 / 0.19);
+  --pos-hl-verb: rgb(16 185 129 / 0.21);
+  --pos-hl-adj: rgb(245 158 11 / 0.25);
+  --pos-hl-adv: rgb(139 92 246 / 0.19);
+  --pos-hl-particle: rgb(244 63 94 / 0.18);
+  --pos-hl-expr: rgb(20 184 166 / 0.20);
   --menu-shadow: 0 10px 28px rgba(30, 24, 16, 0.14);
   --dock-shadow: 0 6px 22px rgba(30, 24, 16, 0.1);
   --card-shadow: 0 2px 10px rgba(30, 24, 16, 0.05);
@@ -67,12 +67,12 @@
   --warn-bg: #2c2214;
   --warn-border: #4a3a1f;
   --warn-fg: #e0b266;
-  --pos-noun: #7dd3fc;
-  --pos-verb: #6ee7b7;
-  --pos-adj: #fcd34d;
-  --pos-adv: #c4b5fd;
-  --pos-particle: #fda4af;
-  --pos-expr: #5eead4;
+  --pos-hl-noun: rgb(56 189 248 / 0.22);
+  --pos-hl-verb: rgb(52 211 153 / 0.22);
+  --pos-hl-adj: rgb(251 191 36 / 0.24);
+  --pos-hl-adv: rgb(167 139 250 / 0.23);
+  --pos-hl-particle: rgb(251 113 133 / 0.22);
+  --pos-hl-expr: rgb(45 212 191 / 0.22);
   --menu-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
   --dock-shadow: 0 8px 26px rgba(0, 0, 0, 0.42);
   --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.24);
@@ -4921,7 +4921,7 @@ dialog::backdrop {
 
   .gloss-word:hover,
   .gloss-word.is-gloss-active {
-    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    background-color: color-mix(in srgb, var(--accent) 14%, transparent);
     border-bottom-color: var(--accent);
   }
 
@@ -4931,7 +4931,7 @@ dialog::backdrop {
 
   .gloss-word.is-particle:hover,
   .gloss-word.is-particle.is-gloss-active {
-    background: color-mix(in srgb, var(--accent) 16%, transparent);
+    background-color: color-mix(in srgb, var(--accent) 16%, transparent);
     border-bottom-color: color-mix(in srgb, var(--accent) 70%, transparent);
   }
 }
@@ -5112,47 +5112,67 @@ dialog::backdrop {
 
 .focus-line .gloss-word:hover,
 .focus-line .gloss-word.is-gloss-active {
-  background: rgb(255 255 255 / 0.14);
+  background-color: rgb(255 255 255 / 0.14);
   border-bottom-color: rgb(255 255 255 / 0.72);
 }
 
-/* ---------- 词性染色（开关控制） ---------- */
+/* ---------- 词性笔刷高光背景（开关控制） ---------- */
 
 .tool-btn.pos-color-btn.is-active {
   background: var(--accent-soft);
   color: var(--accent-text);
 }
 
-:root[data-pos-color='on'] .gloss-word[data-pos='名'] {
-  color: var(--pos-noun);
+:root[data-pos-color='on'] .gloss-word[data-pos] {
+  --pos-hl: transparent;
+  background-image: linear-gradient(
+    104deg,
+    transparent 0.4%,
+    color-mix(in srgb, var(--pos-hl) 68%, transparent) 2.5%,
+    var(--pos-hl) 12%,
+    color-mix(in srgb, var(--pos-hl) 92%, transparent) 84%,
+    color-mix(in srgb, var(--pos-hl) 58%, transparent) 97%,
+    transparent 99.6%
+  );
+  background-size: 100% 0.56em;
+  background-position: 0 92%;
+  background-repeat: no-repeat;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
-:root[data-pos-color='on'] .gloss-word[data-pos='動'] {
-  color: var(--pos-verb);
+:root[data-pos-color='on'] .gloss-word[data-pos='名'],
+.pos-legend-item[data-pos='名'] {
+  --pos-hl: var(--pos-hl-noun);
 }
 
-:root[data-pos-color='on'] .gloss-word[data-pos='形'] {
-  color: var(--pos-adj);
+:root[data-pos-color='on'] .gloss-word[data-pos='動'],
+.pos-legend-item[data-pos='動'] {
+  --pos-hl: var(--pos-hl-verb);
 }
 
-:root[data-pos-color='on'] .gloss-word[data-pos='副'] {
-  color: var(--pos-adv);
+:root[data-pos-color='on'] .gloss-word[data-pos='形'],
+.pos-legend-item[data-pos='形'] {
+  --pos-hl: var(--pos-hl-adj);
 }
 
-:root[data-pos-color='on'] .gloss-word[data-pos='助'] {
-  color: var(--pos-particle);
+:root[data-pos-color='on'] .gloss-word[data-pos='副'],
+.pos-legend-item[data-pos='副'] {
+  --pos-hl: var(--pos-hl-adv);
 }
 
-:root[data-pos-color='on'] .gloss-word:is([data-pos='敬語'], [data-pos='表現'], [data-pos='接'], [data-pos='感']) {
-  color: var(--pos-expr);
+:root[data-pos-color='on'] .gloss-word[data-pos='助'],
+.pos-legend-item[data-pos='助'] {
+  --pos-hl: var(--pos-hl-particle);
 }
 
-:root[data-pos-color='on'] .gloss-word ruby rt {
-  color: var(--muted);
+:root[data-pos-color='on'] .gloss-word:is([data-pos='敬語'], [data-pos='表現'], [data-pos='接'], [data-pos='感']),
+.pos-legend-item[data-pos='敬語'] {
+  --pos-hl: var(--pos-hl-expr);
 }
 
-:root[data-pos-color='on'] .focus-line:not(.is-active):not(:hover) .gloss-word {
-  color: transparent;
+:root[data-pos-color='on'] .focus-line:not(.is-active):not(:hover) .gloss-word[data-pos] {
+  background-image: none;
 }
 
 .pos-legend {
@@ -5164,104 +5184,66 @@ dialog::backdrop {
   border-bottom: 1px solid var(--border);
   background: color-mix(in srgb, var(--surface-2) 48%, var(--surface));
   font-size: 11.5px;
-  color: var(--muted);
+  color: var(--ink);
 }
 
 .pos-legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+  --pos-hl: transparent;
+  display: inline-block;
+  padding: 0 4px;
   font-weight: 500;
   white-space: nowrap;
-}
-
-.pos-legend-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  flex: none;
-}
-
-.pos-legend-item[data-pos='名'] {
-  color: var(--pos-noun);
-}
-.pos-legend-item[data-pos='名'] .pos-legend-dot {
-  background: var(--pos-noun);
-}
-
-.pos-legend-item[data-pos='動'] {
-  color: var(--pos-verb);
-}
-.pos-legend-item[data-pos='動'] .pos-legend-dot {
-  background: var(--pos-verb);
-}
-
-.pos-legend-item[data-pos='形'] {
-  color: var(--pos-adj);
-}
-.pos-legend-item[data-pos='形'] .pos-legend-dot {
-  background: var(--pos-adj);
-}
-
-.pos-legend-item[data-pos='副'] {
-  color: var(--pos-adv);
-}
-.pos-legend-item[data-pos='副'] .pos-legend-dot {
-  background: var(--pos-adv);
-}
-
-.pos-legend-item[data-pos='助'] {
-  color: var(--pos-particle);
-}
-.pos-legend-item[data-pos='助'] .pos-legend-dot {
-  background: var(--pos-particle);
-}
-
-.pos-legend-item[data-pos='敬語'] {
-  color: var(--pos-expr);
-}
-.pos-legend-item[data-pos='敬語'] .pos-legend-dot {
-  background: var(--pos-expr);
+  background-image: linear-gradient(
+    104deg,
+    transparent 0.4%,
+    color-mix(in srgb, var(--pos-hl) 68%, transparent) 2.5%,
+    var(--pos-hl) 12%,
+    color-mix(in srgb, var(--pos-hl) 92%, transparent) 84%,
+    color-mix(in srgb, var(--pos-hl) 58%, transparent) 97%,
+    transparent 99.6%
+  );
+  background-size: 100% 0.56em;
+  background-position: 0 92%;
+  background-repeat: no-repeat;
 }
 
 :root[data-pos-color='on'] .gloss-pos[data-pos='名'] {
-  color: var(--pos-noun);
-  border-color: color-mix(in srgb, var(--pos-noun) 35%, transparent);
+  background: var(--pos-hl-noun);
+  border-color: color-mix(in srgb, var(--pos-hl-noun) 85%, var(--border));
 }
 
 :root[data-pos-color='on'] .gloss-pos[data-pos='動'] {
-  color: var(--pos-verb);
-  border-color: color-mix(in srgb, var(--pos-verb) 35%, transparent);
+  background: var(--pos-hl-verb);
+  border-color: color-mix(in srgb, var(--pos-hl-verb) 85%, var(--border));
 }
 
 :root[data-pos-color='on'] .gloss-pos[data-pos='形'] {
-  color: var(--pos-adj);
-  border-color: color-mix(in srgb, var(--pos-adj) 35%, transparent);
+  background: var(--pos-hl-adj);
+  border-color: color-mix(in srgb, var(--pos-hl-adj) 85%, var(--border));
 }
 
 :root[data-pos-color='on'] .gloss-pos[data-pos='副'] {
-  color: var(--pos-adv);
-  border-color: color-mix(in srgb, var(--pos-adv) 35%, transparent);
+  background: var(--pos-hl-adv);
+  border-color: color-mix(in srgb, var(--pos-hl-adv) 85%, var(--border));
 }
 
 :root[data-pos-color='on'] .gloss-pos[data-pos='助'] {
-  color: var(--pos-particle);
-  border-color: color-mix(in srgb, var(--pos-particle) 35%, transparent);
+  background: var(--pos-hl-particle);
+  border-color: color-mix(in srgb, var(--pos-hl-particle) 85%, var(--border));
 }
 
 :root[data-pos-color='on'] .gloss-pos:is([data-pos='敬語'], [data-pos='表現'], [data-pos='接'], [data-pos='感']) {
-  color: var(--pos-expr);
-  border-color: color-mix(in srgb, var(--pos-expr) 35%, transparent);
+  background: var(--pos-hl-expr);
+  border-color: color-mix(in srgb, var(--pos-hl-expr) 85%, var(--border));
 }
 
 @media (forced-colors: active) {
   :root[data-pos-color='on'] .gloss-word[data-pos],
-  .pos-legend-item[data-pos],
-  :root[data-pos-color='on'] .gloss-pos[data-pos] {
-    color: CanvasText;
+  .pos-legend-item[data-pos] {
+    background-image: none;
   }
 
-  .pos-legend-dot {
-    background: CanvasText;
+  :root[data-pos-color='on'] .gloss-pos[data-pos] {
+    background: transparent;
   }
 }

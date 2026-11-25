@@ -471,29 +471,23 @@ export function PlayerView({
           </div>
         </div>
         {settings.posColor && (
-          <div className="pos-legend" aria-label="词性颜色图例">
+          <div className="pos-legend" aria-label="词性背景图例">
             <span className="pos-legend-item" data-pos="名">
-              <i className="pos-legend-dot" aria-hidden="true" />
               名词
             </span>
             <span className="pos-legend-item" data-pos="動">
-              <i className="pos-legend-dot" aria-hidden="true" />
               动词
             </span>
             <span className="pos-legend-item" data-pos="形">
-              <i className="pos-legend-dot" aria-hidden="true" />
               形容词
             </span>
             <span className="pos-legend-item" data-pos="副">
-              <i className="pos-legend-dot" aria-hidden="true" />
               副词
             </span>
             <span className="pos-legend-item" data-pos="助">
-              <i className="pos-legend-dot" aria-hidden="true" />
               助词
             </span>
             <span className="pos-legend-item" data-pos="敬語">
-              <i className="pos-legend-dot" aria-hidden="true" />
               敬语・表达
             </span>
           </div>
