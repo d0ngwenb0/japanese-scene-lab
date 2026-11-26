@@ -47,7 +47,9 @@ export function SceneSwitcher({ scenarios, currentId, onSelect }: Props) {
     const timer = window.setTimeout(() => {
       const current = menuRef.current?.querySelector<HTMLElement>('[aria-checked="true"]');
       current?.scrollIntoView({ block: 'center' });
-      searchRef.current?.focus();
+      if (!window.matchMedia('(pointer: coarse)').matches) {
+        searchRef.current?.focus();
+      }
     }, 0);
     return () => window.clearTimeout(timer);
   }, [open]);

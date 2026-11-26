@@ -19,6 +19,7 @@ import { ForceRefreshButton } from './ForceRefreshButton';
 import { FullscreenToggle } from './FullscreenToggle';
 import { JlptStage } from './JlptStage';
 import { SceneSwitcher } from './SceneSwitcher';
+import { MobileMoreMenu } from './MobileMoreMenu';
 import { AiChat } from './AiChat';
 import { PassageList } from './PassageList';
 import { FocusLyricsOverlay } from './FocusLyricsOverlay';
@@ -47,6 +48,8 @@ interface Props {
   onFocusModeChange: (enabled: boolean) => void;
   aiOpen: boolean;
   onAiOpenChange: (open: boolean) => void;
+  pendingAiAsk?: { id: number; text: string } | null;
+  onConsumePendingAiAsk?: () => void;
   isFavorite: boolean;
   onToggleFavorite: () => void;
 }
@@ -80,6 +83,8 @@ export function PlayerView({
   onFocusModeChange,
   aiOpen,
   onAiOpenChange,
+  pendingAiAsk,
+  onConsumePendingAiAsk,
   isFavorite,
   onToggleFavorite,
 }: Props) {
@@ -152,6 +157,12 @@ export function PlayerView({
       setPausedByAi(false);
     }
   }, [playing, pausedByAi]);
+
+  useEffect(() => {
+    if (pendingAiAsk && pause()) {
+      setPausedByAi(true);
+    }
+  }, [pendingAiAsk, pause]);
 
   useEffect(() => {
     return () => {
@@ -385,18 +396,29 @@ export function PlayerView({
             currentId={scenario.id}
             onSelect={onSceneChange}
           />
-          <PlaybackTimer
-            endAt={timerEndAt}
-            activeMinutes={timerPreset}
-            onSelect={onTimerChange}
-          />
-          <ThemeToggle mode={theme} onChange={onThemeChange} />
-          <PaletteToggle
+          <div className="pbar-desktop-tools">
+            <PlaybackTimer
+              endAt={timerEndAt}
+              activeMinutes={timerPreset}
+              onSelect={onTimerChange}
+            />
+            <ThemeToggle mode={theme} onChange={onThemeChange} />
+            <PaletteToggle
+              palette={settings.palette}
+              onChange={(palette) => onSettingsChange({ palette })}
+            />
+            <ForceRefreshButton />
+            <FullscreenToggle />
+          </div>
+          <MobileMoreMenu
+            theme={theme}
+            onThemeChange={onThemeChange}
             palette={settings.palette}
-            onChange={(palette) => onSettingsChange({ palette })}
+            onPaletteChange={(palette) => onSettingsChange({ palette })}
+            timerEndAt={timerEndAt}
+            timerPreset={timerPreset}
+            onTimerChange={onTimerChange}
           />
-          <ForceRefreshButton />
-          <FullscreenToggle />
         </div>
       </header>
 
@@ -727,6 +749,8 @@ export function PlayerView({
         line={line}
         open={aiOpen}
         pausedByAi={pausedByAi}
+        pendingAsk={pendingAiAsk}
+        onConsumePendingAsk={onConsumePendingAiAsk}
         onClose={closeAi}
       />
 

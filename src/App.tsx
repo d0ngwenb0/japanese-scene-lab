@@ -8,7 +8,7 @@ import { ScenarioList } from './components/ScenarioList';
 import { PlayerView } from './components/PlayerView';
 import { resetFocusChrome } from './components/FocusLyricsOverlay';
 import { PullToRefresh } from './components/PullToRefresh';
-import { GlossaryTooltip } from './components/GlossaryTooltip';
+import { GlossaryTooltip, type GlossaryAskPayload } from './components/GlossaryTooltip';
 import { ensureGlossaryLoaded } from './lib/glossary';
 
 const scenarios = scenariosData as Scenario[];
@@ -112,9 +112,12 @@ export default function App() {
   const [timerEndAt, setTimerEndAt] = useState<number | null>(null);
   const [timerPreset, setTimerPreset] = useState<number | null>(null);
   const [timerStopTick, setTimerStopTick] = useState(0);
+  const [pendingAiAsk, setPendingAiAsk] = useState<{ id: number; text: string } | null>(null);
+  const askIdRef = useRef(0);
 
   const open = useCallback((id: string) => {
     setAutoPlayNext(false);
+    setPendingAiAsk(null);
     window.location.hash = `#/s/${id}`;
   }, []);
 
@@ -122,7 +125,18 @@ export default function App() {
     setAutoPlayNext(false);
     setFocusMode(false);
     setAiOpen(false);
+    setPendingAiAsk(null);
     window.location.hash = '#/';
+  }, []);
+
+  const handleAskWord = useCallback((payload: GlossaryAskPayload) => {
+    const readingPart = payload.reading ? `（${payload.reading}）` : '';
+    const sentencePart = payload.sentence ? `在「${payload.sentence}」中` : '在本句中';
+    const text = `请结合上下文深入讲解「${payload.surface}」${readingPart}（${payload.pos}）${sentencePart}的准确含义、语法/语气细节及常见搭配。`;
+    askIdRef.current += 1;
+    setFocusMode(false);
+    setPendingAiAsk({ id: askIdRef.current, text });
+    setAiOpen(true);
   }, []);
 
   const advanceToRandomScene = useCallback(() => {
@@ -210,6 +224,8 @@ export default function App() {
           onFocusModeChange={setFocusMode}
           aiOpen={aiOpen}
           onAiOpenChange={setAiOpen}
+          pendingAiAsk={pendingAiAsk}
+          onConsumePendingAiAsk={() => setPendingAiAsk(null)}
           isFavorite={isFavorite(active.id)}
           onToggleFavorite={() => toggleFavorite(active.id)}
         />
@@ -225,7 +241,7 @@ export default function App() {
         />
       )}
       <PullToRefresh />
-      <GlossaryTooltip />
+      <GlossaryTooltip onAskWord={active ? handleAskWord : undefined} />
     </div>
   );
 }

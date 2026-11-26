@@ -7,7 +7,7 @@ const THRESHOLD = 64;
 function isInsideExcludedArea(target: EventTarget | null): boolean {
   return (
     target instanceof Element &&
-    Boolean(target.closest('.menu-popover, .scene-menu, .sheet-layer'))
+    Boolean(target.closest('.menu-popover, .scene-menu, .sheet-layer, .ai-pane, .focus-overlay, .gloss-popover'))
   );
 }
 

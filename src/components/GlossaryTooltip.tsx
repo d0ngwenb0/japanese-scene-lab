@@ -1,8 +1,18 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { getGlossaryEntry, type GlossaryEntry } from '../lib/glossary';
+import { SparklesIcon } from './Icons';
+
+export interface GlossaryAskPayload {
+  surface: string;
+  reading?: string;
+  pos: string;
+  gloss: string;
+  sentence?: string;
+}
 
 type ActiveState = {
   entry: GlossaryEntry & { surface: string };
+  sentence?: string;
   placement: 'top' | 'bottom';
   coords: { x: number; y: number } | null;
 };
@@ -27,7 +37,7 @@ function hasSelectionInside(el: HTMLElement | null): boolean {
   );
 }
 
-export function GlossaryTooltip() {
+export function GlossaryTooltip({ onAskWord }: { onAskWord?: (payload: GlossaryAskPayload) => void }) {
   const tooltipId = useId();
   const popoverRef = useRef<HTMLDivElement>(null);
   const activeWordRef = useRef<HTMLElement | null>(null);
@@ -100,7 +110,12 @@ export function GlossaryTooltip() {
         coords = { x, y };
       }
 
-      setActive({ entry, placement, coords });
+      const sentence =
+        wordEl
+          .closest('.bubble-ja, .passage-seg, .jlpt-question-ja, .jlpt-opt-text, .jlpt-line-body .ja, .focus-ja')
+          ?.textContent?.trim() || undefined;
+
+      setActive({ entry, sentence, placement, coords });
 
       const pop = popoverRef.current;
       if (pop && 'showPopover' in pop && typeof pop.showPopover === 'function') {
@@ -363,6 +378,28 @@ export function GlossaryTooltip() {
               <span className="gloss-base-label">原形：</span>
               <span lang="ja">{entry.l}</span>
               {entry.lr ? <span lang="ja">（{entry.lr}）</span> : null}
+            </div>
+          )}
+          {onAskWord && (
+            <div className="gloss-foot">
+              <button
+                type="button"
+                className="gloss-ask-ai"
+                onClick={() => {
+                  const payload: GlossaryAskPayload = {
+                    surface: entry.surface,
+                    reading: showReading ? reading : undefined,
+                    pos: entry.p === '助' ? '助詞' : entry.p,
+                    gloss: entry.z,
+                    sentence: active?.sentence,
+                  };
+                  hideTooltip();
+                  onAskWord(payload);
+                }}
+              >
+                <SparklesIcon width={12} height={12} />
+                <span>深问 AI</span>
+              </button>
             </div>
           )}
         </div>

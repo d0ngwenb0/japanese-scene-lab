@@ -178,6 +178,8 @@ interface Props {
   pausedByAi?: boolean;
   onSessionStart?: () => void;
   onSessionEnd?: () => void;
+  pendingAsk?: { id: number; text: string } | null;
+  onConsumePendingAsk?: () => void;
 }
 
 export function AiChat({
@@ -188,6 +190,8 @@ export function AiChat({
   pausedByAi = false,
   onSessionStart,
   onSessionEnd,
+  pendingAsk,
+  onConsumePendingAsk,
 }: Props) {
   const initial = useRef<StoredChat | null>(null);
   if (!initial.current) initial.current = loadChat(scenario.id);
@@ -238,6 +242,7 @@ export function AiChat({
   const messagesRef = useRef(messages);
   const saveTimerRef = useRef<number | null>(null);
   const interactionRef = useRef(interactionId);
+  const lastConsumedAskIdRef = useRef(0);
   const lastLineRef = useRef(lastLineId);
   const sceneHashRef = useRef(initial.current.sceneHash);
   const keyHashRef = useRef(initial.current.keyHash);
@@ -889,6 +894,18 @@ export function AiChat({
     },
     [availableModels, draft, key, line.id, messages, model, busy, scenario],
   );
+
+  useEffect(() => {
+    if (!open || !pendingAsk || pendingAsk.id === lastConsumedAskIdRef.current) return;
+    lastConsumedAskIdRef.current = pendingAsk.id;
+    onConsumePendingAsk?.();
+    if (key && !busy) {
+      void send(pendingAsk.text);
+    } else {
+      setDraft(pendingAsk.text);
+      if (!key) setSettingsOpen(true);
+    }
+  }, [open, pendingAsk, key, busy, send, onConsumePendingAsk]);
 
   useEffect(() => {
     if (!key) {
