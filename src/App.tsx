@@ -11,7 +11,8 @@ import { PullToRefresh } from './components/PullToRefresh';
 import { GlossaryTooltip, type GlossaryAskPayload } from './components/GlossaryTooltip';
 import { ensureGlossaryLoaded } from './lib/glossary';
 
-const scenarios = scenariosData as Scenario[];
+// scenarios.json 按新增时间顺序追加，前端展示按最新优先倒序排列。
+const scenarios = [...(scenariosData as Scenario[])].reverse();
 
 function readSceneId(): string | null {
   const match = window.location.hash.match(/^#\/s\/([a-z0-9-]+)/i);
