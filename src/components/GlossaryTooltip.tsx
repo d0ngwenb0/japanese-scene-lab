@@ -33,6 +33,8 @@ export function GlossaryTooltip() {
   const activeWordRef = useRef<HTMLElement | null>(null);
   const openTimerRef = useRef<number | null>(null);
   const closeTimerRef = useRef<number | null>(null);
+  const touchStartRef = useRef<{ x: number; y: number; time: number; wordEl: HTMLElement | null } | null>(null);
+  const suppressClickUntilRef = useRef(0);
   const [active, setActive] = useState<ActiveState | null>(null);
   const [fallbackOpen, setFallbackOpen] = useState(false);
 
@@ -91,7 +93,7 @@ export function GlossaryTooltip() {
       let placement: 'top' | 'bottom' = 'top';
       if (!supportsAnchor) {
         const rect = wordEl.getBoundingClientRect();
-        placement = rect.top < 96 ? 'bottom' : 'top';
+        placement = rect.top < 120 ? 'bottom' : 'top';
         const half = Math.min(168, window.innerWidth / 2 - 12);
         const x = Math.min(Math.max(rect.left + rect.width / 2, half), window.innerWidth - half);
         const y = placement === 'top' ? rect.top - 10 : rect.bottom + 10;
@@ -196,9 +198,54 @@ export function GlossaryTooltip() {
     const onPointerDown = (event: PointerEvent) => {
       const target = event.target as HTMLElement | null;
       if (target?.closest('.gloss-popover')) return;
+      if (event.pointerType === 'touch') {
+        const wordEl = target?.closest('.gloss-word[data-gloss-key]') as HTMLElement | null;
+        touchStartRef.current = {
+          x: event.clientX,
+          y: event.clientY,
+          time: Date.now(),
+          wordEl,
+        };
+        if (!wordEl && (activeWordRef.current || openTimerRef.current !== null)) {
+          hideTooltip();
+        }
+        return;
+      }
       if (event.button === 2) return;
       if (activeWordRef.current || openTimerRef.current !== null) {
         hideTooltip();
+      }
+    };
+
+    const onPointerUp = (event: PointerEvent) => {
+      if (event.pointerType !== 'touch' || !touchStartRef.current) return;
+      const start = touchStartRef.current;
+      touchStartRef.current = null;
+      const dist = Math.hypot(event.clientX - start.x, event.clientY - start.y);
+      const elapsed = Date.now() - start.time;
+      if (!start.wordEl || dist >= 10 || elapsed >= 380 || hasNonCollapsedSelection()) return;
+
+      if (!start.wordEl.closest('.jlpt-option')) {
+        suppressClickUntilRef.current = Date.now() + 450;
+      }
+      if (activeWordRef.current === start.wordEl) {
+        hideTooltip();
+      } else {
+        showForWord(start.wordEl);
+      }
+    };
+
+    const onPointerCancel = () => {
+      touchStartRef.current = null;
+    };
+
+    const onClickCapture = (event: MouseEvent) => {
+      if (Date.now() >= suppressClickUntilRef.current) return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('.gloss-word[data-gloss-key]') && !target.closest('.jlpt-option')) {
+        event.preventDefault();
+        event.stopPropagation();
+        suppressClickUntilRef.current = 0;
       }
     };
 
@@ -224,12 +271,16 @@ export function GlossaryTooltip() {
     document.addEventListener('pointerover', onPointerOver, true);
     document.addEventListener('pointerout', onPointerOut, true);
     document.addEventListener('pointerdown', onPointerDown, true);
+    document.addEventListener('pointerup', onPointerUp, true);
+    document.addEventListener('pointercancel', onPointerCancel, true);
+    document.addEventListener('click', onClickCapture, true);
     document.addEventListener('scroll', onScroll, true);
     window.addEventListener('keydown', onKeyDown, true);
     window.addEventListener('blur', onBlur);
 
     return () => {
       clearTimers();
+      touchStartRef.current = null;
       if (activeWordRef.current) {
         activeWordRef.current.classList.remove('is-gloss-active');
         activeWordRef.current.removeAttribute('aria-describedby');
@@ -238,6 +289,9 @@ export function GlossaryTooltip() {
       document.removeEventListener('pointerover', onPointerOver, true);
       document.removeEventListener('pointerout', onPointerOut, true);
       document.removeEventListener('pointerdown', onPointerDown, true);
+      document.removeEventListener('pointerup', onPointerUp, true);
+      document.removeEventListener('pointercancel', onPointerCancel, true);
+      document.removeEventListener('click', onClickCapture, true);
       document.removeEventListener('scroll', onScroll, true);
       window.removeEventListener('keydown', onKeyDown, true);
       window.removeEventListener('blur', onBlur);
@@ -273,7 +327,7 @@ export function GlossaryTooltip() {
       className={className}
       data-placement={active?.placement ?? 'top'}
       style={manualStyle}
-      {...({ popover: 'hint' } as Record<string, string>)}
+      {...({ popover: 'manual' } as Record<string, string>)}
     >
       {entry && (
         <div className="gloss-popover-inner">
@@ -292,6 +346,14 @@ export function GlossaryTooltip() {
             >
               {entry.p === '助' ? '助詞' : entry.p}
             </span>
+            <button
+              type="button"
+              className="gloss-close"
+              onClick={hideTooltip}
+              aria-label="关闭释义"
+            >
+              ×
+            </button>
           </div>
           <div className="gloss-zh" lang="zh-CN">
             {entry.z}

@@ -29,7 +29,7 @@ export function ForceRefreshButton() {
   return (
     <button
       type="button"
-      className={refreshing ? 'icon-btn is-spinning' : 'icon-btn'}
+      className={refreshing ? 'icon-btn refresh-btn is-spinning' : 'icon-btn refresh-btn'}
       onClick={handleForceRefresh}
       disabled={refreshing}
       aria-label="强制刷新"
