@@ -4,6 +4,7 @@ import {
   AUTO_MODEL_ID,
   GEMINI_MODELS,
   clearKey,
+  clearModelCooldowns,
   deleteInteraction,
   fetchAvailableModels,
   loadCachedModels,
@@ -15,6 +16,7 @@ import {
   streamChatWithFallback,
   transcribeMixedAudio,
   type ChatMessage,
+  type FallbackReason,
   type GeminiContent,
   type ModelOption,
 } from '../lib/gemini';
@@ -214,6 +216,7 @@ export function AiChat({
   const [busy, setBusy] = useState(false);
   const [thinking, setThinking] = useState(false);
   const [thinkingStatus, setThinkingStatus] = useState('');
+  const [thinkingElapsed, setThinkingElapsed] = useState(0);
   const [recording, setRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
   const [error, setError] = useState('');
@@ -786,6 +789,18 @@ export function AiChat({
   );
 
   useEffect(() => {
+    if (!thinking) {
+      setThinkingElapsed(0);
+      return;
+    }
+    setThinkingElapsed(0);
+    const id = window.setInterval(() => {
+      setThinkingElapsed((prev) => prev + 1);
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [thinking]);
+
+  useEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = 'auto';
@@ -819,28 +834,53 @@ export function AiChat({
       abortRef.current = controller;
       let received = false;
 
+      let modelsForTurn = availableModels;
       const labelFor = (modelId: string) =>
-        availableModels.find((item) => item.id === modelId)?.label ??
+        modelsForTurn.find((item) => item.id === modelId)?.label ??
         GEMINI_MODELS.find((item) => item.id === modelId)?.label ??
         modelId;
 
       try {
+        if (model === AUTO_MODEL_ID && !loadCachedModels(key).fromCache) {
+          setThinkingStatus('正在获取可用模型…');
+          try {
+            const fetched = await fetchAvailableModels(key, {
+              signal: controller.signal,
+              timeoutMs: 3000,
+            });
+            if (fetched.length) {
+              modelsForTurn = fetched;
+              setAvailableModels(fetched);
+            }
+          } catch {
+            // 拉取失败或超时则继续使用当前候选列表。
+          }
+        }
         const candidates =
-          model === AUTO_MODEL_ID ? pickAutoCandidates(availableModels) : [model];
+          model === AUTO_MODEL_ID ? pickAutoCandidates(modelsForTurn) : [model];
         const result = await streamChatWithFallback({
           key,
           candidates,
           contents,
           signal: controller.signal,
           onAttempt: ({ model: attemptModel, fallbackReason }) => {
+            setThinkingElapsed(0);
             const name = labelFor(attemptModel);
-            if (fallbackReason === 'timeout') {
-              setThinkingStatus(`响应较慢，已切换至 ${name}…`);
-            } else if (fallbackReason === 'error') {
-              setThinkingStatus(`当前模型暂不可用，已切换至 ${name}…`);
+            const prefixByReason: Record<FallbackReason, string> = {
+              timeout: '前序模型超 20 秒未回复',
+              rate_limit: '前序模型限流（429）',
+              unavailable: '前序模型不可用',
+              server_error: '前序模型服务繁忙',
+              error: '前序模型异常',
+            };
+            if (fallbackReason) {
+              setThinkingStatus(`${prefixByReason[fallbackReason]}，已切换至 ${name}…`);
             } else {
               setThinkingStatus(`正在由 ${name} 解析…`);
             }
+          },
+          onThinking: ({ model: thinkingModel }) => {
+            setThinkingStatus(`正在由 ${labelFor(thinkingModel)} 思考中…`);
           },
           onDelta: (delta) => {
             if (!received) {
@@ -931,6 +971,7 @@ export function AiChat({
   const refreshModels = useCallback(async () => {
     const activeKey = keyDraft.trim() || key;
     if (!activeKey || refreshingModels) return;
+    clearModelCooldowns();
     setRefreshingModels(true);
     try {
       const list = await fetchAvailableModels(activeKey, { force: true });
@@ -1198,6 +1239,7 @@ export function AiChat({
                     <i />
                   </span>
                   {thinkingStatus || '正在解析…'}
+                  {thinkingElapsed >= 3 ? `（${thinkingElapsed}s）` : ''}
                 </div>
               ) : null}
 

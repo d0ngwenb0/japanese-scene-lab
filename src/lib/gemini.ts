@@ -5,6 +5,8 @@ const MODELS_CACHE_TTL_MS = 12 * 60 * 60 * 1000;
 
 export const AUTO_MODEL_ID = 'auto';
 
+export type FallbackReason = 'timeout' | 'rate_limit' | 'unavailable' | 'server_error' | 'error';
+
 export interface ModelOption {
   id: string;
   label: string;
@@ -86,10 +88,14 @@ function keyFingerprint(key: string): string {
   return `${trimmed.slice(0, 6)}:${trimmed.slice(-4)}:${trimmed.length}`;
 }
 
-export function loadCachedModels(key: string): { models: ModelOption[]; fresh: boolean } {
+export function loadCachedModels(key: string): {
+  models: ModelOption[];
+  fresh: boolean;
+  fromCache: boolean;
+} {
   try {
     const raw = localStorage.getItem(MODELS_CACHE_STORAGE);
-    if (!raw) return { models: GEMINI_MODELS, fresh: false };
+    if (!raw) return { models: GEMINI_MODELS, fresh: false, fromCache: false };
     const parsed = JSON.parse(raw) as {
       keyFp?: string;
       fetchedAt?: number;
@@ -101,17 +107,17 @@ export function loadCachedModels(key: string): { models: ModelOption[]; fresh: b
       parsed.models.length > 0
     ) {
       const fresh = typeof parsed.fetchedAt === 'number' && Date.now() - parsed.fetchedAt < MODELS_CACHE_TTL_MS;
-      return { models: parsed.models, fresh };
+      return { models: parsed.models, fresh, fromCache: true };
     }
   } catch {
     // 忽略缓存解析失败。
   }
-  return { models: GEMINI_MODELS, fresh: false };
+  return { models: GEMINI_MODELS, fresh: false, fromCache: false };
 }
 
 export async function fetchAvailableModels(
   key: string,
-  options?: { force?: boolean; signal?: AbortSignal },
+  options?: { force?: boolean; signal?: AbortSignal; timeoutMs?: number },
 ): Promise<ModelOption[]> {
   const trimmed = key.trim();
   if (!trimmed) return GEMINI_MODELS;
@@ -121,7 +127,7 @@ export async function fetchAvailableModels(
     return cached.models;
   }
 
-  const timeoutGuard = createTimeoutSignal(options?.signal, 6000);
+  const timeoutGuard = createTimeoutSignal(options?.signal, options?.timeoutMs ?? 6000);
   let response: Response;
   try {
     response = await fetch(
@@ -206,12 +212,64 @@ export function loadKey(): string {
   }
 }
 
+const modelCooldowns = new Map<string, number>();
+
+const COOLDOWN_MS_BY_REASON: Record<FallbackReason, number> = {
+  unavailable: 30 * 60 * 1000,
+  rate_limit: 3 * 60 * 1000,
+  server_error: 60 * 1000,
+  timeout: 60 * 1000,
+  error: 60 * 1000,
+};
+
+function cooldownKey(key: string, modelId: string): string {
+  const fp = keyFingerprint(key);
+  return fp ? `${fp}::${modelId}` : '';
+}
+
+function markModelCooldown(key: string, modelId: string, reason: FallbackReason): void {
+  const k = cooldownKey(key, modelId);
+  if (!k) return;
+  modelCooldowns.set(k, Date.now() + COOLDOWN_MS_BY_REASON[reason]);
+}
+
+/** 清空会话级模型冷却记录（更换 Key 或手动刷新模型列表时调用）。 */
+export function clearModelCooldowns(): void {
+  modelCooldowns.clear();
+}
+
+function prioritizeCandidates(key: string, candidates: string[]): string[] {
+  if (candidates.length <= 1) return candidates;
+  const now = Date.now();
+  const healthy: string[] = [];
+  const cooling: Array<{ id: string; until: number }> = [];
+
+  for (const id of candidates) {
+    const k = cooldownKey(key, id);
+    const until = k ? modelCooldowns.get(k) : undefined;
+    if (until !== undefined) {
+      if (until <= now) {
+        modelCooldowns.delete(k);
+        healthy.push(id);
+      } else {
+        cooling.push({ id, until });
+      }
+    } else {
+      healthy.push(id);
+    }
+  }
+
+  cooling.sort((a, b) => a.until - b.until);
+  return [...healthy, ...cooling.map((item) => item.id)];
+}
+
 export function saveKey(key: string): void {
   try {
     localStorage.setItem(KEY_STORAGE, key.trim());
   } catch {
     // 隐私模式禁用 localStorage 时静默失败。
   }
+  clearModelCooldowns();
 }
 
 export function clearKey(): void {
@@ -221,6 +279,7 @@ export function clearKey(): void {
   } catch {
     // 同上。
   }
+  clearModelCooldowns();
 }
 
 export function loadModel(): string {
@@ -250,9 +309,32 @@ export interface InteractionError extends Error {
 function createTimeoutSignal(
   parentSignal: AbortSignal | undefined,
   timeoutMs: number,
-): { signal: AbortSignal; didTimeout: () => boolean; clearTimer: () => void; cleanup: () => void } {
+): {
+  signal: AbortSignal;
+  didTimeout: () => boolean;
+  extendToDeadline: (targetTimestamp: number) => void;
+  clearTimer: () => void;
+  cleanup: () => void;
+} {
   const controller = new AbortController();
   let timedOut = false;
+  let cleared = false;
+  let timer: ReturnType<typeof globalThis.setTimeout> | null = null;
+  let deadline = 0;
+
+  const armTimer = (ms: number) => {
+    if (timer !== null) {
+      globalThis.clearTimeout(timer);
+      timer = null;
+    }
+    if (ms <= 0 || cleared || controller.signal.aborted) return;
+    deadline = Date.now() + ms;
+    timer = globalThis.setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, ms);
+  };
+
   const onParentAbort = () => controller.abort();
   if (parentSignal) {
     if (parentSignal.aborted) {
@@ -261,15 +343,23 @@ function createTimeoutSignal(
       parentSignal.addEventListener('abort', onParentAbort, { once: true });
     }
   }
-  const timer =
-    timeoutMs > 0
-      ? globalThis.setTimeout(() => {
-          timedOut = true;
-          controller.abort();
-        }, timeoutMs)
-      : null;
+  if (timeoutMs > 0) {
+    armTimer(timeoutMs);
+  }
+
+  const extendToDeadline = (targetTimestamp: number) => {
+    if (cleared || controller.signal.aborted) return;
+    if (targetTimestamp > deadline) {
+      armTimer(targetTimestamp - Date.now());
+    }
+  };
+
   const clearTimer = () => {
-    if (timer !== null) globalThis.clearTimeout(timer);
+    cleared = true;
+    if (timer !== null) {
+      globalThis.clearTimeout(timer);
+      timer = null;
+    }
   };
   const cleanup = () => {
     clearTimer();
@@ -278,6 +368,7 @@ function createTimeoutSignal(
   return {
     signal: controller.signal,
     didTimeout: () => timedOut && !parentSignal?.aborted,
+    extendToDeadline,
     clearTimer,
     cleanup,
   };
@@ -333,7 +424,9 @@ export async function streamChat(options: {
   contents: GeminiContent[];
   signal?: AbortSignal;
   firstTokenTimeoutMs?: number;
+  maxThinkingWaitMs?: number;
   disableThinkingConfig?: boolean;
+  onThinking?: () => void;
   onDelta: (text: string) => void;
 }): Promise<{ text: string }> {
   const {
@@ -341,8 +434,10 @@ export async function streamChat(options: {
     model,
     contents,
     signal,
-    firstTokenTimeoutMs = 20000,
+    firstTokenTimeoutMs = 25000,
+    maxThinkingWaitMs,
     disableThinkingConfig,
+    onThinking,
     onDelta,
   } = options;
   const generationConfig: Record<string, unknown> = {
@@ -353,8 +448,10 @@ export async function streamChat(options: {
     generationConfig.thinkingConfig = { thinkingLevel: 'low' };
   }
 
+  const startedAt = Date.now();
   const timeoutGuard = createTimeoutSignal(signal, firstTokenTimeoutMs);
   let clearedOnText = false;
+  let notifiedThinking = false;
 
   try {
     const response = await fetch(
@@ -426,7 +523,16 @@ export async function streamChat(options: {
         const parts = candidate?.content?.parts;
         if (Array.isArray(parts)) {
           for (const part of parts) {
-            if (part.thought) continue;
+            if (part.thought) {
+              if (!clearedOnText && !notifiedThinking) {
+                notifiedThinking = true;
+                onThinking?.();
+                if (maxThinkingWaitMs && maxThinkingWaitMs > firstTokenTimeoutMs) {
+                  timeoutGuard.extendToDeadline(startedAt + maxThinkingWaitMs);
+                }
+              }
+              continue;
+            }
             if (part.text) {
               if (!clearedOnText) {
                 clearedOnText = true;
@@ -484,6 +590,9 @@ function isThinkingConfigError(error: unknown): boolean {
 function isFallbackableModelError(error: unknown): boolean {
   const err = error as InteractionError | null;
   if (!err) return false;
+  if (err.status === 400 && /API key not valid|API_KEY_INVALID/i.test(`${err.message} ${err.detail ?? ''}`)) {
+    return false;
+  }
   if (err.isTimeout) return true;
   if (err.status && [403, 404, 429, 500, 502, 503, 504].includes(err.status)) return true;
   if (err.status === 400 && /model|not found|not supported|unsupported/i.test(`${err.message} ${err.detail ?? ''}`)) {
@@ -492,10 +601,26 @@ function isFallbackableModelError(error: unknown): boolean {
   return false;
 }
 
+function classifyFallbackReason(error: unknown): FallbackReason {
+  const err = error as InteractionError | null;
+  if (!err) return 'error';
+  if (err.isTimeout) return 'timeout';
+  if (err.status === 429) return 'rate_limit';
+  if (
+    err.status === 403 ||
+    err.status === 404 ||
+    (err.status === 400 && /model|not found|not supported|unsupported/i.test(`${err.message} ${err.detail ?? ''}`))
+  ) {
+    return 'unavailable';
+  }
+  if (err.status && [500, 502, 503, 504].includes(err.status)) return 'server_error';
+  return 'error';
+}
+
 /**
  * 按候选优先级调用流式对话：
  * - 单模型若因不支持 thinkingConfig 报 400，自动去掉 thinkingConfig 重试一次；
- * - 若首选模型首字超时（10s 无回复）或在未输出前遇权限/下线/限流/5xx，自动顺延下一档候选模型。
+ * - 若首选模型超 20s（收到思考帧则宽限至 30s）未吐出正文，或在未输出前遇权限/下线/限流/5xx，自动顺延下一档候选模型并记入会话冷却。
  */
 export async function streamChatWithFallback(options: {
   key: string;
@@ -506,18 +631,22 @@ export async function streamChatWithFallback(options: {
     model: string;
     index: number;
     total: number;
-    fallbackReason?: 'timeout' | 'error';
+    fallbackReason?: FallbackReason;
   }) => void;
+  onThinking?: (info: { model: string; index: number; total: number }) => void;
   onDelta: (text: string) => void;
 }): Promise<{ text: string; usedModel: string }> {
-  const { key, candidates, contents, signal, onAttempt, onDelta } = options;
-  const list = candidates.length ? candidates : ['gemini-4-argon', 'gemini-3.8-flash'];
+  const { key, candidates, contents, signal, onAttempt, onThinking, onDelta } = options;
+  const rawList = candidates.length ? candidates : ['gemini-4-argon', 'gemini-3.8-flash'];
+  const list = prioritizeCandidates(key, rawList);
   let lastError: unknown;
-  let lastFallbackReason: 'timeout' | 'error' | undefined;
+  let lastFallbackReason: FallbackReason | undefined;
 
   for (let i = 0; i < list.length; i += 1) {
     const model = list[i];
-    const firstTokenTimeoutMs = i < list.length - 1 ? 10000 : 25000;
+    const isLast = i === list.length - 1;
+    const firstTokenTimeoutMs = isLast ? 35000 : 20000;
+    const maxThinkingWaitMs = isLast ? 55000 : 30000;
     onAttempt?.({
       model,
       index: i,
@@ -529,6 +658,9 @@ export async function streamChatWithFallback(options: {
       emitted = true;
       onDelta(delta);
     };
+    const handleThinking = () => {
+      onThinking?.({ model, index: i, total: list.length });
+    };
 
     try {
       const res = await streamChat({
@@ -537,6 +669,8 @@ export async function streamChatWithFallback(options: {
         contents,
         signal,
         firstTokenTimeoutMs,
+        maxThinkingWaitMs,
+        onThinking: handleThinking,
         onDelta: wrappedOnDelta,
       });
       return { text: res.text, usedModel: model };
@@ -550,21 +684,31 @@ export async function streamChatWithFallback(options: {
             contents,
             signal,
             firstTokenTimeoutMs,
+            maxThinkingWaitMs,
             disableThinkingConfig: true,
+            onThinking: handleThinking,
             onDelta: wrappedOnDelta,
           });
           return { text: retry.text, usedModel: model };
         } catch (retryErr) {
           if (signal?.aborted || emitted) throw retryErr;
           lastError = retryErr;
-          lastFallbackReason = (retryErr as InteractionError | null)?.isTimeout ? 'timeout' : 'error';
-          if (i < list.length - 1 && isFallbackableModelError(retryErr)) continue;
+          const reason = classifyFallbackReason(retryErr);
+          if (isFallbackableModelError(retryErr)) {
+            markModelCooldown(key, model, reason);
+          }
+          lastFallbackReason = reason;
+          if (!isLast && isFallbackableModelError(retryErr)) continue;
           throw retryErr;
         }
       }
       lastError = err;
-      lastFallbackReason = (err as InteractionError | null)?.isTimeout ? 'timeout' : 'error';
-      if (i < list.length - 1 && isFallbackableModelError(err)) continue;
+      const reason = classifyFallbackReason(err);
+      if (isFallbackableModelError(err)) {
+        markModelCooldown(key, model, reason);
+      }
+      lastFallbackReason = reason;
+      if (!isLast && isFallbackableModelError(err)) continue;
       throw err;
     }
   }
