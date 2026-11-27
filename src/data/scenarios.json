@@ -2367,19 +2367,19 @@
         "id": "narrator",
         "label": "ナレーター",
         "voice": "Aoede",
-        "style": "clear, neutral, formal JLPT exam announcer"
+        "style": "clear, natural Japanese JLPT narrator at steady normal conversational pace, no long pauses"
       },
       {
         "id": "guest",
         "label": "男の客",
         "voice": "Iapetus",
-        "style": "polite, slightly flustered Japanese male traveler calling on the phone"
+        "style": "polite, clear Japanese male traveler calling on the phone at steady normal conversational pace, no sighing or gasping"
       },
       {
         "id": "staff",
         "label": "旅館の職員",
         "voice": "Zephyr",
-        "style": "calm, warm, courteous Japanese ryokan front desk staff"
+        "style": "calm, courteous Japanese ryokan front desk staff speaking smoothly at steady normal conversational pace, no sighing or dragging"
       }
     ],
     "lines": [
@@ -2394,35 +2394,35 @@
         "speaker": "guest",
         "ja": "すみません、{今日|きょう}{宿泊|しゅく はく}の{高橋|たか はし}です。{乗|の}る{予定|よ てい}だった{電車|でん しゃ}が{遅|おく}れてしまって、{五時|ご じ}の{送迎|そう げい}バスに{間|ま}に{合|あ}いそうにないんです。",
         "zh": "不好意思，我是今天入住的高桥。原本打算坐的电车晚点了，五点的接驳车恐怕赶不上了。",
-        "style": "apologetic and slightly hurried"
+        "style": "polite, apologetic request at steady normal conversational pace, crisp start without gasping or sighing"
       },
       {
         "id": "l3",
         "speaker": "staff",
         "ja": "ご{連絡|れん らく}ありがとうございます。{五時|ご じ}の{次|つぎ}は{五時半|ご じ はん}の{最終|さい しゅう}{便|びん}がございますが、そちらには{間|ま}に{合|あ}いそうでしょうか。",
         "zh": "感谢您提前联系。五点之后还有五点半的末班接驳车，请问那一班您赶得上吗？",
-        "style": "calm, helpful ryokan tone"
+        "style": "calm, helpful ryokan staff response at steady normal conversational pace, no sighing"
       },
       {
         "id": "l4",
         "speaker": "guest",
         "ja": "{駅|えき}に{着|つ}くのが{五時|ご じ}{四十分|よん じゅっ ぷん}ごろなので、{最終|さい しゅう}{便|びん}も{難|むずか}しいです。{駅|えき}からタクシーで{向|む}かいますね。{六時|ろく じ}の{夕食|ゆう しょく}は{遅|おく}らせられますか。",
         "zh": "到站大概要五点四十了，末班车也赶不上。我从车站打车过去吧。六点的晚餐可以往后推迟吗？",
-        "style": "clear explanation and request"
+        "style": "clear explanation and polite request at steady normal conversational pace, no sighing"
       },
       {
         "id": "l5",
         "speaker": "staff",
         "ja": "{承知|しょう ち}いたしました。{夕食|ゆう しょく}は{六時半|ろく じ はん}に{変更|へん こう}しておきます。ただ、この{時間帯|じ かん たい}は{駅前|えき まえ}にタクシーが{少|すく}ないので、{着|つ}く{前|まえ}に{予約|よ やく}アプリで{呼|よ}んでおいたほうがいいですよ。",
         "zh": "明白了，晚餐这边我先帮您改到六点半。不过这个时间段车站前出租车很少，您最好在到站前先用叫车软件预约一下哦。",
-        "style": "reassuring and thoughtful advice"
+        "style": "reassuring, courteous advice at steady normal conversational pace, crisp transition without sighing or long pauses"
       },
       {
         "id": "l6",
         "speaker": "guest",
         "ja": "なるほど、それは{助|たす}かります。じゃあ、{今|いま}すぐアプリでタクシーを{手配|て はい}します。",
         "zh": "原来如此，太感谢提醒了。那我现在马上用软件预约出租车。",
-        "style": "relieved and decisive"
+        "style": "grateful, decisive closing at steady normal conversational pace, crisp start without gasping or sighing"
       },
       {
         "id": "l7",
